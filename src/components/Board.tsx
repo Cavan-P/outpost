@@ -24,12 +24,14 @@ interface Props {
   blind?: boolean
   /** Rendered directly under the board (e.g. a "line complete" strip) — never covering it. */
   result?: ReactNode
+  /** 'large' lets the board grow past the usual 620px on pages where it's the main event */
+  size?: 'default' | 'large'
 }
 
 const EMPTY = '8/8/8/8/8/8/8/8'
 
 
-export function Board({ fen, orientation, onMove, interactive = true, arrows = [], lastMove, flash, player, blind = false, result }: Props) {
+export function Board({ fen, orientation, onMove, interactive = true, arrows = [], lastMove, flash, player, blind = false, result, size = 'default' }: Props) {
   const settings = useSettings()
   const [light, dark] = boardColors(settings)
   const [selected, setSelected] = useState<string | null>(null)
@@ -103,7 +105,7 @@ export function Board({ fen, orientation, onMove, interactive = true, arrows = [
   // The board fills its container's height, so pin the container to a square.
   return (
     // sized to the window height too, so the board and the result strip under it fit on screen together
-    <div className="mx-auto w-full self-start" style={{ maxWidth: 'min(620px, max(320px, calc(100vh - 240px)))' }}>
+    <div className="mx-auto w-full self-start" style={{ maxWidth: size === 'large' ? 'min(820px, max(320px, calc(100vh - 250px)))' : 'min(620px, max(320px, calc(100vh - 240px)))' }}>
       <div className="relative aspect-square w-full select-none">
         <Chessboard
           options={{

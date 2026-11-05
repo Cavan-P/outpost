@@ -14,7 +14,10 @@ import { reviewMove } from '../../lib/review'
 export function MistakePuzzles({ puzzles, title, onBack, onOpenGame }: { puzzles: MistakePuzzle[]; title: string; onBack: () => void; onOpenGame: (gameId: string, ply: number) => void }) {
   const profile = useProfile()
   const solvedSet = new Set(profile.sets.ownPuzzles ?? [])
-  const order = [...puzzles].sort((a, b) => Number(solvedSet.has(a.id)) - Number(solvedSet.has(b.id)))
+  // Fix the order once per session (unsolved first). Re-sorting on every render would move the
+  // puzzle you just solved to the back mid-answer — the board would jump to the next position
+  // and "Next" would skip one.
+  const [order] = useState(() => [...puzzles].sort((a, b) => Number(solvedSet.has(a.id)) - Number(solvedSet.has(b.id))))
   const [i, setI] = useState(0)
   const [state, setState] = useState<'solving' | 'checking' | 'solved' | 'failed'>('solving')
   const [note, setNote] = useState('')

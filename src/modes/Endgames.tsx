@@ -46,6 +46,7 @@ export function Endgames() {
   const profile = useProfile()
   const solved = new Set(profile.sets.endgames ?? [])
   const [def, setDef] = useState<EndgameDef>(ENDGAMES[0])
+  const [category, setCategory] = useState<EndgameDef['category']>(ENDGAMES[0].category)
   const [moves, setMoves] = useState<string[]>([])
   const [hint, setHint] = useState<Explanation | null>(null)
   const [hintUci, setHintUci] = useState<string | null>(null)
@@ -117,6 +118,7 @@ export function Endgames() {
 
   function choose(d: EndgameDef) {
     setDef(d)
+    setCategory(d.category)
     setMoves([])
     setHint(null)
     setHintUci(null)
@@ -146,103 +148,112 @@ export function Endgames() {
   const categories = [...new Set(ENDGAMES.map((e) => e.category))]
 
   return (
-    <div className="grid xl:grid-cols-[220px_minmax(0,1fr)] 2xl:grid-cols-[240px_minmax(0,520px)_1fr] gap-6">
-      <aside className="space-y-4 xl:max-h-[calc(100vh-7rem)] xl:overflow-auto pr-1">
-        <p className="text-xs text-zinc-500">
-          {solved.size}/{ENDGAMES.length} solved
-        </p>
-        {categories.map((cat) => (
-          <div key={cat} className="space-y-1.5">
-            <h3 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{cat}</h3>
-            {ENDGAMES.filter((d) => d.category === cat).map((d) => (
-              <button key={d.id} onClick={() => choose(d)} className={`w-full text-left rounded-lg px-3 py-2 ring-1 transition ${d === def ? 'bg-zinc-800 ring-brand-500/50' : 'ring-white/5 hover:bg-zinc-900'}`}>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="font-medium text-zinc-100 text-sm">{d.name}</span>
-                  {solved.has(d.id) && <span className="text-emerald-400 text-xs">✓</span>}
-                </div>
-                <span className="text-xs text-zinc-500">
-                  {d.level} · {GOAL_LABEL[d.goal]} as {d.side === 'w' ? 'White' : 'Black'}
-                </span>
-              </button>
-            ))}
-          </div>
-        ))}
-      </aside>
-
-      <div className="space-y-3">
-        <Board fen={fen} orientation={def.side === 'w' ? 'white' : 'black'} onMove={onMove} interactive={!result} player={def.side} arrows={arrows} lastMove={last ? { from: last.slice(0, 2), to: last.slice(2, 4) } : null} blind={blind && !peek}
-          result={
-            result ? (
-              <ResultCard
-                tone={result.ok ? 'success' : 'fail'}
-                title={result.ok ? 'Solved!' : 'Not this time'}
-                subtitle={
-                  <>
-                    <p>{result.text}</p>
-                    {stars > 0 && (
-                      <p className="mt-1 text-lg text-amber-300">
-                        {'★'.repeat(stars)}
-                        {'☆'.repeat(3 - stars)} <span className="text-sm text-zinc-400">{myMoves} moves · perfect play: {optimal}</span>
-                      </p>
-                    )}
-                  </>
-                }
-                onPrimary={result.ok ? () => choose(ENDGAMES[(ENDGAMES.indexOf(def) + 1) % ENDGAMES.length]) : () => choose(def)}
-                primaryLabel={result.ok ? 'Next endgame' : 'Try again'}
+    <div className="space-y-5">
+      {/* compact picker: category tabs + the endgames in that category */}
+      <div className="space-y-2">
+        <div className="flex flex-wrap items-center gap-x-1 gap-y-2 border-b border-white/10">
+          {categories.map((cat) => {
+            const inCat = ENDGAMES.filter((d) => d.category === cat)
+            const done = inCat.filter((d) => solved.has(d.id)).length
+            return (
+              <button
+                key={cat}
+                onClick={() => setCategory(cat)}
+                className={`-mb-px border-b-2 px-3 py-2 text-sm transition ${category === cat ? 'border-brand-400 text-zinc-50' : 'border-transparent text-zinc-500 hover:text-zinc-200'}`}
               >
-                {result.ok && (
-                  <button className="btn-secondary" onClick={() => choose(def)}>
-                    Again
-                  </button>
-                )}
-              </ResultCard>
-            ) : undefined
-          }
-        />
-        <div className="flex flex-wrap gap-2">
-          <button className="btn-secondary" onClick={() => choose(def)}>⟲ Restart</button>
-          <button
-            className="btn-secondary"
-            onClick={() => {
-              assisted.current = true
-              setMoves((m) => m.slice(0, Math.max(0, m.length - 2)))
-            }}
-            disabled={moves.length < 2 || !!result}
-          >
-            ← Take back
-          </button>
-          <button className="btn-secondary" onClick={askHint} disabled={!!result || chess.turn() !== def.side}>Hint</button>
-          <span className="ml-auto text-sm text-zinc-500 self-center">
-            {thinking ? 'Stockfish is thinking…' : `${myMoves} move${myMoves === 1 ? '' : 's'}`}
-            {def.holdMoves && !result ? ` / hold ${def.holdMoves}` : ''}
+                {cat} <span className="text-xs text-zinc-500">{done}/{inCat.length}</span>
+              </button>
+            )
+          })}
+          <span className="ml-auto pb-2 text-xs text-zinc-500">
+            {solved.size}/{ENDGAMES.length} solved
           </span>
         </div>
-        <BlindfoldBar blind={blind} setBlind={setBlind} setPeek={setPeek} fen={fen} onMove={onMove} myTurn={!result && chess.turn() === def.side} />
+        <div className="flex flex-wrap gap-1.5">
+          {ENDGAMES.filter((d) => d.category === category).map((d) => (
+            <button key={d.id} onClick={() => choose(d)} className={`chip !px-2.5 !py-0.5 text-xs ${d === def ? 'chip-active' : ''}`} title={`${d.level} · ${GOAL_LABEL[d.goal]} as ${d.side === 'w' ? 'White' : 'Black'}`}>
+              {solved.has(d.id) && <span className="mr-1 text-emerald-400">✓</span>}
+              {d.name}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="space-y-4 min-w-0">
-        <section className="rounded-xl bg-zinc-900/80 ring-1 ring-white/5 p-4 space-y-3">
-          <h2 className="text-lg font-semibold text-zinc-100">{def.name}</h2>
-          {optimal && (
-            <p className="text-xs text-amber-300/90">
-              Perfect play mates in {optimal} moves · ★★★ for ≤{optimal}, ★★ for ≤{optimal + 4}
-              {profile.bests[`eg-${def.id}`] ? ` · your best ${'★'.repeat(profile.bests[`eg-${def.id}`])}` : ''}
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_260px] xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="min-w-0 space-y-3">
+          <Board size="large" fen={fen} orientation={def.side === 'w' ? 'white' : 'black'} onMove={onMove} interactive={!result} player={def.side} arrows={arrows} lastMove={last ? { from: last.slice(0, 2), to: last.slice(2, 4) } : null} blind={blind && !peek}
+            result={
+              result ? (
+                <ResultCard
+                  tone={result.ok ? 'success' : 'fail'}
+                  title={result.ok ? 'Solved!' : 'Not this time'}
+                  subtitle={
+                    <>
+                      <p>{result.text}</p>
+                      {stars > 0 && (
+                        <p className="mt-1 text-lg text-amber-300">
+                          {'★'.repeat(stars)}
+                          {'☆'.repeat(3 - stars)} <span className="text-sm text-zinc-400">{myMoves} moves · perfect play: {optimal}</span>
+                        </p>
+                      )}
+                    </>
+                  }
+                  onPrimary={result.ok ? () => choose(ENDGAMES[(ENDGAMES.indexOf(def) + 1) % ENDGAMES.length]) : () => choose(def)}
+                  primaryLabel={result.ok ? 'Next endgame' : 'Try again'}
+                >
+                  {result.ok && (
+                    <button className="btn-secondary" onClick={() => choose(def)}>
+                      Again
+                    </button>
+                  )}
+                </ResultCard>
+              ) : undefined
+            }
+          />
+          <div className="flex flex-wrap gap-2">
+            <button className="btn-secondary" onClick={() => choose(def)}>⟲ Restart</button>
+            <button
+              className="btn-secondary"
+              onClick={() => {
+                assisted.current = true
+                setMoves((m) => m.slice(0, Math.max(0, m.length - 2)))
+              }}
+              disabled={moves.length < 2 || !!result}
+            >
+              ← Take back
+            </button>
+            <button className="btn-secondary" onClick={askHint} disabled={!!result || chess.turn() !== def.side}>Hint</button>
+            <span className="ml-auto text-sm text-zinc-500 self-center">
+              {thinking ? 'Stockfish is thinking…' : `${myMoves} move${myMoves === 1 ? '' : 's'}`}
+              {def.holdMoves && !result ? ` / hold ${def.holdMoves}` : ''}
+            </span>
+          </div>
+          <BlindfoldBar blind={blind} setBlind={setBlind} setPeek={setPeek} fen={fen} onMove={onMove} myTurn={!result && chess.turn() === def.side} />
+        </div>
+
+        <div className="space-y-4 min-w-0">
+          <section className="rounded-xl bg-zinc-900/80 ring-1 ring-white/5 p-4 space-y-3">
+            <h2 className="text-lg font-semibold text-zinc-100">{def.name}</h2>
+            {optimal && (
+              <p className="text-xs text-amber-300/90">
+                Perfect play mates in {optimal} moves · ★★★ for ≤{optimal}, ★★ for ≤{optimal + 4}
+                {profile.bests[`eg-${def.id}`] ? ` · your best ${'★'.repeat(profile.bests[`eg-${def.id}`])}` : ''}
+              </p>
+            )}
+            <p className="text-sm text-zinc-300">{def.summary}</p>
+            <p className="text-xs text-zinc-500">
+              Goal: {GOAL_LABEL[def.goal]}
+              {def.holdMoves ? ` (or survive ${def.holdMoves} moves)` : ''} · first solve +100 XP, blindfold ×2, hints/take-backs halve it
             </p>
-          )}
-          <p className="text-sm text-zinc-300">{def.summary}</p>
-          <p className="text-xs text-zinc-500">
-            Goal: {GOAL_LABEL[def.goal]}
-            {def.holdMoves ? ` (or survive ${def.holdMoves} moves)` : ''} · first solve +100 XP, blindfold ×2, hints/take-backs halve it
-          </p>
-          {result && <div className={`rounded-lg p-3 text-sm font-semibold ${result.ok ? 'bg-emerald-950/50 text-emerald-300' : 'bg-red-950/50 text-red-300'}`}>{result.text}</div>}
-          <h3 className="text-sm font-semibold tracking-wide text-zinc-300 uppercase pt-1">Technique</h3>
-          <ol className="list-decimal pl-5 space-y-1 text-sm text-zinc-300">
-            {def.technique.map((t) => (
-              <li key={t}>{t}</li>
-            ))}
-          </ol>
-        </section>
-        {hint && <WhyList explanation={hint} title={`Hint: ${hint.san}`} />}
+            <h3 className="text-sm font-semibold tracking-wide text-zinc-300 uppercase pt-1">Technique</h3>
+            <ol className="list-decimal pl-5 space-y-1 text-sm text-zinc-300">
+              {def.technique.map((t) => (
+                <li key={t}>{t}</li>
+              ))}
+            </ol>
+          </section>
+          {hint && <WhyList explanation={hint} title={`Hint: ${hint.san}`} />}
+        </div>
       </div>
     </div>
   )
