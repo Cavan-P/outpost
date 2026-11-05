@@ -1,0 +1,22 @@
+# Caddy config for hosting Outpost on a small VPS (e.g. a DigitalOcean droplet).
+# Replace the domain, copy the built `dist/` folder to /var/www/outpost, and Caddy
+# fetches and renews the HTTPS certificate on its own.
+outpost.example.com {
+	root * /var/www/outpost
+	encode zstd gzip
+	file_server
+
+	header {
+		Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://lichess.org https://api.chess.com https://tablebase.lichess.ovh; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+		Cross-Origin-Opener-Policy "same-origin"
+		-Server
+	}
+	@hashed path /assets/*
+	header @hashed Cache-Control "public, max-age=31536000, immutable"
+	@engine path /engine/*
+	header @engine Cache-Control "public, max-age=604800"
+}

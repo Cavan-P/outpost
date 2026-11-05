@@ -1,0 +1,130 @@
+body {
+  margin: 0;
+  background: var(--app-bg);
+  color: var(--color-zinc-200);
+  /* clicking around a chess UI shouldn't paint text selections everywhere */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+input,
+textarea,
+code,
+.select-text {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* white hairline rings become dark hairlines on the light theme */
+:root[data-theme='paper'] .ring-white\/5,
+:root[data-theme='paper'] .ring-white\/10 {
+  --tw-ring-color: rgb(0 0 0 / 0.08);
+}
+
+@layer components {
+  .btn-primary {
+    @apply rounded-lg bg-brand-600 px-3.5 py-1.5 text-sm font-medium text-white transition hover:bg-brand-500 disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .btn-secondary {
+    @apply rounded-lg bg-zinc-800 px-3.5 py-1.5 text-sm font-medium text-zinc-200 ring-1 ring-white/5 transition hover:bg-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+  .chip {
+    @apply rounded-full px-3 py-1 text-sm font-medium bg-zinc-900 text-zinc-300 ring-1 ring-white/10 hover:bg-zinc-800;
+  }
+  .chip-active {
+    @apply bg-brand-600 text-white ring-brand-500;
+  }
+  .chip-good {
+    @apply font-mono bg-emerald-900/50 text-emerald-200 ring-emerald-500/40 hover:bg-emerald-800/60;
+  }
+  .chip-bad {
+    @apply font-mono bg-rose-950/50 text-rose-200 ring-rose-500/40 hover:bg-rose-900/60;
+  }
+  .input {
+    @apply rounded-lg bg-zinc-800 px-2.5 py-1.5 text-sm text-zinc-100 ring-1 ring-white/10 outline-none focus:ring-brand-500;
+  }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to { opacity: 1; transform: none; }
+}
+.toast-in { animation: toast-in 180ms ease-out; }
+
+@keyframes pop-in {
+  0% { opacity: 0; transform: scale(0.85); }
+  60% { opacity: 1; transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+.pop-in { animation: pop-in 320ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.fade-in { animation: fade-in 200ms ease-out both; }
+
+@keyframes burst {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0.4); opacity: 0; }
+}
+.burst { animation: burst 900ms ease-out forwards; }
+
+/* ───────────── minimal themes (Onyx, Obsidian, Noir Rouge, Mono) ─────────────
+   flatter surfaces, hairline borders, tighter corners and a serif display face */
+:root[data-minimal] {
+  --font-display: 'Cormorant Garamond', 'Times New Roman', serif;
+}
+:root[data-minimal] .rounded-xl { border-radius: 4px; }
+:root[data-minimal] .rounded-2xl { border-radius: 6px; }
+:root[data-minimal] .rounded-lg { border-radius: 3px; }
+:root[data-minimal] .chip { border-radius: 2px; letter-spacing: 0.04em; }
+:root[data-minimal] .bg-zinc-900\/80,
+:root[data-minimal] .bg-zinc-900\/60 {
+  background-color: rgb(255 255 255 / 0.018);
+}
+:root[data-minimal] .ring-white\/5 { --tw-ring-color: rgb(255 255 255 / 0.07); }
+:root[data-minimal] .ring-white\/10 { --tw-ring-color: rgb(255 255 255 / 0.1); }
+:root[data-minimal] h1,
+:root[data-minimal] h2,
+:root[data-minimal] .font-display {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+:root[data-minimal] h1 { font-size: 2.4rem; line-height: 1.1; }
+:root[data-minimal] .shadow-2xl,
+:root[data-minimal] .shadow-lg { box-shadow: none; }
+/* gold / platinum buttons read better with dark text */
+:root[data-theme='onyx'] .btn-primary,
+:root[data-theme='onyx'] .chip-active,
+:root[data-theme='onyx'] .bg-brand-600,
+:root[data-theme='obsidian'] .btn-primary,
+:root[data-theme='obsidian'] .chip-active,
+:root[data-theme='obsidian'] .bg-brand-600,
+:root[data-theme='mono'] .btn-primary,
+:root[data-theme='mono'] .chip-active {
+  color: #0a0a0a;
+}
+:root[data-theme='mono'] .bg-brand-600,
+:root[data-theme='mono'] .btn-primary { background-color: #e5e5e5; }
+
+/* the quieter details of the minimal themes */
+:root[data-minimal] .btn-secondary {
+  background-color: transparent;
+  --tw-ring-color: rgb(255 255 255 / 0.12);
+}
+:root[data-minimal] .btn-secondary:hover { background-color: rgb(255 255 255 / 0.04); }
+:root[data-minimal] .chip { background-color: transparent; }
+:root[data-minimal] .chip-active {
+  background-color: transparent;
+  color: var(--color-brand-300);
+  --tw-ring-color: var(--color-brand-400);
+}
+:root[data-minimal] .input { background-color: rgb(255 255 255 / 0.03); }
+:root[data-minimal] .toast-in {
+  background-color: #0b0b0b !important;
+  color: var(--color-brand-300) !important;
+  --tw-ring-color: rgb(255 255 255 / 0.12) !important;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+:root[data-minimal] .emoji { filter: grayscale(1) brightness(1.15); }
+:root[data-minimal] .burst { display: none; }
