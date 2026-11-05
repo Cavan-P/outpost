@@ -1,6 +1,6 @@
 import { Chess, type Color, type PieceSymbol, type Square } from 'chess.js'
 import { allOpenings } from './custom'
-import { getBatchEngine, uciToSan, winProb } from './engine'
+import { getBatchEngine, scoreValue, uciToSan, winProb } from './engine'
 import { VALUE, enPrise, explainMove, material, pieceName } from './explain'
 import type { GameAnalysis, ImportedGame, MoveAnalysis, Score } from './games'
 import { bookMoves, flipOpening, getTree, type TreeNode } from './tree'
@@ -102,6 +102,47 @@ function terminalScore(fen: string): Score | null {
   return null
 }
 
+/** Bump when the labelling rules change; stored analyses get relabelled by `relabel()`. */
+export const ANALYSIS_VERSION = 2
+
+/** Re-apply the current labelling rules to a stored analysis — no engine needed, the evals are saved. */
+export function relabel(game: ImportedGame): GameAnalysis | null {
+  const a = game.analysis
+  if (!a || a.version === ANALYSIS_VERSION) return null
+  const fens = fensOf(game.sans, game.startFen)
+  const moves = a.moves.map((m, i) => {
+    const mover: Color = new Chess(fens[i]).turn()
+    const cls = classifyMove(m.before, m.after, mover, m.uci === m.best)
+    const tags = [m.tags[0]]
+    if (cls === 'mistake' || cls === 'blunder') tags.push(...tagMistake(fens[i], fens[i + 1], m, mover))
+    return { ...m, cls, tags }
+  })
+  return { ...a, version: ANALYSIS_VERSION, moves }
+}
+
+const SEVERITY: MoveAnalysis['cls'][] = ['best', 'good', 'inaccuracy', 'mistake', 'blunder']
+
+/**
+ * How a move is labelled, from the evaluation before and after it (both from White's point of view).
+ * Two yardsticks, and the worse verdict wins:
+ *  - winning chances (lichess-style): catches throwing away a win or a draw, and missed mates;
+ *  - pawns of evaluation lost: catches tactical errors in positions that are already lopsided,
+ *    where winning chances barely move (e.g. hanging a knight at −5.6). Only applied while the
+ *    game isn't completely decided, so "mate in 5 instead of mate in 3" isn't called a mistake.
+ */
+export function classifyMove(before: Score, after: Score, mover: Color, isBest: boolean): MoveAnalysis['cls'] {
+  if (isBest) return 'best'
+  const loss = Math.max(0, wp(before, mover) - wp(after, mover))
+  const byChances = SEVERITY.indexOf(loss < 0.01 ? 'best' : loss < 0.05 ? 'good' : loss < 0.1 ? 'inaccuracy' : loss < 0.15 ? 'mistake' : 'blunder')
+  const sign = mover === 'w' ? 1 : -1
+  const b = scoreValue(before)
+  const a = scoreValue(after)
+  const pawns = Math.max(0, sign * (b - a))
+  const undecided = Math.min(Math.abs(b), Math.abs(a)) <= 8
+  const byPawns = !undecided ? 0 : SEVERITY.indexOf(pawns < 0.8 ? 'best' : pawns < 1.5 ? 'inaccuracy' : pawns < 3 ? 'mistake' : 'blunder')
+  return SEVERITY[Math.max(byChances, byPawns)]
+}
+
 /** Analyse every move of a game. `onProgress(done, total)` is called as positions are evaluated. */
 export async function analyzeGame(game: ImportedGame, depth: number, onProgress?: (done: number, total: number) => void, shouldStop?: () => boolean): Promise<GameAnalysis | null> {
   const fens = fensOf(game.sans, game.startFen)
@@ -142,7 +183,7 @@ export async function analyzeGame(game: ImportedGame, depth: number, onProgress?
       reply: evals[i + 1].pv.slice(0, 10),
       loss,
     }
-    const cls: MoveAnalysis['cls'] = uci === best || loss < 0.01 ? 'best' : loss < 0.05 ? 'good' : loss < 0.1 ? 'inaccuracy' : loss < 0.15 ? 'mistake' : 'blunder'
+    const cls = classifyMove(before, afterScore, mover, uci === best)
     const tags: string[] = [phaseOf(fens[i], i + 1)]
     if (cls === 'mistake' || cls === 'blunder') tags.push(...tagMistake(fens[i], fens[i + 1], base, mover))
     moves.push({ ...base, cls, tags })
@@ -150,7 +191,7 @@ export async function analyzeGame(game: ImportedGame, depth: number, onProgress?
     acc[mover].push(Math.max(0, Math.min(100, 103.1668 * Math.exp(-0.04354 * loss * 100) - 3.1669)))
   }
   const avg = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0)
-  return { depth, moves, accuracy: { w: avg(acc.w), b: avg(acc.b) } }
+  return { version: ANALYSIS_VERSION, depth, moves, accuracy: { w: avg(acc.w), b: avg(acc.b) } }
 }
 
 // ───────────── repertoire check ─────────────

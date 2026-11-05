@@ -12,7 +12,8 @@
     "postinstall": "node -e \"const fs=require('fs');fs.mkdirSync('public/engine',{recursive:true});for(const e of ['js','wasm'])fs.copyFileSync('node_modules/stockfish/bin/stockfish-19-lite-single.'+e,'public/engine/stockfish-19-lite-single.'+e);fs.copyFileSync('node_modules/stockfish/Copying.txt','public/engine/COPYING.txt')\"",
     "test:explain": "rolldown scripts/explain-check.ts --file node_modules/.cache/explain-check.mjs --platform node --format esm --transform.define 'import.meta.env.BASE_URL=\"/\"' --log-level silent && node node_modules/.cache/explain-check.mjs",
     "audit": "rolldown scripts/audit.ts --file node_modules/.cache/audit.mjs --platform node --format esm --transform.define 'import.meta.env.BASE_URL=\"/\"' --log-level silent && node node_modules/.cache/audit.mjs",
-    "test:review": "rolldown scripts/review-check.ts --file node_modules/.cache/review-check.mjs --platform node --format esm --transform.define 'import.meta.env.BASE_URL=\"/\"' --log-level silent && node node_modules/.cache/review-check.mjs"
+    "test:review": "rolldown scripts/review-check.ts --file node_modules/.cache/review-check.mjs --platform node --format esm --transform.define 'import.meta.env.BASE_URL=\"/\"' --log-level silent && node node_modules/.cache/review-check.mjs",
+    "analyze-pgn": "rolldown scripts/analyze-pgn.ts --file node_modules/.cache/analyze-pgn.mjs --platform node --format esm --transform.define 'import.meta.env.BASE_URL=\"/\"' --log-level silent && node node_modules/.cache/analyze-pgn.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.4",

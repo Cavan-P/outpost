@@ -30,6 +30,7 @@ expect('learned mate pattern included', s.includes('mate:back-rank'), s)
 expect('London never appears', !s.some((x) => x.includes('london')), s)
 
 // 3. a trap you attempted in Training comes back even without studying its opening
+mem['ctt.progress.v1'] = '{}' // nothing studied, so the attempted trap is the only candidate
 s = describe(buildSession({ puzzlesSeen: ['london:d4 d5 Bf4 c5 e3 Qb6 Nc3 Qxb2'] }))
 expect('attempted London trap returns', s.includes('trap:london'), s)
 process.exit(fail ? 1 : 0)
