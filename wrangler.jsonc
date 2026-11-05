@@ -1,0 +1,9 @@
+// Cloudflare Workers config: serves the static `dist/` build (no server code).
+// `public/_headers` is copied into dist and applied by Cloudflare automatically.
+{
+  "name": "outpost",
+  "compatibility_date": "2025-10-01",
+  "assets": {
+    "directory": "./dist"
+  }
+}
