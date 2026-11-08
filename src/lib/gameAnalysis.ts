@@ -113,14 +113,22 @@ const TACTICAL = (t: string) => t.startsWith('hung-') || t === 'allowed-fork' ||
  */
 export function labelMove(fenBefore: string, fenAfter: string, m: Omit<MoveAnalysis, 'tags' | 'cls'>, mover: Color): { cls: MoveAnalysis['cls']; tags: string[] } {
   let cls = classifyMove(m.before, m.after, mover, m.uci === m.best)
-  if (cls !== 'inaccuracy' && cls !== 'mistake' && cls !== 'blunder') return { cls, tags: [] }
+  if (cls === 'best') return { cls, tags: [] }
+  if (cls === 'good') {
+    // Eval swings say little once a game is decided (−8 → −9.5 barely changes the winning chances),
+    // so a "good" move still gets checked for a concrete tactic: if the opponent's best reply is a
+    // fork / hung piece / mating attack that really nets material, it's a mistake.
+    const tags = tagMistake(fenBefore, fenAfter, m, mover)
+    const nets = m.after.mate !== undefined || settledGain(fenAfter, m.reply) >= 2
+    return tags.some(TACTICAL) && nets ? { cls: 'mistake', tags } : { cls, tags: [] }
+  }
   const tags = tagMistake(fenBefore, fenAfter, m, mover)
   if (cls === 'inaccuracy' && tags.some(TACTICAL)) cls = 'mistake'
   return { cls, tags: cls === 'inaccuracy' ? [] : tags }
 }
 
 /** Bump when the labelling rules change; stored analyses get relabelled by `relabel()`. */
-export const ANALYSIS_VERSION = 3
+export const ANALYSIS_VERSION = 4
 
 /** Re-apply the current labelling rules to a stored analysis — no engine needed, the evals are saved. */
 export function relabel(game: ImportedGame): GameAnalysis | null {
