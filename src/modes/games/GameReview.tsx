@@ -6,7 +6,7 @@ import { EvalGraph } from '../../components/EvalGraph'
 import { formatPv, formatScore } from '../../lib/engine'
 import { explainMove } from '../../lib/explain'
 import { TAG_LABEL, fensOf } from '../../lib/gameAnalysis'
-import { safeUrl, userResult, type ImportedGame, type MoveAnalysis } from '../../lib/games'
+import { removeGame, safeUrl, setNotMine, userResult, type ImportedGame, type MoveAnalysis } from '../../lib/games'
 
 const CLS_STYLE: Record<MoveAnalysis['cls'], { label: string; color: string; mark: string }> = {
   best: { label: 'Best', color: 'text-emerald-400', mark: '' },
@@ -19,7 +19,7 @@ const CLS_STYLE: Record<MoveAnalysis['cls'], { label: string; color: string; mar
 export function GameReview({ game, initialPly = 0, onBack }: { game: ImportedGame; initialPly?: number; onBack: () => void }) {
   const fens = useMemo(() => fensOf(game.sans), [game.sans])
   const [ply, setPly] = useState(initialPly) // 0 = start position; n = after move n
-  const [onlyMine, setOnlyMine] = useState(true)
+  const [onlyMine, setOnlyMine] = useState(!game.notMine)
   const moves = game.analysis?.moves ?? []
   const move = ply > 0 ? moves[ply - 1] : undefined
   const mine = (m: MoveAnalysis) => (m.ply % 2 === 1 ? 'w' : 'b') === game.userColor
@@ -50,14 +50,36 @@ export function GameReview({ game, initialPly = 0, onBack }: { game: ImportedGam
           {game.white} – {game.black} <span className="text-zinc-500">{game.result}</span>
         </h1>
         <p className="text-sm text-zinc-500">
-          {game.opening ?? 'Unknown opening'} · you were {game.userColor === 'w' ? 'White' : 'Black'} · {res}
-          {game.analysis && ` · your accuracy ${game.analysis.accuracy[game.userColor].toFixed(0)}% (opponent ${game.analysis.accuracy[game.userColor === 'w' ? 'b' : 'w'].toFixed(0)}%)`}
+          {game.opening ?? 'Unknown opening'}
+          {game.notMine
+            ? game.analysis && ` · accuracy White ${game.analysis.accuracy.w.toFixed(0)}%, Black ${game.analysis.accuracy.b.toFixed(0)}%`
+            : <>
+                {` · you were ${game.userColor === 'w' ? 'White' : 'Black'} · ${res}`}
+                {game.analysis && ` · your accuracy ${game.analysis.accuracy[game.userColor].toFixed(0)}% (opponent ${game.analysis.accuracy[game.userColor === 'w' ? 'b' : 'w'].toFixed(0)}%)`}
+              </>}
           {safeUrl(game.url) && (
             <a className="ml-2 text-brand-400 hover:underline" href={safeUrl(game.url)} target="_blank" rel="noopener noreferrer">
               original ↗
             </a>
           )}
         </p>
+        <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
+          <label className="flex items-center gap-2 text-zinc-400" title="Games that aren't yours can be analysed, but stay out of your mistake report, puzzles and daily review">
+            <input type="checkbox" checked={!!game.notMine} onChange={(e) => setNotMine(game.id, e.target.checked)} />
+            Not my game — analysis only
+          </label>
+          <button
+            className="text-zinc-600 hover:text-red-400"
+            onClick={() => {
+              if (confirm('Remove this game and its analysis?')) {
+                removeGame(game.id)
+                onBack()
+              }
+            }}
+          >
+            Remove game
+          </button>
+        </div>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,560px)_1fr]">

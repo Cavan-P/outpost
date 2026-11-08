@@ -162,7 +162,7 @@ async function evalQuestion(): Promise<{ fen: string; value: number; label: stri
     const m = g.analysis!.moves[Math.floor(Math.random() * g.analysis!.moves.length)]
     const c = new Chess()
     for (const s of g.sans.slice(0, m.ply - 1)) c.move(s)
-    return { fen: c.fen(), value: scoreValue(m.before), label: formatScore(m.before), bestSan: m.bestSan, source: `your game vs ${g.userColor === 'w' ? g.black : g.white}` }
+    return { fen: c.fen(), value: scoreValue(m.before), label: formatScore(m.before), bestSan: m.bestSan, source: g.notMine ? `${g.white} – ${g.black}` : `your game vs ${g.userColor === 'w' ? g.black : g.white}` }
   }
   const def = OPENINGS[Math.floor(Math.random() * OPENINGS.length)]
   const nodes = [...getTree(def).nodes.values()].filter((n) => n.ply >= 8)

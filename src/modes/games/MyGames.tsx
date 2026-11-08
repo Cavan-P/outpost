@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import type { PieceSymbol } from 'chess.js'
 import { runAnalysis, stopAnalysis, useRunner } from '../../lib/analysisRunner'
 import { TAG_LABEL, buildReport, type Report } from '../../lib/gameAnalysis'
-import { addGames, clearGames, fetchChessCom, fetchLichess, parsePgnText, useGames, userResult, type ImportedGame } from '../../lib/games'
+import { addGames, clearGames, fetchChessCom, fetchLichess, myGames, parsePgnText, useGames, userResult, type ImportedGame } from '../../lib/games'
 import { GameReview } from './GameReview'
 import { MistakePuzzles } from './MistakePuzzles'
 
@@ -11,7 +11,8 @@ type Sub = { kind: 'report' } | { kind: 'game'; id: string; ply?: number } | { k
 export function MyGames({ onOpenOpening }: { onOpenOpening: (id: string, flip: boolean) => void }) {
   const store = useGames()
   const [sub, setSub] = useState<Sub>({ kind: 'report' })
-  const report = useMemo(() => buildReport(store.games), [store.games])
+  // only your own games feed the report and puzzles; ones imported "just to analyse" are listed but left out
+  const report = useMemo(() => buildReport(myGames(store.games)), [store.games])
 
   if (sub.kind === 'game') {
     const g = store.games.find((x) => x.id === sub.id)
@@ -32,7 +33,11 @@ export function MyGames({ onOpenOpening }: { onOpenOpening: (id: string, flip: b
       {report.analysed > 0 ? (
         <ReportView report={report} onTrain={(tag) => setSub({ kind: 'puzzles', tag })} onOpenOpening={onOpenOpening} />
       ) : (
-        store.games.length > 0 && <p className="text-sm text-zinc-400">Run the analysis to see your report.</p>
+        store.games.length > 0 && (
+          <p className="text-sm text-zinc-400">
+            {myGames(store.games).length ? 'Run the analysis to see your report.' : 'These games are marked "analysis only", so there\'s no report on your play yet — import your own games for that.'}
+          </p>
+        )
       )}
       {store.games.length > 0 && <GameList games={store.games} onOpen={(id) => setSub({ kind: 'game', id })} />}
     </div>
@@ -49,6 +54,7 @@ function Importer() {
   const [pgn, setPgn] = useState('')
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
+  const [notMine, setNotMine] = useState(false)
 
   async function go() {
     setBusy(true)
@@ -56,8 +62,8 @@ function Importer() {
     try {
       const games = source === 'lichess' ? await fetchLichess(user.trim(), count) : source === 'chess.com' ? await fetchChessCom(user.trim(), count) : parsePgnText(pgn, user)
       if (!games.length) throw new Error(source === 'pgn' ? "Couldn't read any games from that PGN." : 'No standard games found.')
-      const added = addGames(user.trim(), source, games)
-      setMsg({ ok: true, text: `Imported ${games.length} game${games.length === 1 ? '' : 's'} (${added} new).` })
+      const added = addGames(user.trim(), source, games, notMine)
+      setMsg({ ok: true, text: `Imported ${games.length} game${games.length === 1 ? '' : 's'} (${added} new)${notMine ? ' to analyse only — they won\'t count towards your report or puzzles' : ''}.` })
     } catch (e) {
       setMsg({ ok: false, text: e instanceof TypeError ? "Couldn't reach the server — check your connection." : (e as Error).message })
     } finally {
@@ -85,6 +91,10 @@ function Importer() {
             ))}
           </select>
         )}
+        <label className="flex items-center gap-2 text-sm text-zinc-400" title="For games you didn't play: you can analyse them, but they stay out of your mistake report, puzzles and daily review">
+          <input type="checkbox" checked={notMine} onChange={(e) => setNotMine(e.target.checked)} />
+          Not my games — just analyse
+        </label>
         <button className="btn-primary" onClick={go} disabled={busy || (source === 'pgn' ? !pgn.trim() : !user.trim())}>
           {busy ? 'Importing…' : 'Import'}
         </button>
@@ -328,18 +338,27 @@ function GameList({ games, onOpen }: { games: ImportedGame[]; onOpen: (id: strin
       <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-500">Games</h2>
       <div className="divide-y divide-white/5 rounded-xl ring-1 ring-white/5">
         {games.slice(0, shown).map((g) => {
-          const res = userResult(g)
+          const res = g.notMine ? (g.result === '1/2-1/2' ? '½–½' : g.result) : userResult(g)
           const blunders = g.analysis?.moves.filter((m, i) => (i % 2 === 0 ? 'w' : 'b') === g.userColor && m.cls === 'blunder').length
           return (
             <button key={g.id} onClick={() => onOpen(g.id)} className="flex w-full flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2.5 text-left text-sm hover:bg-white/[0.02]">
               <span className={`w-12 font-semibold ${res === 'win' ? 'text-emerald-400' : res === 'loss' ? 'text-red-400' : 'text-zinc-400'}`}>{res}</span>
               <span className="min-w-0 flex-1 truncate text-zinc-200">
-                {g.userColor === 'w' ? '♔' : '♚'} vs {g.userColor === 'w' ? g.black : g.white}
+                {g.notMine ? (
+                  <>
+                    {g.white} – {g.black}
+                    <span className="ml-2 rounded px-1.5 py-0.5 text-[10px] uppercase tracking-wider text-zinc-400 ring-1 ring-white/10">analysis only</span>
+                  </>
+                ) : (
+                  <>
+                    {g.userColor === 'w' ? '♔' : '♚'} vs {g.userColor === 'w' ? g.black : g.white}
+                  </>
+                )}
                 <span className="ml-2 text-xs text-zinc-500">{g.opening ?? ''}</span>
               </span>
               <span className="text-xs text-zinc-500">{g.speed ?? g.source}</span>
               <span className="w-24 text-right text-xs text-zinc-400">
-                {g.analysis ? `${g.analysis.accuracy[g.userColor].toFixed(0)}% · ${blunders}✗` : 'not analysed'}
+                {!g.analysis ? 'not analysed' : g.notMine ? `${g.analysis.accuracy.w.toFixed(0)}% / ${g.analysis.accuracy.b.toFixed(0)}%` : `${g.analysis.accuracy[g.userColor].toFixed(0)}% · ${blunders}✗`}
               </span>
               <span className="w-20 text-right text-xs text-zinc-600">{g.date ? new Date(g.date).toLocaleDateString() : ''}</span>
             </button>

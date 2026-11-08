@@ -45,7 +45,12 @@ export interface ImportedGame {
   /** set for positions that didn't start from the initial position (graded play-outs) */
   startFen?: string
   analysis?: GameAnalysis
+  /** someone else's game, imported just to look at: kept out of your report, puzzles and review */
+  notMine?: boolean
 }
+
+/** The games that are really yours — the only ones that feed the report, mistake puzzles and daily review. */
+export const myGames = (games: ImportedGame[]) => games.filter((g) => !g.notMine)
 
 interface Store {
   username: string
@@ -87,17 +92,25 @@ export function useGames(): Store {
 
 export const getGames = () => store
 
-export function addGames(username: string, source: Store['source'], games: ImportedGame[]) {
+export function addGames(username: string, source: Store['source'], games: ImportedGame[], notMine = false) {
   const known = new Set(store.games.map((g) => g.id))
-  store.username = username
-  store.source = source
-  store.games = [...store.games, ...games.filter((g) => !known.has(g.id))].sort((a, b) => b.date - a.date)
+  // importing someone else's games shouldn't overwrite the username you use for your own
+  if (!notMine) {
+    store.username = username
+    store.source = source
+  }
+  store.games = [...store.games, ...games.filter((g) => !known.has(g.id)).map((g) => (notMine ? { ...g, notMine: true } : g))].sort((a, b) => b.date - a.date)
   commit()
   return games.filter((g) => !known.has(g.id)).length
 }
 
 export function saveAnalysis(id: string, analysis: GameAnalysis) {
   store.games = store.games.map((g) => (g.id === id ? { ...g, analysis } : g))
+  commit()
+}
+
+export function setNotMine(id: string, notMine: boolean) {
+  store.games = store.games.map((g) => (g.id === id ? { ...g, notMine } : g))
   commit()
 }
 

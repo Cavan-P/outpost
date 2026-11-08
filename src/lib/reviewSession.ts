@@ -5,7 +5,7 @@ import { MATES } from '../data/mates'
 import type { OpeningDef } from '../data/openings'
 import { allOpenings } from './custom'
 import { buildReport, type MistakePuzzle } from './gameAnalysis'
-import { getGames } from './games'
+import { getGames, myGames } from './games'
 import { getProgress, isDue, progressOf, type NodeStat } from './progress'
 import { PUZZLES, type Puzzle } from './puzzles'
 import { flipOpening, getTree, userDecisionNodes, type TreeNode } from './tree'
@@ -60,7 +60,7 @@ export function buildSession(sets: Record<string, string[]>): Item[] {
     .slice(0, 2)
     .map((puzzle) => ({ kind: 'trap', puzzle }))
   // mistakes from your own games that you've already had a go at
-  const ownPool = buildReport(getGames().games).puzzles.filter((p) => has('ownPuzzlesSeen', p.id) || has('ownPuzzles', p.id))
+  const ownPool = buildReport(myGames(getGames().games)).puzzles.filter((p) => has('ownPuzzlesSeen', p.id) || has('ownPuzzles', p.id))
   const own: Item[] = [...pick(ownPool.filter((p) => !has('ownPuzzles', p.id)), 3), ...pick(ownPool, 3)]
     .filter((p, i, a) => a.indexOf(p) === i)
     .slice(0, 3)
