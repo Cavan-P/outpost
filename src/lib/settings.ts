@@ -3,7 +3,7 @@ import { useSyncExternalStore } from 'react'
 // ───────────── themes ─────────────
 
 export type ThemeId = 'onyx' | 'obsidian' | 'noir' | 'mono' | 'forest' | 'crimson' | 'midnight' | 'paper'
-export type BoardId = 'theme' | 'green' | 'brown' | 'blue' | 'red' | 'grey' | 'ink' | 'ivory' | 'slate' | 'carbon'
+export type BoardId = 'theme' | 'green' | 'brown' | 'blue' | 'red' | 'grey' | 'ink' | 'ivory' | 'slate' | 'carbon' | 'walnut' | 'marble' | 'ocean' | 'rose' | 'tournament' | 'royal' | 'emerald' | 'champion'
 
 export const THEMES: { id: ThemeId; name: string; desc: string; swatch: [string, string, string]; minimal?: boolean }[] = [
   { id: 'onyx', name: 'Onyx', desc: 'Black and gold', swatch: ['#000000', '#c5a059', '#9a7b56'], minimal: true },
@@ -29,6 +29,15 @@ export const BOARDS: Record<Exclude<BoardId, 'theme'>, { name: string; colors: [
   ivory: { name: 'Ivory', colors: ['#ebe3d1', '#9a7b56'] },
   slate: { name: 'Slate', colors: ['#d3d6d9', '#5b6168'] },
   carbon: { name: 'Carbon', colors: ['#bdbdbd', '#4f4f4f'] },
+  // collectibles — unlocked by playing (see lib/meta.ts)
+  walnut: { name: 'Walnut', colors: ['#e8cfa6', '#7b4f2c'] },
+  marble: { name: 'Marble', colors: ['#f4f1ea', '#a9a49a'] },
+  ocean: { name: 'Ocean', colors: ['#d6eaf0', '#2f6f86'] },
+  rose: { name: 'Rose', colors: ['#f6e3e5', '#b5677a'] },
+  tournament: { name: 'Tournament', colors: ['#f0f0dc', '#4e7a4a'] },
+  royal: { name: 'Royal', colors: ['#e9e2f3', '#5b3f8c'] },
+  emerald: { name: 'Emerald', colors: ['#dff2e7', '#1f7a55'] },
+  champion: { name: 'Champion', colors: ['#f3e7c4', '#8a6a1f'] },
 }
 
 const THEME_BOARD: Record<ThemeId, Exclude<BoardId, 'theme'>> = { onyx: 'ivory', obsidian: 'slate', noir: 'carbon', mono: 'grey', forest: 'green', crimson: 'red', midnight: 'blue', paper: 'brown' }
@@ -47,10 +56,12 @@ export interface Settings {
   coordinates: boolean
   animationMs: number
   xpPopups: boolean
+  /** skip the promotion picker and always make a queen */
+  autoQueen: boolean
 }
 
 const KEY = 'ctt.settings.v1'
-const DEFAULTS: Settings = { depth: 18, autoReplyMs: 450, theme: 'onyx', board: 'theme', coordinates: true, animationMs: 180, xpPopups: true }
+const DEFAULTS: Settings = { depth: 18, autoReplyMs: 450, theme: 'onyx', board: 'theme', coordinates: true, animationMs: 180, xpPopups: true, autoQueen: false }
 
 function load(): Settings {
   try {

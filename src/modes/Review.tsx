@@ -71,7 +71,7 @@ export function Review({ onDone }: { onDone: () => void }) {
   function onMove(m: BoardMove) {
     if (state !== 'ask' || !q) return false
     const uci = m.from + m.to + (m.promotion ?? '')
-    const hit = q.answers.some((a) => a === uci || a.slice(0, 4) === uci.slice(0, 4))
+    const hit = q.answers.some((a) => a === uci || (a.length === 4 && a === uci.slice(0, 4)))
     if (item.kind === 'book') {
       const change = recordAnswer(item.def.id, item.node.id, hit ? 'correct' : 'wrong')
       if (hit) {

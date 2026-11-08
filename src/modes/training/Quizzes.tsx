@@ -9,7 +9,7 @@ import { boardColors, useSettings } from '../../lib/settings'
 import { START_FEN as START_POS, getTree, pathTo } from '../../lib/tree'
 import { DrillShell, shuffle, type DrillApi } from './shared'
 
-function Mini({ fen, orientation }: { fen: string; orientation: 'white' | 'black' }) {
+export function Mini({ fen, orientation }: { fen: string; orientation: 'white' | 'black' }) {
   const [light, dark] = boardColors(useSettings())
   return (
     <div className="aspect-square w-full max-w-[520px] select-none">
@@ -19,7 +19,7 @@ function Mini({ fen, orientation }: { fen: string; orientation: 'white' | 'black
 }
 
 /** Round-based quiz frame (no timer): N rounds, score, personal best, XP. */
-function RoundShell({ id, title, blurb, rounds, xpPer, children }: { id: string; title: string; blurb: string; rounds: number; xpPer: number; children: (api: { answer: (points: number) => void; round: number }) => React.ReactNode }) {
+export function RoundShell({ id, title, blurb, rounds, xpPer, children }: { id: string; title: string; blurb: string; rounds: number; xpPer: number; children: (api: { answer: (points: number) => void; round: number }) => React.ReactNode }) {
   const profile = useProfile()
   const [round, setRound] = useState(0)
   const [score, setScore] = useState(0)

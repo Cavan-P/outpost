@@ -6,7 +6,11 @@ import { ColoursDrill, CoordinatesDrill, CountingDrill, KnightDrill } from './Vi
 import { CalculationDrill, NotationDrill } from './Visualize'
 import { MatingPatterns } from './Mates'
 import { MATES } from '../../data/mates'
+import { MASTER_GAMES } from '../../data/masters'
 import { EvalGuess, NameOpening, PlanQuiz } from './Quizzes'
+import { DefendIt } from './Defend'
+import { MasterGames } from './Masters'
+import { StructureQuiz } from './Structures'
 
 type Group = 'Vision' | 'Tactics' | 'Judgement'
 const GROUPS: { id: Group; blurb: string }[] = [
@@ -15,12 +19,15 @@ const GROUPS: { id: Group; blurb: string }[] = [
   { id: 'Judgement', blurb: 'Know who is better, and why.' },
 ]
 
-type Drill = 'coords' | 'colours' | 'knight' | 'count' | 'puzzles' | 'notation' | 'calc' | 'mates' | 'plans' | 'evalguess' | 'nameopening'
+type Drill = 'coords' | 'colours' | 'knight' | 'count' | 'puzzles' | 'notation' | 'calc' | 'mates' | 'plans' | 'evalguess' | 'nameopening' | 'defend' | 'masters' | 'structures'
 
 const DRILLS: { id: Drill; group: Group; name: string; desc: string; bestKey?: string }[] = [
   { id: 'puzzles', group: 'Tactics', name: 'Trap puzzles', desc: 'Punish the blunders from the opening traps you studied.' },
   { id: 'calc', group: 'Vision', name: 'Calculate it', desc: 'Follow a narrated line in your head — "knight b4, bishop e2 check" — then say what\'s where.', bestKey: 'calc' },
   { id: 'notation', group: 'Vision', name: 'Name the move', desc: 'An arrow appears; type the move by its squares. Builds fluent notation.', bestKey: 'notation' },
+  { id: 'defend', group: 'Tactics', name: 'Defend it', desc: 'The reverse of trap puzzles: you are the one being tricked. Find the move that does not walk into it.' },
+  { id: 'masters', group: 'Judgement', name: "Guess the master's move", desc: 'Play through famous games — the Opera Game, the Immortal, Fischer\'s Game of the Century — and guess each move.' },
+  { id: 'structures', group: 'Judgement', name: 'Pawn structures', desc: 'Carlsbad, IQP, Maróczy, Stonewall… recognise the structure, pick the plan.', bestKey: 'structures' },
   { id: 'mates', group: 'Tactics', name: 'Mating patterns', desc: 'Back-rank, smothered, Arabian, Anastasia, Boden and more — learn them on the board.' },
   { id: 'evalguess', group: 'Judgement', name: 'Guess the eval', desc: "Who's better, and by how much? Uses your own games when you've imported some.", bestKey: 'evalguess' },
   { id: 'plans', group: 'Judgement', name: 'Plans & ideas', desc: 'Match each opening to its plans — understanding, not just memory.', bestKey: 'plans' },
@@ -52,11 +59,14 @@ export function Training({ onBlindfold }: { onBlindfold: () => void }) {
         {drill === 'plans' && <PlanQuiz />}
         {drill === 'evalguess' && <EvalGuess />}
         {drill === 'nameopening' && <NameOpening />}
+        {drill === 'defend' && <DefendIt />}
+        {drill === 'masters' && <MasterGames />}
+        {drill === 'structures' && <StructureQuiz />}
       </div>
     )
 
   const stat = (d: (typeof DRILLS)[number]) =>
-    d.id === 'puzzles' ? `${(profile.sets.puzzles ?? []).length}/${PUZZLES.length}` : d.id === 'mates' ? `${(profile.sets.mates ?? []).length}/${MATES.length}` : profile.bests[d.bestKey!] ? `best ${profile.bests[d.bestKey!]}` : ''
+    d.id === 'puzzles' ? `${(profile.sets.puzzles ?? []).length}/${PUZZLES.length}` : d.id === 'defend' ? `${(profile.sets.defended ?? []).length} held` : d.id === 'masters' ? `${(profile.sets.mastersPassed ?? []).length}/${MASTER_GAMES.length}` : d.id === 'mates' ? `${(profile.sets.mates ?? []).length}/${MATES.length}` : profile.bests[d.bestKey!] ? `best ${profile.bests[d.bestKey!]}` : ''
   const row = (key: string, name: string, desc: string, onClick: () => void, right = '') => (
     <button key={key} onClick={onClick} className="group flex w-full items-baseline gap-6 py-4 text-left">
       <span className="w-48 shrink-0 text-lg text-zinc-100 group-hover:text-brand-300">{name}</span>

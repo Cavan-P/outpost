@@ -36,6 +36,8 @@ export function Board({ fen, orientation, onMove, interactive = true, arrows = [
   const [light, dark] = boardColors(settings)
   const [selected, setSelected] = useState<string | null>(null)
   const [premove, setPremove] = useState<{ from: string; to: string } | null>(null)
+  // a pawn move waiting for you to pick the promotion piece
+  const [promo, setPromo] = useState<{ from: string; to: string; color: 'w' | 'b' } | null>(null)
   const chess = useMemo(() => new Chess(fen), [fen])
   const premoving = !!player && chess.turn() !== player && !chess.isGameOver()
   const mover = premoving ? player : chess.turn()
@@ -80,9 +82,31 @@ export function Board({ fen, orientation, onMove, interactive = true, arrows = [
     const { chess, onMove } = live.current
     const legal = chess.moves({ square: from as Square, verbose: true }).find((m) => m.to === to)
     if (!legal || !onMove) return false
-    // Auto-queen: underpromotion is rare enough in opening/endgame drills.
+    if (legal.promotion && !settings.autoQueen) {
+      setPromo({ from, to, color: legal.color })
+      return false
+    }
     return onMove({ from, to, promotion: legal.promotion ? 'q' : undefined })
   }
+
+  function promote(piece: 'q' | 'r' | 'b' | 'n') {
+    const p = promo
+    setPromo(null)
+    if (p) live.current.onMove?.({ from: p.from, to: p.to, promotion: piece })
+  }
+
+  // a new position (or the board going read-only) cancels an open picker
+  useEffect(() => setPromo(null), [fen, interactive])
+  useEffect(() => {
+    if (!promo) return
+    const k = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setPromo(null)
+      const p = ({ q: 'q', r: 'r', b: 'b', n: 'n', k: 'n' } as const)[e.key.toLowerCase() as 'q']
+      if (p) promote(p)
+    }
+    window.addEventListener('keydown', k)
+    return () => window.removeEventListener('keydown', k)
+  }, [promo]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const squareStyles: Record<string, React.CSSProperties> = {}
   if (lastMove) {
@@ -100,13 +124,14 @@ export function Board({ fen, orientation, onMove, interactive = true, arrows = [
       ? { background: 'radial-gradient(circle, transparent 58%, rgba(15,23,42,0.35) 60%)' }
       : { background: 'radial-gradient(circle, rgba(15,23,42,0.3) 22%, transparent 24%)' }
   }
+  if (promo) squareStyles[promo.to] = { background: 'rgba(56, 189, 248, 0.5)' }
   if (flash) squareStyles[flash.square] = { background: flash.color === 'good' ? 'rgba(34,197,94,0.6)' : 'rgba(239,68,68,0.6)' }
 
   // The board fills its container's height, so pin the container to a square.
   return (
     // sized to the window height too, so the board and the result strip under it fit on screen together
     <div className="mx-auto w-full self-start" style={{ maxWidth: size === 'large' ? 'min(820px, max(320px, calc(100vh - 250px)))' : 'min(620px, max(320px, calc(100vh - 240px)))' }}>
-      <div className="relative aspect-square w-full select-none">
+      <div className="relative aspect-square w-full select-none" style={{ containerType: 'inline-size' }}>
         <Chessboard
           options={{
             position: blind ? EMPTY : fen,
@@ -153,8 +178,40 @@ export function Board({ fen, orientation, onMove, interactive = true, arrows = [
             },
           }}
         />
+        {promo && <PromotionPicker promo={promo} orientation={orientation} onPick={promote} onCancel={() => setPromo(null)} />}
       </div>
       {result && <div className="mt-3">{result}</div>}
+    </div>
+  )
+}
+
+const GLYPH = { w: { q: '♕', r: '♖', b: '♗', n: '♘' }, b: { q: '♛', r: '♜', b: '♝', n: '♞' } } as const
+
+/** Four pieces stacked over the promotion square (towards the board's centre), like on Lichess. */
+function PromotionPicker({ promo, orientation, onPick, onCancel }: { promo: { to: string; color: 'w' | 'b' }; orientation: 'white' | 'black'; onPick: (p: 'q' | 'r' | 'b' | 'n') => void; onCancel: () => void }) {
+  const file = promo.to.charCodeAt(0) - 97
+  const col = orientation === 'white' ? file : 7 - file
+  const rank = Number(promo.to[1])
+  const atTop = (orientation === 'white') === (rank === 8)
+  return (
+    <div className="absolute inset-0 z-10 bg-black/40" onClick={onCancel} onContextMenu={(e) => (e.preventDefault(), onCancel())}>
+      <div
+        className="absolute flex flex-col overflow-hidden rounded-md shadow-2xl ring-1 ring-white/20"
+        style={{ left: `${col * 12.5}%`, width: '12.5%', ...(atTop ? { top: 0 } : { bottom: 0, flexDirection: 'column-reverse' }) }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {(['q', 'n', 'r', 'b'] as const).map((p) => (
+          <button
+            key={p}
+            onClick={() => onPick(p)}
+            title={`Promote to ${{ q: 'queen', r: 'rook', b: 'bishop', n: 'knight' }[p]} (${p === 'n' ? 'N' : p.toUpperCase()})`}
+            className="flex aspect-square w-full items-center justify-center bg-zinc-100 leading-none text-zinc-900 hover:bg-amber-200"
+            style={{ fontSize: '10cqw' }}
+          >
+            {GLYPH[promo.color][p]}
+          </button>
+        ))}
+      </div>
     </div>
   )
 }

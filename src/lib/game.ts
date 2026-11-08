@@ -18,6 +18,10 @@ export interface Profile {
   today: { day: string; counts: Record<string, number>; done: string[]; xpBySource: Record<string, number>; quests?: string[] }
   /** highest medal ever reached per opening, so medal XP is paid once */
   medals: Record<string, number>
+  /** weekly league: current tier and past results */
+  league?: { tier: number; week: string; history: { week: string; tier: number; rank: number; moved: -1 | 0 | 1 }[] }
+  /** monthly season pass: which reward tiers were already paid */
+  season?: { key: string; claimed: number[] }
 }
 
 export type GameEvent =
@@ -27,6 +31,7 @@ export type GameEvent =
   | { kind: 'quest'; text: string; xp: number }
   | { kind: 'freeze'; text: string }
   | { kind: 'medal'; name: string; opening: string; xp: number }
+  | { kind: 'info'; text: string }
 
 const KEY = 'ctt.profile.v1'
 export const DAILY_GOAL = 120
@@ -136,6 +141,7 @@ function touchDay() {
     emit({ kind: 'freeze', text: `${missed === 1 ? 'A streak freeze' : `${missed} streak freezes`} saved your ${profile.streak - 1}-day streak` })
   } else profile.streak = 1
   profile.lastDay = today
+  if (profile.streak > (profile.counters.bestStreak ?? 0)) profile.counters = { ...profile.counters, bestStreak: profile.streak }
 }
 
 /** The streak shown to the user: it survives missed days only while you have freezes to cover them. */
@@ -225,6 +231,10 @@ export const QUESTS: Quest[] = [
   { id: 'blind-1', text: 'Complete a line blindfolded', counter: 'blindLines', target: 1, xp: 50 },
   { id: 'combo-10', text: 'Reach a 10-move combo in Practice', counter: 'combo10', target: 1, xp: 35 },
   { id: 'playout-1', text: 'Get a play-out graded', counter: 'playouts', target: 1, xp: 30 },
+  { id: 'gauntlet-2', text: 'Run the Opening Gauntlet twice', counter: 'gauntlets', target: 2, xp: 35 },
+  { id: 'boss-1', text: 'Defeat a boss', counter: 'bossWins', target: 1, xp: 50, available: () => Object.values(profile.medals ?? {}).some((t) => t >= 1) },
+  { id: 'defend-3', text: 'Dodge 3 traps in Defend it', counter: 'defendSolves', target: 3, xp: 35 },
+  { id: 'master-1', text: "Play through a master game", counter: 'masterGames', target: 1, xp: 40 },
 ]
 
 const hashDay = (d: string) => [...d].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) | 0, 7)
@@ -331,6 +341,19 @@ export function best(name: string, score: number) {
   return true
 }
 
+/** For the league / season modules: change the profile, optionally pay XP, save. */
+export function patchProfile(fn: (p: Profile) => void, xp = 0) {
+  fn(profile)
+  if (xp) grant(xp)
+  checkAchievements()
+  commit()
+}
+
+export const notify = (text: string) => emit({ kind: 'info', text })
+
+/** yyyy-mm-dd key for a date (local time), as used by `daily`. */
+export const dayKeyOf = (d: Date) => dayKey(d)
+
 export function resetProfile() {
   profile = empty()
   commit()
@@ -396,6 +419,16 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'medal-gold', name: 'Golden Repertoire', desc: 'Earn a Gold medal in any opening', icon: '🥇', test: (p) => Object.values(p.medals ?? {}).some((t) => t >= 3) },
   { id: 'medal-diamond', name: 'Flawless Theory', desc: 'Earn a Diamond medal in any opening', icon: '💠', test: (p) => Object.values(p.medals ?? {}).some((t) => t >= 4) },
   { id: 'medal-5', name: 'Well Prepared', desc: 'Earn medals in 5 different openings', icon: '🏅', test: (p) => Object.values(p.medals ?? {}).filter((t) => t >= 1).length >= 5 },
+  { id: 'boss-1', name: 'Giant Slayer', desc: 'Defeat your first boss', icon: '⚔️', test: (p) => (p.sets.bosses ?? []).length >= 1 },
+  { id: 'boss-5', name: 'Boss Rush', desc: 'Defeat 5 different bosses', icon: '👹', test: (p) => (p.sets.bosses ?? []).length >= 5 },
+  { id: 'gauntlet-30', name: 'Deep Prep', desc: 'Score 30 in the Opening Gauntlet', icon: '🛡️', test: (p) => Object.entries(p.bests).some(([k, v]) => k.startsWith('gauntlet:') && v >= 30) },
+  { id: 'defend-10', name: 'Unfoolable', desc: 'Dodge 10 different traps', icon: '🧱', test: (p) => (p.sets.defended ?? []).length >= 10 },
+  { id: 'masters-3', name: 'Student of the Classics', desc: "Score 70%+ on 3 master games", icon: '📚', test: (p) => (p.sets.mastersPassed ?? []).length >= 3 },
+  { id: 'course-1', name: 'Graduate', desc: 'Complete an endgame course', icon: '🎓', test: (p) => (p.sets.courses ?? []).length >= 1 },
+  { id: 'course-all', name: 'Endgame Professor', desc: 'Complete every endgame course', icon: '🏛️', test: (p) => (p.sets.courses ?? []).length >= 5 },
+  { id: 'league-up', name: 'Moving Up', desc: 'Get promoted in the weekly league', icon: '📈', test: (p) => c(p, 'promotions') >= 1 },
+  { id: 'league-top', name: 'Top Division', desc: 'Reach the Diamond league', icon: '💎', test: (p) => (p.league?.tier ?? 0) >= 9 },
+  { id: 'season-30', name: 'Season Champion', desc: 'Reach tier 30 of a season pass', icon: '🎟️', test: (p) => (p.sets.seasons ?? []).length >= 1 },
   { id: 'quests-1', name: 'Quest Giver', desc: 'Finish all three daily quests', icon: '📜', test: (p) => c(p, 'questDays') >= 1 },
   { id: 'quests-14', name: 'Fortnight of Focus', desc: 'Finish all daily quests on 14 days', icon: '🗺️', test: (p) => c(p, 'questDays') >= 14 },
 ]

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getSettings } from '../lib/settings'
+import { Collection, LeagueCard, SeasonPass, YearReview } from './MetaUI'
 import { ACHIEVEMENTS, DAILY_GOAL, MEDALS, MAX_LEVEL, lastDays, levelInfo, liveStreak, onGameEvent, questProgress, resetProfile, titleFor, todaysQuests, todayXp, useProfile, type GameEvent } from '../lib/game'
 
 /** Compact level / XP / streak / daily-goal widget for the header. */
@@ -109,7 +110,9 @@ export function Toasts() {
               ? { id, text: `📜 Quest done: ${e.text} (+${e.xp} XP)`, tone: 'gold' }
               : e.kind === 'freeze'
                 ? { id, text: `❄️ ${e.text}`, tone: 'level' }
-                : e.kind === 'medal'
+                : e.kind === 'info'
+                  ? { id, text: e.text, tone: 'level' }
+                  : e.kind === 'medal'
                   ? { id, text: `${MEDAL_ICON[e.name] ?? '🏅'} ${e.name} medal · ${e.opening} (+${e.xp} XP)`, tone: 'gold' }
                   : { id, text: `${ACHIEVEMENTS.find((a) => a.id === e.id)?.icon} Achievement: ${ACHIEVEMENTS.find((a) => a.id === e.id)?.name} (+50 XP)`, tone: 'gold' }
       setToasts((ts) => [...ts.slice(-3), t])
@@ -168,6 +171,15 @@ export function ProfilePage() {
           opening or drill all day pays less and less.
         </p>
       </section>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <LeagueCard />
+        <div className="space-y-4">
+          <SeasonPass />
+          <YearReview />
+        </div>
+      </div>
+      <Collection />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {stat('day streak 🔥', liveStreak(p))}

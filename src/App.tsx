@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { OPENINGS } from './data/openings'
 import { allOpenings, useCustomOpenings } from './lib/custom'
 import { flipOpening, getTree } from './lib/tree'
@@ -15,8 +15,10 @@ import { Practice } from './modes/Practice'
 import { Analysis } from './modes/Analysis'
 import { Endgames } from './modes/Endgames'
 import { Training } from './modes/training/Training'
+import { Arena } from './modes/Arena'
 import { ProfilePage, Toasts } from './components/GameUI'
-import { configureTotals } from './lib/game'
+import { configureTotals, getProfile, onGameEvent } from './lib/game'
+import { claimSeason, isCollectible, isUnlocked, settleLeague } from './lib/meta'
 import { getGames, myGames } from './lib/games'
 import { PUZZLES } from './lib/puzzles'
 import { ENDGAMES } from './data/endgames'
@@ -30,13 +32,27 @@ configureTotals({
   hasGameAnalysis: () => myGames(getGames().games).some((g) => g.analysis),
 })
 
-type View = { kind: 'home' } | { kind: 'opening'; id: string; mode: 'learn' | 'practice'; flip: boolean } | { kind: 'analysis'; fen?: string; key: number; blind?: boolean } | { kind: 'endgames' } | { kind: 'training' } | { kind: 'profile' } | { kind: 'games' } | { kind: 'review'; key: number } | { kind: 'builder' } | { kind: 'about' }
+type View = { kind: 'home' } | { kind: 'opening'; id: string; mode: 'learn' | 'practice'; flip: boolean } | { kind: 'analysis'; fen?: string; key: number; blind?: boolean } | { kind: 'endgames' } | { kind: 'training' } | { kind: 'arena' } | { kind: 'profile' } | { kind: 'games' } | { kind: 'review'; key: number } | { kind: 'builder' } | { kind: 'about' }
 
 const sideName = (s: 'w' | 'b') => (s === 'w' ? 'White' : 'Black')
 
 export default function App() {
   const [view, setView] = useState<View>({ kind: 'home' })
   const [showSettings, setShowSettings] = useState(false)
+  // weekly league results and season-pass rewards (after mount, so their toasts are visible)
+  useEffect(() => {
+    const t = setTimeout(() => {
+      settleLeague()
+      claimSeason()
+    }, 800)
+    const off = onGameEvent((e) => {
+      if (e.kind === 'xp') setTimeout(claimSeason, 0)
+    })
+    return () => {
+      clearTimeout(t)
+      off()
+    }
+  }, [])
   const analyze = (fen: string) => setView({ kind: 'analysis', fen, key: Date.now() })
 
   useCustomOpenings() // re-render when custom repertoires change
@@ -108,6 +124,7 @@ export default function App() {
 
         {view.kind === 'analysis' && <Analysis key={view.key} initialFen={view.fen} blindfold={view.blind} />}
         {view.kind === 'endgames' && <Endgames />}
+        {view.kind === 'arena' && <Arena onAnalyze={analyze} />}
         {view.kind === 'training' && <Training onBlindfold={() => setView({ kind: 'analysis', key: Date.now(), blind: true })} />}
         {view.kind === 'profile' && <ProfilePage />}
         {view.kind === 'review' && <Review key={view.key} onDone={() => setView({ kind: 'home' })} />}
@@ -173,7 +190,7 @@ function SettingsDialog({ onClose }: { onClose: () => void }) {
 
         {section('Board')}
         <div className="flex flex-wrap gap-2">
-          {(['theme', ...Object.keys(BOARDS)] as BoardId[]).map((b) => {
+          {(['theme', ...Object.keys(BOARDS)] as BoardId[]).filter((b) => !isCollectible(b) || isUnlocked(getProfile(), b)).map((b) => {
             const [light, dark] = b === 'theme' ? boardColors({ ...s, board: 'theme' }) : BOARDS[b as Exclude<BoardId, 'theme'>].colors
             return (
               <button key={b} onClick={() => set({ board: b })} className={`rounded-lg p-1.5 ring-2 ${s.board === b ? 'ring-brand-500' : 'ring-transparent hover:ring-white/10'}`} title={b === 'theme' ? 'Match theme' : BOARDS[b as Exclude<BoardId, 'theme'>].name}>
@@ -198,6 +215,7 @@ function SettingsDialog({ onClose }: { onClose: () => void }) {
             <option value={300}>Slow</option>
           </select>
         </label>
+        {toggle('Always promote to queen', s.autoQueen, (v) => set({ autoQueen: v }), 'Off: you pick the piece — some puzzles need a knight')}
         {toggle('XP pop-ups', s.xpPopups, (v) => set({ xpPopups: v }), 'Achievements and level-ups always show')}
 
         {section('Training')}

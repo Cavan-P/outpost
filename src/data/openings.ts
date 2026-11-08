@@ -20,6 +20,7 @@ export interface OpeningDef {
 
 import { EXTRA_OPENINGS } from './openings-extra'
 import { SOLID_OPENINGS } from './openings-solid'
+import { MORE_OPENINGS } from './openings-more'
 
 const CORE_OPENINGS: OpeningDef[] = [
   // ───────────────────────────── White gambits ─────────────────────────────
@@ -324,4 +325,4 @@ const CORE_OPENINGS: OpeningDef[] = [
   },
 ]
 
-export const OPENINGS: OpeningDef[] = [...CORE_OPENINGS, ...EXTRA_OPENINGS, ...SOLID_OPENINGS]
+export const OPENINGS: OpeningDef[] = [...CORE_OPENINGS, ...EXTRA_OPENINGS, ...SOLID_OPENINGS, ...MORE_OPENINGS]

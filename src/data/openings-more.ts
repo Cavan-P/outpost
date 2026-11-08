@@ -1,0 +1,157 @@
+import type { OpeningDef } from './openings'
+
+// A second batch: two more e4 gambits, a sharp d4 weapon, and four fighting defences for Black.
+
+export const MORE_OPENINGS: OpeningDef[] = [
+  {
+    id: 'urusov',
+    name: 'Urusov Gambit',
+    eco: 'C24',
+    side: 'w',
+    tags: ['gambit', 'e4', 'aggressive'],
+    summary: "From the Bishop's Opening, White gives the d-pawn for quick development and open lines against f7. A great way to dodge the Petrov.",
+    ideas: [
+      'Development first: Nf3, O-O, Nc3 and Re1 come before winning the pawn back.',
+      'The e-file and the a2–g8 diagonal are your attacking lanes.',
+      "If Black transposes to the Two Knights, you're in Max Lange territory — e5! is the key push.",
+    ],
+    lines: [
+      "e4 e5 Bc4{The Bishop's Opening.} Nf6 d4{The Urusov Gambit.} exd4 Nf3 Nxe4{Grabbing a second pawn.} Qxd4 Nf6 Bg5 Be7 Nc3 c6 O-O-O{White's whole army is out; the e-file and d-file are open.} d5 Rhe1{Every piece joins the attack.}",
+      "e4 e5 Bc4 Nf6 d4 exd4 Nf3 Bc5 O-O d6 c3{Opening more lines, Danish-style.} dxc3 Nxc3{Huge lead in development for two pawns.}",
+      "e4 e5 Bc4 Nf6 d4 exd4 Nf3 Nc6 O-O Bc5 e5{The Max Lange Attack by transposition.} d5 exf6 dxc4 Re1+ Be6 Ng5{Hitting the pinned bishop.}",
+    ],
+  },
+  {
+    id: 'ponziani',
+    name: 'Ponziani Opening',
+    eco: 'C44',
+    side: 'w',
+    tags: ['e4', 'offbeat', 'trappy'],
+    summary: '3.c3 prepares d4 with a big pawn center. Old, rare and full of tricks — most Black players have never studied it.',
+    ideas: [
+      'c3 and d4 build the center; Qa4 pins the c6-knight in many lines.',
+      'Against …Nxe4, d5! kicks the knight and the e5-pawn often falls.',
+      'Your b1-knight goes to d2, not c3 — the pawn sits there.',
+    ],
+    lines: [
+      "e4 e5 Nf3 Nc6 c3{The Ponziani: preparing d4.} Nf6{Counterattacking e4 at once.} d4 Nxe4 d5{Kicking the knight.} Ne7 Nxe5 Ng6 Qd4{Centralising and hitting the e4-knight.}",
+      "e4 e5 Nf3 Nc6 c3 d5{The sharpest reply.} Qa4{Pinning the knight.} Nf6 Nxe5 Bd6 Nxc6 bxc6 d3{A solid extra pawn for White.}",
+      "e4 e5 Nf3 Nc6 c3 d6 d4 Nf6 Nbd2{Keeping a strong, flexible center.}",
+    ],
+  },
+  {
+    id: 'belgrade',
+    name: 'Belgrade Gambit',
+    eco: 'C47',
+    side: 'w',
+    tags: ['gambit', 'e4', 'trappy'],
+    summary: 'A Four Knights with a twist: 5.Nd5!? gives the d4-pawn to drag Black into tactics. Lots of players get mated in the first ten moves.',
+    ideas: [
+      'Nd5 eyes f6, c7 and e7 — watch for Nxf6+ and Nxc7 tricks.',
+      'Win the d4-pawn back with Nxd4 when the tactics settle.',
+      'If Black grabs e4 too, Bc4, O-O and Re1 hit the knight on the open file.',
+    ],
+    lines: [
+      "e4 e5 Nf3 Nc6 Nc3 Nf6{The Four Knights.} d4 exd4 Nd5{The Belgrade Gambit.} Be7 Bf4 d6 Nxd4{Pawn regained with a nice position.} Nxd5 exd5 Nxd4 Qxd4 O-O",
+      "e4 e5 Nf3 Nc6 Nc3 Nf6 d4 exd4 Nd5 Nxe4{Greedy.} Bc4{Developing with threats against f7.} Be7 O-O O-O Re1 Nf6 Nxe7+ Nxe7 Nxd4{White has the bishop pair and active pieces.}",
+    ],
+  },
+  {
+    id: 'alekhine',
+    name: "Alekhine's Defence",
+    eco: 'B02–B05',
+    side: 'b',
+    tags: ['vs-e4', 'hypermodern', 'offbeat'],
+    summary: "1…Nf6 dares White to chase the knight and overextend. Black then attacks the big pawn center with …d6, …Bg4 and …c5.",
+    ideas: [
+      'Let White build the center — then hit it with …d6, …c5 and …Nc6.',
+      "Against the Four Pawns, don't panic: …dxe5, …Nc6 and …Bf5 pressure the overextended pawns.",
+      'The b6-knight is a target for a4-a5; keep an eye on it.',
+    ],
+    lines: [
+      "e4 Nf6{Alekhine's Defence: provoking the pawns.} e5 Nd5 d4 d6{Undermining the e5-pawn at once.} Nf3{The Modern Variation.} Bg4{Pinning the knight that defends e5.} Be2 e6 O-O Be7 c4 Nb6{A solid, flexible setup.}",
+      "e4 Nf6 e5 Nd5 d4 d6 c4 Nb6 f4{The Four Pawns Attack.} dxe5 fxe5 Nc6 Be3 Bf5{Pressure on e5 and the light squares.} Nc3 e6 Nf3 Be7",
+      "e4 Nf6 e5 Nd5 c4 Nb6 d4 d6 exd6{The Exchange Variation.} cxd6{Keeps central control.} Nc3 g6 Be3 Bg7{A fianchetto aimed at d4.}",
+      "e4 Nf6 Nc3{Declining the challenge.} d5 e5 Nfd7 d4 e6{A French-like structure.}",
+    ],
+  },
+  {
+    id: 'grunfeld',
+    name: 'Grünfeld Defence',
+    eco: 'D70–D99',
+    side: 'b',
+    tags: ['vs-d4', 'hypermodern', 'aggressive'],
+    summary: 'Black lets White build a huge center, then blows it up with …Bg7, …c5 and …Nc6. Razor-sharp and a lifelong weapon for many world champions.',
+    ideas: [
+      'The g7-bishop and …c5 target d4 — almost everything revolves around that pawn.',
+      'Trade a pair of knights on c3 to make White\'s center a target.',
+      'Castle early; the counterattack only works once your king is safe.',
+    ],
+    lines: [
+      "d4 Nf6 c4 g6 Nc3 d5{The Grünfeld.} cxd5 Nxd5 e4{The Exchange Variation: White takes the center.} Nxc3 bxc3 Bg7 Nf3 c5{Attacking d4 straight away.} Be3 Qa5 Qd2 O-O Rc1",
+      "d4 Nf6 c4 g6 Nc3 d5 cxd5 Nxd5 Bd2{A quieter line.} Bg7 e4 Nxc3 Bxc3 O-O{Black prepares …c5.}",
+      "d4 Nf6 c4 g6 Nc3 d5 Nf3 Bg7 Qb3{The Russian System.} dxc4 Qxc4 O-O e4 a6{Preparing …b5 to gain queenside space.}",
+      "d4 Nf6 c4 g6 Nc3 d5 Bf4{The Bf4 System.} Bg7 e3 O-O Rc1 c5 dxc5 Be6{Black regains the pawn with active play.}",
+    ],
+  },
+  {
+    id: 'modern-benoni',
+    name: 'Modern Benoni',
+    eco: 'A60–A79',
+    side: 'b',
+    tags: ['vs-d4', 'aggressive', 'counterattack'],
+    summary: 'An unbalanced pawn structure from move three: Black takes a queenside majority and a monster g7-bishop, White gets a central space edge. Play to win.',
+    ideas: [
+      'Your plan is …a6 and …b5 on the queenside, with …Re8 and …Nbd7-e5 in the center.',
+      'The g7-bishop is your best piece — never trade it lightly.',
+      "Watch for White's e4-e5 break; meet it with pieces, not pawns.",
+    ],
+    lines: [
+      "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6{The Modern Benoni structure.} e4 g6 Nf3 Bg7 Be2 O-O O-O Re8{Pressure on e4.} Nd2 Na6{Heading for c7 to support …b5.}",
+      "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 Nf3 g6 g3{The fianchetto system.} Bg7 Bg2 O-O O-O a6 a4 Re8",
+      "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 f4{The Four Pawns (Taimanov) Attack.} Bg7 Bb5+{The most dangerous check.} Nfd7{Blocking with the knight keeps …Qh4+ ideas.} a4 O-O Nf3 Na6 O-O Nc7",
+      "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 cxd5 d6 e4 g6 Bd3 Bg7 Nge2 O-O O-O a6{Getting …b5 in.}",
+      "d4 Nf6 c4 c5 d5 e6 Nc3 exd5 Nxd5{Recapturing with the knight.} Nxd5 Qxd5 Nc6 Nf3 d6{Easy development for Black.}",
+    ],
+  },
+  {
+    id: 'trompowsky',
+    name: 'Trompowsky Attack',
+    eco: 'A45',
+    side: 'w',
+    tags: ['d4', 'offbeat', 'aggressive'],
+    summary: "2.Bg5 sidesteps the King's Indian, Grünfeld and Nimzo in one move. Black has to know what to do from move two.",
+    ideas: [
+      'Bxf6 is a real option: doubled pawns for Black, a lead in development for you.',
+      'Against …Ne4, f3 kicks the knight and builds e4.',
+      'Against …c5, d5 grabs space; the b2-pawn gambit is a famous trap for Black.',
+    ],
+    lines: [
+      "d4 Nf6 Bg5{The Trompowsky.} Ne4{The most direct reply.} Bf4 c5 f3{Kicking the knight.} Qa5 c3 Nf6 Nd2 cxd4 Nb3{Hitting the queen.} Qb6 Qxd4{Offering a queen trade from a position of strength.}",
+      "d4 Nf6 Bg5 e6 e4{Grabbing the center.} h6 Bxf6 Qxf6 Nc3 d6 Qd2 g5{Black wants the dark squares; White castles long.}",
+      "d4 Nf6 Bg5 d5 Bxf6{Doubling Black's pawns.} exf6 e3 Bd6 c4 dxc4 Bxc4 O-O Nc3{Healthy structure, easy play.}",
+      "d4 Nf6 Bg5 c5 d5 Qb6{Hitting b2.} Nc3{The Vaganian Gambit.} Qxb2 Bd2 Qb6 e4 d6 f4{A pawn down, but a huge center and attack.}",
+    ],
+  },
+  {
+    id: 'accelerated-dragon',
+    name: 'Accelerated Dragon',
+    eco: 'B34–B39',
+    side: 'b',
+    tags: ['vs-e4', 'sicilian', 'counterattack'],
+    summary: 'A Dragon without …d6: Black saves a tempo and can play …d5 in one go. Dodges the Yugoslav Attack — the Dragon\'s scariest line.',
+    ideas: [
+      'Strike with …d5 whenever White allows it.',
+      'Against the Maróczy Bind (c4), play patiently: …d6, …Bd7, …a6/…b5 or …Nxd4 and …Be6.',
+      'The g7-bishop and the c-file are your main weapons.',
+    ],
+    lines: [
+      "e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6{The Accelerated Dragon.} Nc3 Bg7 Be3 Nf6 Bc4 O-O Bb3 d6 f3 Bd7 Qd2 Nxd4 Bxd4 b5{Fast queenside counterplay.}",
+      "e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6 c4{The Maróczy Bind.} Bg7 Be3 Nf6 Nc3 O-O Be2 d6 O-O Bd7{Solid, waiting for the right break.}",
+      "e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6 Nxc6 bxc6 Qd4{Hitting h8.} Nf6 e5 Nd5 e6 f6{Black blocks the e-pawn and keeps the extra center pawn.}",
+      "e4 c5 Nf3 Nc6 Bb5{The Rossolimo.} g6 O-O Bg7 Re1 Nf6 c3 O-O d4 cxd4 cxd4 d5 e5 Ne4{Active knight, solid center.}",
+      "e4 c5 c3{The Alapin.} Nf6 e5 Nd5 d4 cxd4 cxd4 d6 Nf3 Nc6{Pressure on White's center.}",
+      "e4 c5 Nc3{The Closed Sicilian.} Nc6 g3 g6 Bg2 Bg7 d3 d6{A slow positional fight.}",
+    ],
+  },
+]

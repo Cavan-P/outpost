@@ -8,6 +8,8 @@ import { bookMoves, isMistake, leavesUnder, moveLabel, sideToMove, type OpeningT
 import { getProgress, markLearned } from '../lib/progress'
 import { addToSet, award, count } from '../lib/game'
 
+import { GapFinder } from '../components/GapFinder'
+
 interface Props {
   tree: OpeningTree
   onAnalyze: (fen: string) => void
@@ -209,6 +211,7 @@ export function Learn({ tree, onAnalyze }: Props) {
             ))}
           </ul>
         </section>
+        <GapFinder tree={tree} onJump={go} onAnalyze={onAnalyze} />
       </div>
     </div>
   )

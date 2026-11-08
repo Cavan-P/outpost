@@ -3,6 +3,7 @@ import type { OpeningDef } from '../data/openings'
 import { allOpenings, useCustomOpenings } from '../lib/custom'
 import { getProgress, isDue, isMastered, medalOf, nextMedalHint, progressOf } from '../lib/progress'
 import { MedalBadge } from '../components/GameUI'
+import { openingOfWeek, weekBounds } from '../lib/weekly'
 import { getTree, userDecisionNodes } from '../lib/tree'
 
 type Filter = 'all' | 'gambit' | 'solid' | 'aggressive' | 'trappy' | 'dubious' | 'due'
@@ -124,6 +125,8 @@ export function Library({ onOpen }: { onOpen: (id: string, mode: 'learn' | 'prac
         </div>
       </header>
 
+      <WeeklyBanner all={all} onOpen={onOpen} />
+
       {recent.length > 0 && (
         <section>
           <h2 className="mb-3 text-xs font-semibold uppercase tracking-widest text-zinc-500">Continue</h2>
@@ -195,6 +198,30 @@ export function Library({ onOpen }: { onOpen: (id: string, mode: 'learn' | 'prac
         )}
       </section>
     </div>
+  )
+}
+
+function WeeklyBanner({ all, onOpen }: { all: Stats[]; onOpen: (id: string, mode: 'learn' | 'practice', flip: boolean) => void }) {
+  const o = openingOfWeek()
+  const s = all.find((x) => x.def.id === o.id)
+  const { end } = weekBounds()
+  const days = Math.ceil((end.getTime() - Date.now()) / 86_400_000)
+  return (
+    <section className="relative overflow-hidden rounded-xl p-5 ring-1 ring-brand-500/30">
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-500/10 to-transparent" />
+      <div className="relative flex flex-wrap items-center gap-4">
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] uppercase tracking-[0.25em] text-brand-400">Opening of the week · ×1.5 XP · {days} day{days === 1 ? '' : 's'} left</p>
+          <h2 className="mt-1 text-2xl text-zinc-50">{o.name}</h2>
+          <p className="mt-1 line-clamp-2 max-w-2xl text-sm text-zinc-400">{o.summary}</p>
+        </div>
+        <div className="flex items-center gap-3">
+          {s && <MedalBadge tier={s.medal} title={s.medalHint} />}
+          <button className="btn-secondary" onClick={() => onOpen(o.id, 'learn', false)}>Learn</button>
+          <button className="btn-primary" onClick={() => onOpen(o.id, 'practice', false)}>Practice</button>
+        </div>
+      </div>
+    </section>
   )
 }
 

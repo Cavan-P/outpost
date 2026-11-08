@@ -9,10 +9,48 @@ import { ENDGAMES, type EndgameDef } from '../data/endgames'
 import { getCheckEngine, getPlayEngine } from '../lib/engine'
 import { explainMove, type Explanation } from '../lib/explain'
 import { addToSet, award, best, count, useProfile } from '../lib/game'
+import { COURSES } from '../data/courses'
 
 type Result = { ok: boolean; text: string } | null
 
 const GOAL_LABEL: Record<EndgameDef['goal'], string> = { mate: 'deliver mate', promote: 'promote', win: 'win', draw: 'hold the draw' }
+
+/** Courses: progress dots, a "continue" button, and a one-off bonus when a course is complete (and when every step has ★★★). */
+function CourseStrip({ solved, stars, current, onPick }: { solved: Set<string>; stars: Record<string, number>; current: string; onPick: (id: string) => void }) {
+  useEffect(() => {
+    for (const c of COURSES) {
+      if (c.steps.every((s) => solved.has(s)) && addToSet('courses', c.id)) award(150, `Course complete: ${c.name}`)
+      // stars only exist for mates; other steps just need solving
+      const perfect = (s: string) => (ENDGAMES.find((e) => e.id === s)?.goal === 'mate' ? (stars[`eg-${s}`] ?? 0) >= 3 : solved.has(s))
+      if (c.steps.some((s) => ENDGAMES.find((e) => e.id === s)?.goal === 'mate') && c.steps.every(perfect) && addToSet('coursesGold', c.id)) award(100, `${c.name}: perfect technique`)
+    }
+  }, [solved, stars])
+  return (
+    <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+      {COURSES.map((c) => {
+        const done = c.steps.filter((s) => solved.has(s)).length
+        const next = c.steps.find((s) => !solved.has(s)) ?? c.steps.find((s) => (stars[`eg-${s}`] ?? 0) < 3) ?? c.steps[0]
+        const active = c.steps.includes(current)
+        return (
+          <button key={c.id} onClick={() => onPick(next)} title={c.blurb} className={`rounded-lg p-3 text-left ring-1 transition ${active ? 'ring-brand-500/50' : 'ring-white/5 hover:ring-white/15'}`}>
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="text-sm text-zinc-100">{c.name}</span>
+              <span className="text-[11px] text-zinc-500">
+                {done}/{c.steps.length}
+              </span>
+            </div>
+            <div className="mt-2 flex gap-1">
+              {c.steps.map((s) => (
+                <span key={s} className={`h-1.5 flex-1 rounded-full ${(stars[`eg-${s}`] ?? 0) >= 3 ? 'bg-amber-400' : solved.has(s) ? 'bg-emerald-500' : s === current ? 'bg-brand-400/60' : 'bg-zinc-800'}`} />
+              ))}
+            </div>
+            <span className="mt-2 block text-[11px] text-brand-400">{done === c.steps.length ? 'Replay for ★★★ →' : 'Continue →'}</span>
+          </button>
+        )
+      })}
+    </div>
+  )
+}
 
 function judge(def: EndgameDef, chess: Chess, startPawns: number, myMoves: number): Result {
   const me = def.side
@@ -150,6 +188,8 @@ export function Endgames() {
 
   return (
     <div className="space-y-5">
+      <CourseStrip solved={solved} stars={profile.bests} current={def.id} onPick={(id) => choose(ENDGAMES.find((e) => e.id === id)!)} />
+
       {/* compact picker: category tabs + the endgames in that category */}
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-x-1 gap-y-2 border-b border-white/10">

@@ -11,6 +11,7 @@ import { addToSet, award, count, reachMedal, record } from '../lib/game'
 import { BlindfoldBar } from '../components/Blindfold'
 import { ResultCard } from '../components/ResultCard'
 import { MedalBadge } from '../components/GameUI'
+import { weekBonus } from '../lib/weekly'
 import { bookMoves, isMistake, moveLabel, sideToMove, userDecisionNodes, type OpeningTree, type TreeNode } from '../lib/tree'
 
 type Phase = 'user' | 'opponent' | 'wrong' | 'done'
@@ -160,7 +161,7 @@ export function Practice({ tree, onAnalyze }: Props) {
       }
       if (change.promoted) {
         line.current.learning++
-        xp *= (1 + Math.min(next, 20) * 0.03) * blindBonus()
+        xp *= (1 + Math.min(next, 20) * 0.03) * blindBonus() * weekBonus(def.id)
       }
       xp = Math.round(xp)
       line.current.xp += xp

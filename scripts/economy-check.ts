@@ -1,6 +1,8 @@
 // Sanity checks for the XP economy: grinding pays little, learning pays, levels/medals/quests/freezes work.
 import './mock-storage'
 import { award, count, getProfile, levelInfo, liveStreak, MAX_LEVEL, step, titleFor, todaysQuests } from '../src/lib/game'
+import { claimSeason, seasonKey, settleLeague, standings } from '../src/lib/meta'
+import { openingOfWeek, weekKey } from '../src/lib/weekly'
 import { boxOf, medalOf, recordAnswer, getProgress, type NodeStat } from '../src/lib/progress'
 
 let fails = 0
@@ -67,6 +69,29 @@ Object.assign(p, { lastDay: key(d), streak: 9, freezes: 1 })
 check('streak shown alive with a freeze banked', liveStreak(p) === 9)
 award(5)
 check('training after a missed day uses the freeze', getProfile().streak === 10 && getProfile().freezes === 0, `streak ${getProfile().streak}, freezes ${getProfile().freezes}`)
+
+// leagues
+const table = standings(getProfile(), 0)
+check('league table has you plus 9 rivals', table.length === 10 && table.filter((x) => x.you).length === 1)
+settleLeague()
+check('first visit starts you in Bronze this week', getProfile().league?.tier === 0 && getProfile().league?.week === weekKey())
+// pretend last week you crushed it: lots of XP last week, league week = last week
+const lw = new Date()
+lw.setDate(lw.getDate() - 7)
+Object.assign(getProfile().daily, { [key(lw)]: 50_000 })
+getProfile().league = { tier: 0, week: weekKey(lw), history: [] }
+settleLeague()
+check('winning last week promotes you', getProfile().league?.tier === 1 && getProfile().league?.history.at(-1)?.moved === 1, `tier ${getProfile().league?.tier}`)
+
+// season pass: this month's XP pays the reward track once
+const xpBefore = getProfile().xp
+claimSeason()
+const claimed = getProfile().season?.claimed ?? []
+check('season rewards claimed for this month', getProfile().season?.key === seasonKey() && claimed.length > 0, `tiers ${claimed.join(',')}`)
+const xpMid = getProfile().xp
+claimSeason()
+check('season rewards are not paid twice', getProfile().xp === xpMid && xpMid >= xpBefore)
+check('opening of the week is stable', openingOfWeek().id === openingOfWeek().id, openingOfWeek().name)
 
 console.log(fails ? `\n${fails} failed` : '\nall passed')
 process.exit(fails ? 1 : 0)
