@@ -19,6 +19,8 @@ import { Arena } from './modes/Arena'
 import { ProfilePage, Toasts } from './components/GameUI'
 import { configureTotals, getProfile, onGameEvent } from './lib/game'
 import { SyncPanel } from './components/SyncPanel'
+import { LeaderboardSettings } from './components/LeaderboardUI'
+import { startBoardPosting } from './lib/leaderboard'
 import { startAutoSync } from './lib/sync'
 import { claimSeason, isCollectible, isUnlocked, settleLeague } from './lib/meta'
 import { getGames, myGames } from './lib/games'
@@ -48,6 +50,7 @@ export default function App() {
       claimSeason()
     }, 800)
     startAutoSync()
+    startBoardPosting()
     const off = onGameEvent((e) => {
       if (e.kind === 'xp') setTimeout(claimSeason, 0)
     })
@@ -223,6 +226,9 @@ function SettingsDialog({ onClose }: { onClose: () => void }) {
 
         {section('Sync')}
         <SyncPanel />
+
+        {section('Leaderboards')}
+        <LeaderboardSettings />
 
         {section('Training')}
         <label className="block space-y-1">

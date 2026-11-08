@@ -1,8 +1,13 @@
 // Cloudflare Workers config: serves the static `dist/` build, plus the sync API in worker/index.ts.
 // `public/_headers` is copied into dist and applied to static files by Cloudflare automatically.
 //
-// One-time setup for sync: create the R2 bucket (dashboard → R2 → Create bucket "outpost-sync",
-// or `npx wrangler r2 bucket create outpost-sync`).
+// One-time setup:
+//  - Sync: R2 bucket "outpost-sync" (dashboard → R2 → Create bucket, or `npx wrangler r2 bucket create outpost-sync`)
+//  - Leaderboards: D1 database "outpost" (dashboard → D1 → Create, or `npx wrangler d1 create outpost`),
+//    then paste its id below. Tables are created automatically on first use.
+//  - Opening explorer (optional): a Lichess personal API token (lichess.org/account/oauth/token, no
+//    scopes needed) saved as the Worker secret LICHESS_TOKEN (dashboard → Worker → Settings →
+//    Variables and Secrets, or `npx wrangler secret put LICHESS_TOKEN`).
 {
   "name": "outpost",
   "main": "worker/index.ts",
@@ -12,5 +17,6 @@
     "binding": "ASSETS",
     "run_worker_first": ["/api/*"]
   },
-  "r2_buckets": [{ "binding": "SYNC", "bucket_name": "outpost-sync" }]
+  "r2_buckets": [{ "binding": "SYNC", "bucket_name": "outpost-sync" }],
+  "d1_databases": [{ "binding": "DB", "database_name": "outpost", "database_id": "20664543-c8e2-4355-ae2a-5c4f9f2322d3" }]
 }

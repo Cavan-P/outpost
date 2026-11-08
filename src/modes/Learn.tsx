@@ -9,6 +9,7 @@ import { getProgress, markLearned } from '../lib/progress'
 import { addToSet, award, count } from '../lib/game'
 
 import { GapFinder } from '../components/GapFinder'
+import { PopularMoves } from '../components/PopularMoves'
 
 interface Props {
   tree: OpeningTree
@@ -211,6 +212,7 @@ export function Learn({ tree, onAnalyze }: Props) {
             ))}
           </ul>
         </section>
+        <PopularMoves node={node} />
         <GapFinder tree={tree} onJump={go} onAnalyze={onAnalyze} />
       </div>
     </div>

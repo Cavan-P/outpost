@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getSettings } from '../lib/settings'
 import { Collection, LeagueCard, SeasonPass, YearReview } from './MetaUI'
+import { LeaderboardCard } from './LeaderboardUI'
 import { ACHIEVEMENTS, DAILY_GOAL, MEDALS, MAX_LEVEL, lastDays, levelInfo, liveStreak, onGameEvent, questProgress, resetProfile, titleFor, todaysQuests, todayXp, useProfile, type GameEvent } from '../lib/game'
 
 /** Compact level / XP / streak / daily-goal widget for the header. */
@@ -179,6 +180,7 @@ export function ProfilePage() {
           <YearReview />
         </div>
       </div>
+      <LeaderboardCard />
       <Collection />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

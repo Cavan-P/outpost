@@ -6,6 +6,7 @@ import { ResultCard } from '../components/ResultCard'
 import type { OpeningDef } from '../data/openings'
 import { allOpenings } from '../lib/custom'
 import { getPlayEngine, scoreValue, uciToSan } from '../lib/engine'
+import { games, getExplorer } from '../lib/explorer'
 import { addToSet, award, best, count, useProfile } from '../lib/game'
 import { getProgress, isDue, medalOf, progressOf, recordAnswer, type OpeningProgress } from '../lib/progress'
 import { reviewMove } from '../lib/review'
@@ -133,8 +134,13 @@ const pick = <T,>(xs: T[], weight: (x: T) => number) => {
   return xs[xs.length - 1]
 }
 
-/** Out of book: a "human" engine — picks among its top three moves that are close to the best. */
+/** Out of book: what club players actually play here (Lichess explorer), else a "human" engine. */
 async function humanMove(fen: string): Promise<string | null> {
+  const ex = await getExplorer(fen, 'lichess', 2500)
+  if (ex && ex.total >= 30) {
+    const options = ex.moves.filter((m) => games(m) / ex.total >= 0.05)
+    if (options.length) return pick(options, (m) => games(m)).uci
+  }
   const engine = getPlayEngine()
   engine.setOption('Skill Level', 20)
   const a = await engine.analyze(fen, { depth: 10, multipv: 3 })
@@ -197,7 +203,13 @@ function Duel({ tree, kind, onWin }: { tree: OpeningTree; kind: 'gauntlet' | 'bo
       if (node && node.children.length) {
         const p = getProgress(def.id)
         // gauntlet: any book reply (traps included); boss: the reply that hits your weakest spot
-        const reply = kind === 'boss' ? pick(node.children.filter((c) => !isMistake(c)).length ? node.children.filter((c) => !isMistake(c)) : node.children, (c) => weakness(c, side, p) ** 2) : pick(node.children, () => 1)
+        // gauntlet: book replies weighted by how often people really play them (when the explorer is available)
+        const ex = kind === 'gauntlet' ? await getExplorer(node.fen, 'lichess', 2500) : null
+        const popularity = (c: TreeNode) => {
+          const m = ex?.moves.find((x) => x.uci === c.uci)
+          return m ? games(m) / Math.max(1, ex!.total) + 0.02 : ex ? 0.02 : 1
+        }
+        const reply = kind === 'boss' ? pick(node.children.filter((c) => !isMistake(c)).length ? node.children.filter((c) => !isMistake(c)) : node.children, (c) => weakness(c, side, p) ** 2) : pick(node.children, popularity)
         if (cancel) return
         setFen(reply.fen)
         setLast(reply.uci)

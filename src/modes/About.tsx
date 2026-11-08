@@ -160,6 +160,9 @@ export function About() {
         <p className="text-sm text-zinc-400">
           <b className="text-zinc-200">Sync (optional).</b> If you turn it on in Settings, a compressed copy of your progress, XP, custom repertoires and imported games (including the usernames in them) is stored on Cloudflare R2, under a one-way hash of your sync code — the code itself is never stored. Anyone who has your code can read and change that copy. Settings stay on each device. "Delete synced copy" in Settings removes it from the server.
         </p>
+        <p className="text-sm text-zinc-400">
+          <b className="text-zinc-200">Leaderboards (optional).</b> If you join with a nickname, your nickname, level, total and weekly XP, bosses defeated, medal count, streak and Gauntlet best scores are stored in a Cloudflare D1 database and shown publicly. "Leave leaderboards" in Settings deletes them. The opening-explorer statistics are fetched from Lichess through the same server, which sends only the position.
+        </p>
         <div className="flex flex-wrap gap-2">
           <button className="btn-primary" onClick={backup}>
             Download backup
