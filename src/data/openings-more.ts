@@ -1,6 +1,6 @@
 import type { OpeningDef } from './openings'
 
-// A second batch: two more e4 gambits, a sharp d4 weapon, and four fighting defences for Black.
+// A second batch: two more e4 gambits, a sharp d4 weapon, and four fighting defenses for Black.
 
 export const MORE_OPENINGS: OpeningDef[] = [
   {
@@ -58,7 +58,7 @@ export const MORE_OPENINGS: OpeningDef[] = [
   },
   {
     id: 'alekhine',
-    name: "Alekhine's Defence",
+    name: "Alekhine's Defense",
     eco: 'B02–B05',
     side: 'b',
     tags: ['vs-e4', 'hypermodern', 'offbeat'],
@@ -69,7 +69,7 @@ export const MORE_OPENINGS: OpeningDef[] = [
       'The b6-knight is a target for a4-a5; keep an eye on it.',
     ],
     lines: [
-      "e4 Nf6{Alekhine's Defence: provoking the pawns.} e5 Nd5 d4 d6{Undermining the e5-pawn at once.} Nf3{The Modern Variation.} Bg4{Pinning the knight that defends e5.} Be2 e6 O-O Be7 c4 Nb6{A solid, flexible setup.}",
+      "e4 Nf6{Alekhine's Defense: provoking the pawns.} e5 Nd5 d4 d6{Undermining the e5-pawn at once.} Nf3{The Modern Variation.} Bg4{Pinning the knight that defends e5.} Be2 e6 O-O Be7 c4 Nb6{A solid, flexible setup.}",
       "e4 Nf6 e5 Nd5 d4 d6 c4 Nb6 f4{The Four Pawns Attack.} dxe5 fxe5 Nc6 Be3 Bf5{Pressure on e5 and the light squares.} Nc3 e6 Nf3 Be7",
       "e4 Nf6 e5 Nd5 c4 Nb6 d4 d6 exd6{The Exchange Variation.} cxd6{Keeps central control.} Nc3 g6 Be3 Bg7{A fianchetto aimed at d4.}",
       "e4 Nf6 Nc3{Declining the challenge.} d5 e5 Nfd7 d4 e6{A French-like structure.}",
@@ -77,7 +77,7 @@ export const MORE_OPENINGS: OpeningDef[] = [
   },
   {
     id: 'grunfeld',
-    name: 'Grünfeld Defence',
+    name: 'Grünfeld Defense',
     eco: 'D70–D99',
     side: 'b',
     tags: ['vs-d4', 'hypermodern', 'aggressive'],

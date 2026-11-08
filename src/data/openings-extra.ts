@@ -15,20 +15,20 @@ export const EXTRA_OPENINGS: OpeningDef[] = [
       "1.d4 players' answer to the King's Gambit: White sacrifices the e-pawn (and often more) for a half-open f-file and a quick kingside attack. Objectively dubious but deadly at club level.",
     ideas: [
       'After Nxf3 you have five pieces ready to go — castle and attack down the f-file.',
-      'The Qe1-h4 manoeuvre is a typical attacking plan.',
+      'The Qe1-h4 maneuver is a typical attacking plan.',
       'The e5 push and Ne5 jump are thematic once your pieces are out.',
-      'Know the named defences: Teichmann (…Bg4), Euwe (…e6), Bogoljubov (…g6), Ziegler (…c6), Gunderam (…Bf5).',
+      'Know the named defenses: Teichmann (…Bg4), Euwe (…e6), Bogoljubov (…g6), Ziegler (…c6), Gunderam (…Bf5).',
     ],
     lines: [
-      "d4 d5 e4{The Blackmar-Diemer Gambit.} dxe4 Nc3{Developing with an attack on e4.} Nf6 f3{The point: White offers a second pawn to open the f-file.} exf3{Accepting. Declining with …e3 or …Bf5 is also possible.} Nxf3{Five white pieces are about to join the game; Black has an extra pawn.} Bg4{The Teichmann Defence: Black pins the knight and intends to trade it.} h3{Put the question to the bishop.} Bxf3 Qxf3 c6 Be3{White has the bishop pair and a lead in development, with O-O-O and g4-g5 on the agenda.}",
-      "d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 e6{The Euwe Defence: solid, Black blunts White's light-squared bishop.} Bg5{Pinning the knight; Bd3 and Qe1 follow.} Be7 Bd3{Aiming at h7. White castles next and plays Qe1-h4.}",
-      "d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 g6{The Bogoljubov Defence: a kingside fianchetto.} Bc4{Hitting f7 — the bishop is very strong here.} Bg7 O-O O-O Qe1{The famous attacking plan: Qh4, Bh6 and trade off Black's key defender.}",
-      "d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 c6{The Ziegler Defence: Black prepares …Bg4 or …Bf5 with c6 supporting.} Bc4{Develop with pressure on f7.} Bf5 O-O{White will continue with Ne5, Qe1 or g4 ideas.}",
-      "d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 Bf5{The Gunderam Defence.} Ne5{Jumping into e5; ideas of g4 and Qf3 to hit b7 and f7.} e6 g4{Kicking the bishop with tempo.} Bg6 h4{Threatening h5 to trap the bishop. Sharp play!}",
-      "d4 d5 e4 dxe4 Nc3 Nf6 f3 e3{The Langeheinicke Defence: Black returns the pawn to keep lines closed.} Bxe3{White has a comfortable position with easy development.}",
+      "d4 d5 e4{The Blackmar-Diemer Gambit.} dxe4 Nc3{Developing with an attack on e4.} Nf6 f3{The point: White offers a second pawn to open the f-file.} exf3{Accepting. Declining with …e3 or …Bf5 is also possible.} Nxf3{Five white pieces are about to join the game; Black has an extra pawn.} Bg4{The Teichmann Defense: Black pins the knight and intends to trade it.} h3{Put the question to the bishop.} Bxf3 Qxf3 c6 Be3{White has the bishop pair and a lead in development, with O-O-O and g4-g5 on the agenda.}",
+      "d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 e6{The Euwe Defense: solid, Black blunts White's light-squared bishop.} Bg5{Pinning the knight; Bd3 and Qe1 follow.} Be7 Bd3{Aiming at h7. White castles next and plays Qe1-h4.}",
+      "d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 g6{The Bogoljubov Defense: a kingside fianchetto.} Bc4{Hitting f7 — the bishop is very strong here.} Bg7 O-O O-O Qe1{The famous attacking plan: Qh4, Bh6 and trade off Black's key defender.}",
+      "d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 c6{The Ziegler Defense: Black prepares …Bg4 or …Bf5 with c6 supporting.} Bc4{Develop with pressure on f7.} Bf5 O-O{White will continue with Ne5, Qe1 or g4 ideas.}",
+      "d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 Bf5{The Gunderam Defense.} Ne5{Jumping into e5; ideas of g4 and Qf3 to hit b7 and f7.} e6 g4{Kicking the bishop with tempo.} Bg6 h4{Threatening h5 to trap the bishop. Sharp play!}",
+      "d4 d5 e4 dxe4 Nc3 Nf6 f3 e3{The Langeheinicke Defense: Black returns the pawn to keep lines closed.} Bxe3{White has a comfortable position with easy development.}",
       "d4 d5 e4 dxe4 Nc3 e5{The Lemberger Countergambit: Black strikes back immediately.} dxe5{The calm route to an ending where White is a bit better.} Qxd1+ Kxd1 Nc6 Bb5 Bd7 Nxe4{White has won back the pawn and is slightly better.}",
       "d4 d5 e4 dxe4 Nc3 Bf5{Black tries to hold e4 with the bishop.} f3{Same idea: open lines.} exf3 Nxf3 e6 Ne5{Pressure on f7 and the bishop; Qf3 and g4 ideas.}",
-      "d4 d5 e4 e6{Black declines into a French Defence.} Nc3{A normal French; the gambit didn't happen.}",
+      "d4 d5 e4 e6{Black declines into a French Defense.} Nc3{A normal French; the gambit didn't happen.}",
     ],
   },
   {
@@ -47,7 +47,7 @@ export const EXTRA_OPENINGS: OpeningDef[] = [
     lines: [
       "e4 e5 Nf3 Nc6 Nc3{The Four Knights move order.} Nf6 Nxe5?!{The Halloween Gambit! A full knight for a pawn and the center.} Nxe5 d4{Forking nothing — but the e5-knight must move and the pawns gain tempo.} Ng6{The most common retreat.} e5{Kicking the other knight.} Ng8{Back home. Black is a piece up but has zero development.} Bc4{Aiming at f7 with Qf3 and h4-h5 to follow.}",
       "e4 e5 Nf3 Nc6 Nc3 Nf6 Nxe5 Nxe5 d4 Nc6{Retreating toward the queenside.} d5{Gaining more tempo.} Ne5 f4{Chasing the knight again.} Ng6 e5{And again.} Ng8 d6{A pawn wedge on d6 that cramps Black completely.}",
-      "e4 e5 Nf3 Nc6 Nc3 Nf6 Nxe5 Nxe5 d4 Nc6 d5 Nb4{Black's knight heads to the queenside.} e5{Kicking the f6 knight; the pawns keep rolling.} Qe7!{Black's best defence: pinning the e5 pawn instead of retreating.} f4 d6 a3{Kicking the b4-knight. Stockfish prefers Black here — the Halloween is a practical weapon, not a sound one.}",
+      "e4 e5 Nf3 Nc6 Nc3 Nf6 Nxe5 Nxe5 d4 Nc6 d5 Nb4{Black's knight heads to the queenside.} e5{Kicking the f6 knight; the pawns keep rolling.} Qe7!{Black's best defense: pinning the e5 pawn instead of retreating.} f4 d6 a3{Kicking the b4-knight. Stockfish prefers Black here — the Halloween is a practical weapon, not a sound one.}",
       "e4 e5 Nf3 Nc6 Nc3 Nf6 Nxe5 Nxe5 d4 Ng6 e5 Qe7{Pinning the e5 pawn — Black's sharpest try.} Qe2{Defending and preparing exf6.} Ng8 Nd5{Hitting the queen and c7.}",
     ],
   },
@@ -123,8 +123,8 @@ export const EXTRA_OPENINGS: OpeningDef[] = [
     ],
     lines: [
       "e4 e5 f4 exf4 Nf3 g5 Bc4{Aiming at f7.} g4{Attacking the knight.} O-O!?{The Muzio Gambit: White ignores the knight.} gxf3 Qxf3{For the piece: two pawns, a big lead in development and the open f-file.} Qf6{Black's best: block the f-file and offer a queen trade.} e5{Another pawn, to deflect the queen.} Qxe5 d3{Opening the c1-bishop.} Bh6 Nc3 Ne7 Bd2 Nbc6 Rae1{Every white piece is in the attack.}",
-      "e4 e5 f4 exf4 Nf3 g5 Bc4 Bg7{The Hanstein Defence: keeping the pawn solidly.} O-O d6 d4 h6 c3{A slow buildup; White's center and the f-file compensate for the pawn.}",
-      "e4 e5 f4 exf4 Nf3 d6 d4{Same Fischer Defence ideas as in the main King's Gambit.}",
+      "e4 e5 f4 exf4 Nf3 g5 Bc4 Bg7{The Hanstein Defense: keeping the pawn solidly.} O-O d6 d4 h6 c3{A slow buildup; White's center and the f-file compensate for the pawn.}",
+      "e4 e5 f4 exf4 Nf3 d6 d4{Same Fischer Defense ideas as in the main King's Gambit.}",
     ],
   },
   {
@@ -141,7 +141,7 @@ export const EXTRA_OPENINGS: OpeningDef[] = [
       'Against the Traxler (…Bc5), Bxf7+ is the safe practical answer.',
     ],
     lines: [
-      "e4 e5 Nf3 Nc6 Bc4 Nf6{The Two Knights Defence.} Ng5{Attacking f7 twice.} d5{The correct reply.} exd5 Na5{The main line: Black gives a pawn for activity.} Bb5+ c6 dxc6 bxc6 Be2 h6 Nf3 e4 Ne5 Bd6 d4 exd3 Nxd3{White keeps the extra pawn; Black has free piece play.}",
+      "e4 e5 Nf3 Nc6 Bc4 Nf6{The Two Knights Defense.} Ng5{Attacking f7 twice.} d5{The correct reply.} exd5 Na5{The main line: Black gives a pawn for activity.} Bb5+ c6 dxc6 bxc6 Be2 h6 Nf3 e4 Ne5 Bd6 d4 exd3 Nxd3{White keeps the extra pawn; Black has free piece play.}",
       "e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5?!{Natural, but it allows the Fried Liver.} Nxf7!{The Fried Liver Attack.} Kxf7 Qf3+{Forking king and the d5-knight.} Ke6 Nc3{Piling on the pinned knight.} Ncb4{Black's best: counterattacking c2.} a3{Kicking the knight; if …Nxc2+ Kd1 Nxa1 Nxd5 White's attack crashes through.}",
       "e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Bc5!?{The Traxler (Wilkes-Barre) Counterattack: Black ignores f7!} Bxf7+{The safest practical choice.} Ke7 Bd5{The bishop retreats to a strong central square.} Rf8{Black uses the half-open f-file.}",
       "e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 b5{The Ulvestad Variation: deflecting the bishop.} Bf1{The best retreat — White keeps the d5 pawn.}",
@@ -155,7 +155,7 @@ export const EXTRA_OPENINGS: OpeningDef[] = [
     side: 'w',
     tags: ['d4-free', 'dubious', 'offbeat', 'trappy'],
     summary:
-      '1.g4!? — weakening, provocative, and loaded with traps around the long diagonal and the b7 pawn. A favourite of bullet players everywhere.',
+      '1.g4!? — weakening, provocative, and loaded with traps around the long diagonal and the b7 pawn. A favorite of bullet players everywhere.',
     ideas: [
       'Bg2 immediately pressures d5 and b7.',
       'c4 undermines d5 — if it falls, Bxb7 hits a8.',
@@ -210,14 +210,14 @@ export const EXTRA_OPENINGS: OpeningDef[] = [
     side: 'w',
     tags: ['gambit', 'e4', 'aggressive', 'trappy'],
     summary:
-      'Against the French Defence, White plays the Advance and then offers the d4 pawn — and often the e5 pawn too — for a huge lead in development.',
+      'Against the French Defense, White plays the Advance and then offers the d4 pawn — and often the e5 pawn too — for a huge lead in development.',
     ideas: [
       'After …Nxd4 Nxd4 Qxd4 Nc3, Nb5 and Re1 ideas hit c7 and e5.',
       'The trap: …Nxd4?? too early allows Bb5+ winning the queen.',
       'Black cannot easily develop the g8-knight or castle.',
     ],
     lines: [
-      "e4 e6{The French Defence.} d4 d5 e5{The Advance Variation: grab space.} c5 c3 Nc6 Nf3 Qb6{Triple pressure on d4.} Bd3{The Milner-Barry Gambit.} cxd4 cxd4 Bd7{Black prepares to take on d4 safely.} O-O Nxd4 Nxd4 Qxd4 Nc3{White has a big lead in development for the pawn. Nb5, Qe2 and Re1 follow.}",
+      "e4 e6{The French Defense.} d4 d5 e5{The Advance Variation: grab space.} c5 c3 Nc6 Nf3 Qb6{Triple pressure on d4.} Bd3{The Milner-Barry Gambit.} cxd4 cxd4 Bd7{Black prepares to take on d4 safely.} O-O Nxd4 Nxd4 Qxd4 Nc3{White has a big lead in development for the pawn. Nb5, Qe2 and Re1 follow.}",
       "e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Qb6 Bd3 cxd4 cxd4 Nxd4??{Too early!} Nxd4 Qxd4 Bb5+{A discovered attack: the bishop checks and the d1 queen takes on d4.}",
       "e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Qb6 Bd3 cxd4 cxd4 Bd7 O-O Nxd4 Nxd4 Qxd4 Nc3 Qxe5?{Greedy.} Re1{The queen is hunted along the e-file; Nxd5 tactics follow.}",
       "e4 e6 d4 d5 e5 c5 c3 Nc6 Nf3 Bd7{A flexible French setup.} Be2{Solid; White keeps the space advantage.}",
@@ -237,7 +237,7 @@ export const EXTRA_OPENINGS: OpeningDef[] = [
       'Against the Stafford, play d3, Be2, then c3 and d4. Never play Bg5.',
     ],
     lines: [
-      "e4 e5 Nf3 Nf6{The Petrov Defence.} Nxe5 d6{The correct move order.} Nxf7?!{The Cochrane Gambit: a knight for a pawn and the black king.} Kxf7 Nc3{Quick development; d4, Bc4+ and e5 are the plans.} c5{Restraining d4.} Bc4+ Be6 Bxe6+ Kxe6 d4{White has two pawns for the piece and play against the black king.}",
+      "e4 e5 Nf3 Nf6{The Petrov Defense.} Nxe5 d6{The correct move order.} Nxf7?!{The Cochrane Gambit: a knight for a pawn and the black king.} Kxf7 Nc3{Quick development; d4, Bc4+ and e5 are the plans.} c5{Restraining d4.} Bc4+ Be6 Bxe6+ Kxe6 d4{White has two pawns for the piece and play against the black king.}",
       "e4 e5 Nf3 Nf6 Nxe5 Nxe4?!{Copying White — a classic inaccuracy.} Qe2{Hitting the knight on the e-file.} Qe7 Qxe4 d6{Black pins the e5 knight…} d4{…but White simply defends.} dxe5 dxe5{White is a pawn up.}",
       "e4 e5 Nf3 Nf6 Nxe5 Nc6{The Stafford Gambit.} Nxc6 dxc6 d3{Covering e4 — the key move.} Bc5 Be2{Simple development — just never Bg5??.} h5 c3{Preparing d4 to blunt the c5-bishop.} Ng4 d4 Qh4 g3 Qf6{Black's pieces are buzzing, but White is clearly better. Consolidate with Be3/Bf4 and Nd2.}",
       "e4 e5 Nf3 Nf6 Nxe5 Nc6 Nxc6 dxc6 d3 Bc5 Bg5??{The famous blunder.} Nxe4!{Black sacrifices the queen…} Bxd8 Bxf2+ Ke2 Bg4#{…and mates. Now you know what NOT to play.}",
@@ -258,12 +258,12 @@ export const EXTRA_OPENINGS: OpeningDef[] = [
       'In the Berlin endgame, use your kingside pawn majority.',
     ],
     lines: [
-      "e4 e5 Nf3 Nc6 Bb5{The Ruy Lopez.} a6{The Morphy Defence.} Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3{The Closed Ruy Lopez main line. White prepares d4.}",
+      "e4 e5 Nf3 Nc6 Bb5{The Ruy Lopez.} a6{The Morphy Defense.} Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3{The Closed Ruy Lopez main line. White prepares d4.}",
       "e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O c3 d5{The Marshall Attack! Black gives a pawn for a kingside attack.} exd5 Nxd5 Nxe5 Nxe5 Rxe5 c6 d4 Bd6 Re1 Qh4 g3 Qh3 Be3{The main line: White's king is under fire but he's a pawn up.}",
-      "e4 e5 Nf3 Nc6 Bb5 Nf6{The Berlin Defence.} O-O Nxe4 d4 Nd6 Bxc6 dxc6 dxe5 Nf5 Qxd8+ Kxd8{The Berlin endgame — Kramnik's Berlin Wall. White has a kingside majority; Black has the bishops.}",
+      "e4 e5 Nf3 Nc6 Bb5 Nf6{The Berlin Defense.} O-O Nxe4 d4 Nd6 Bxc6 dxc6 dxe5 Nf5 Qxd8+ Kxd8{The Berlin endgame — Kramnik's Berlin Wall. White has a kingside majority; Black has the bishops.}",
       "e4 e5 Nf3 Nc6 Bb5 f5{The Schliemann (Jaenisch) Gambit.} Nc3{The main antidote.} fxe4 Nxe4 d5 Nxe5 dxe4 Nxc6 Qg5 Qe2 Nf6 f4 Qxf4 Ne5+ c6 d4{A wild main line; White's pieces are more active.}",
-      "e4 e5 Nf3 Nc6 Bb5 Nd4{Bird's Defence.} Nxd4 exd4 O-O c6 Bc4{White is comfortable; Black's d4 pawn can become weak.}",
-      "e4 e5 Nf3 Nc6 Bb5 Bc5{The Classical (Cordel) Defence.} c3{Preparing d4 with tempo on the bishop.} Nf6 O-O O-O d4 Bb6{A classical center for White.}",
+      "e4 e5 Nf3 Nc6 Bb5 Nd4{Bird's Defense.} Nxd4 exd4 O-O c6 Bc4{White is comfortable; Black's d4 pawn can become weak.}",
+      "e4 e5 Nf3 Nc6 Bb5 Bc5{The Classical (Cordel) Defense.} c3{Preparing d4 with tempo on the bishop.} Nf6 O-O O-O d4 Bb6{A classical center for White.}",
       "e4 e5 Nf3 Nc6 Bb5 a6 Ba4 d6{The Modern Steinitz.} c3 Bd7 d4{A solid center.}",
     ],
   },
@@ -298,9 +298,9 @@ export const EXTRA_OPENINGS: OpeningDef[] = [
       'Qe1-h4 and f5 are typical attacking plans.',
     ],
     lines: [
-      "e4 d6{The Pirc Defence.} d4 Nf6 Nc3 g6 f4{The Austrian Attack: three pawns in the center.} Bg7 Nf3 O-O Bd3{Preparing O-O and e5.} Na6{A modern idea: …c5 next.} O-O c5 d5{Gaining space.}",
+      "e4 d6{The Pirc Defense.} d4 Nf6 Nc3 g6 f4{The Austrian Attack: three pawns in the center.} Bg7 Nf3 O-O Bd3{Preparing O-O and e5.} Na6{A modern idea: …c5 next.} O-O c5 d5{Gaining space.}",
       "e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 c5{Striking at the center immediately.} Bb5+{Disrupting Black's development.} Bd7 e5{Kicking the knight with a strong initiative.}",
-      "e4 g6{The Modern Defence.} d4 Bg7 Nc3 d6 f4{Same three-pawn center.}",
+      "e4 g6{The Modern Defense.} d4 Bg7 Nc3 d6 f4{Same three-pawn center.}",
     ],
   },
   {
@@ -315,7 +315,7 @@ export const EXTRA_OPENINGS: OpeningDef[] = [
       'f3 offers another pawn to accelerate development.',
     ],
     lines: [
-      "d4 f5{The Dutch Defence.} e4{The Staunton Gambit.} fxe4 Nc3 Nf6 Bg5{Pressure on the defender of e4.} e6 Nxe4{White has regained the pawn with active pieces.} Be7 Bxf6 Bxf6 Nf3{A pleasant position: Bd3 and Qe2 next.}",
+      "d4 f5{The Dutch Defense.} e4{The Staunton Gambit.} fxe4 Nc3 Nf6 Bg5{Pressure on the defender of e4.} e6 Nxe4{White has regained the pawn with active pieces.} Be7 Bxf6 Bxf6 Nf3{A pleasant position: Bd3 and Qe2 next.}",
       "d4 f5 e4 fxe4 Nc3 Nf6 Bg5 g6{Black fianchettoes.} f3{A second pawn to open the f-file.} exf3 Nxf3 Bg7 Bd3{Ready to castle and attack.}",
     ],
   },
@@ -358,7 +358,7 @@ export const EXTRA_OPENINGS: OpeningDef[] = [
     side: 'b',
     tags: ['gambit', 'vs-e4', 'dubious', 'aggressive'],
     summary:
-      "The King's Gambit with colours reversed and a tempo down: 2…f5!? Objectively dubious, but crazy positions arise where precise play is needed from White.",
+      "The King's Gambit with colors reversed and a tempo down: 2…f5!? Objectively dubious, but crazy positions arise where precise play is needed from White.",
     ideas: [
       'After 3.Nxe5 Qf6, the queen supports …fxe4 and eyes f2.',
       'Against 3.Bc4, the wild …fxe4 Nxe5 Qg5 line is the main try.',
@@ -496,7 +496,7 @@ export const EXTRA_OPENINGS: OpeningDef[] = [
   },
   {
     id: 'scandinavian',
-    name: 'Scandinavian Defence',
+    name: 'Scandinavian Defense',
     eco: 'B01',
     side: 'b',
     tags: ['vs-e4', 'solid'],
@@ -557,18 +557,18 @@ export const EXTRA_OPENINGS: OpeningDef[] = [
     eco: 'D32',
     side: 'b',
     tags: ['gambit', 'vs-d4', 'aggressive', 'offbeat'],
-    summary: "A sharp gambit within the Tarrasch Defence: Black sacrifices the d-pawn for rapid development and attacking chances.",
+    summary: "A sharp gambit within the Tarrasch Defense: Black sacrifices the d-pawn for rapid development and attacking chances.",
     ideas: [
       'After …Bd7 and …Nc6, Black develops with tempo against the white queen.',
       'Long castling and pressure down the d-file are common.',
     ],
     lines: [
-      "d4 d5 c4 e6 Nc3 c5{The Tarrasch Defence.} cxd5 cxd4!?{The Hennig-Schara Gambit.} Qa4+ Bd7 Qxd4 exd5 Qxd5 Nc6{Black develops with tempo on the queen.} Nf3 Nf6 Qd1 Bc5{Black is a pawn down but has a huge lead in development.}",
+      "d4 d5 c4 e6 Nc3 c5{The Tarrasch Defense.} cxd5 cxd4!?{The Hennig-Schara Gambit.} Qa4+ Bd7 Qxd4 exd5 Qxd5 Nc6{Black develops with tempo on the queen.} Nf3 Nf6 Qd1 Bc5{Black is a pawn down but has a huge lead in development.}",
       "d4 d5 c4 e6 Nc3 c5 cxd5 cxd4 Qxd4 Nc6 Qd1 exd5 Qxd5 Bd7{Black has quick development for the pawn.}",
       "d4 d5 c4 e6 Nf3 c5{Tarrasch move order.} cxd5 exd5{A classical isolated-pawn Tarrasch.}",
     ],
   },
-  // ───────────────────────────── Black: mainstream fighting defences ─────────────────────────────
+  // ───────────────────────────── Black: mainstream fighting defenses ─────────────────────────────
   {
     id: 'dragon',
     name: 'Sicilian Dragon',
@@ -625,7 +625,7 @@ export const EXTRA_OPENINGS: OpeningDef[] = [
       'Against 2.Bg5, …h6 and …g5 chase the bishop.',
     ],
     lines: [
-      "d4 f5{The Dutch Defence.} g3 Nf6 Bg2 g6{The Leningrad.} Nf3 Bg7 O-O O-O c4 d6 Nc3 Qe8{Preparing …e5.} d5 a5{The main line: Black secures c5 for a knight.}",
+      "d4 f5{The Dutch Defense.} g3 Nf6 Bg2 g6{The Leningrad.} Nf3 Bg7 O-O O-O c4 d6 Nc3 Qe8{Preparing …e5.} d5 a5{The main line: Black secures c5 for a knight.}",
       "d4 f5 e4{The Staunton Gambit.} fxe4 Nc3 Nf6 Bg5 e6{Solid: Black returns the pawn safely.} Nxe4 Be7{Easy development.}",
       "d4 f5 Bg5{An annoying line.} h6 Bh4 g5 e3 Nf6 Bg3 d6{Black has gained space on the kingside.}",
       "d4 f5 Nc3 Nf6 Bg5 d5{A Stonewall-ish setup.}",

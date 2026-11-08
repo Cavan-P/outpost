@@ -64,7 +64,7 @@ export function GameReview({ game, initialPly = 0, onBack }: { game: ImportedGam
           )}
         </p>
         <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
-          <label className="flex items-center gap-2 text-zinc-400" title="Games that aren't yours can be analysed, but stay out of your mistake report, puzzles and daily review">
+          <label className="flex items-center gap-2 text-zinc-400" title="Games that aren't yours can be analyzed, but stay out of your mistake report, puzzles and daily review">
             <input type="checkbox" checked={!!game.notMine} onChange={(e) => setNotMine(game.id, e.target.checked)} />
             Not my game — analysis only
           </label>
@@ -99,7 +99,7 @@ export function GameReview({ game, initialPly = 0, onBack }: { game: ImportedGam
 
         <div className="min-w-0 space-y-4">
           <section className="space-y-3 rounded-xl bg-zinc-900/80 p-4 ring-1 ring-white/5">
-            {!game.analysis && <p className="text-sm text-amber-300">This game hasn't been analysed yet — run the analysis from the Games page.</p>}
+            {!game.analysis && <p className="text-sm text-amber-300">This game hasn't been analyzed yet — run the analysis from the Games page.</p>}
             {move ? <MoveDetail game={game} move={move} fenBefore={fens[ply - 1]} fenAfter={fens[ply]} /> : <p className="text-sm text-zinc-400">Start position. Use the arrows, the graph, or "Next mistake".</p>}
           </section>
 

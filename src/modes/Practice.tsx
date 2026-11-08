@@ -91,7 +91,7 @@ export function Practice({ tree, onAnalyze }: Props) {
   const seenDue = decisions.filter((n) => progress.nodes[n.id] && isDue(progress.nodes[n.id], now)).length
   const fading = decisions.filter((n) => isFading(progress.nodes[n.id], now)).length
   const unseen = (c: TreeNode) => decisions.filter((d) => (d.id === c.id || d.id.startsWith(c.id + ' ')) && !progress.nodes[d.id]).length
-  // When you have two book moves here, Practice can't steer you — so it asks you to pick the less-practised one.
+  // When you have two book moves here, Practice can't steer you — so it asks you to pick the less-practiced one.
   const branch = useMemo(() => {
     if (phase !== 'user') return null
     const book = bookMoves(node)
@@ -125,7 +125,7 @@ export function Practice({ tree, onAnalyze }: Props) {
     setPhase(def.side === 'w' ? 'user' : 'opponent')
   }, [tree, def.side])
 
-  // Opponent replies from the book, favouring lines you haven't mastered.
+  // Opponent replies from the book, favoring lines you haven't mastered.
   useEffect(() => {
     if (phase !== 'opponent') return
     if (!node.children.length) {
@@ -338,7 +338,7 @@ export function Practice({ tree, onAnalyze }: Props) {
           {branch && (
             <div className="rounded-lg bg-amber-500/10 p-3 text-sm text-amber-100 ring-1 ring-amber-400/30">
               <p>
-                You have {branch.count} book moves here. Play the one you've practised less this time
+                You have {branch.count} book moves here. Play the one you've practiced less this time
                 {branch.fresh > 0 && <> — it leads to <b>{branch.fresh} new position{branch.fresh === 1 ? '' : 's'}</b></>}.
               </p>
               {!showBranch && (

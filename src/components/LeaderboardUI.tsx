@@ -149,7 +149,7 @@ export function LeaderboardCard() {
           ))}
         </div>
       )}
-      <p className="mt-2 text-[11px] text-zinc-600">Weekly board resets on Monday (UTC). Scores are posted from your browser, so they're on the honour system.</p>
+      <p className="mt-2 text-[11px] text-zinc-600">Weekly board resets on Monday (UTC). Scores are posted from your browser, so they're on the honor system.</p>
     </section>
   )
 }

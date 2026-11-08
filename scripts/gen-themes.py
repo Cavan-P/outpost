@@ -1,5 +1,5 @@
 # Generates src/index.css: Tailwind setup, the themeable "brand" palette, per-theme overrides
-# of the neutral (zinc) scale, and the light "Paper" theme's inverted status colours.
+# of the neutral (zinc) scale, and the light "Paper" theme's inverted status colors.
 # Run: python3 scripts/gen-themes.py
 from pathlib import Path
 
@@ -52,7 +52,7 @@ out.append(block(':root', [
 for name, (zinc, brand, bg) in DARK_THEMES.items():
     out.append(block(f':root[data-theme="{name}"]', [scale('zinc', zinc), scale('brand', brand), f'  --app-bg: {bg};']))
 
-# Paper: light theme. Invert neutrals and status colours (keeping the solid 500/600 fills) so the
+# Paper: light theme. Invert neutrals and status colors (keeping the solid 500/600 fills) so the
 # same utility classes still read as dark-on-light.
 paper = ['  color-scheme: light;', scale('zinc', PAPER), scale('brand', TW['red'])]
 for c in ['emerald', 'red', 'rose', 'amber', 'sky', 'blue', 'orange', 'indigo', 'violet']:

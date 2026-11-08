@@ -61,7 +61,7 @@ export class Engine {
     this.send(`setoption name ${name} value ${value}`)
   }
 
-  /** Analyse a position. Starting a new analysis cancels the previous one (it resolves with partial results). */
+  /** Analyze a position. Starting a new analysis cancels the previous one (it resolves with partial results). */
   analyze(fen: string, opts: { depth?: number; movetime?: number; multipv?: number } = {}, onUpdate?: (a: Analysis) => void): Promise<Analysis> {
     return new Promise((resolve) => {
       const go = opts.movetime ? `go movetime ${opts.movetime}` : `go depth ${opts.depth ?? 16}`
@@ -116,7 +116,7 @@ export class Engine {
     const multipv = mpIdx >= 0 ? Number(t[mpIdx + 1]) : 1
     const kind = t[scoreAt + 1]
     let val = Number(t[scoreAt + 2])
-    // UCI scores are from the side to move; normalise to White's perspective.
+    // UCI scores are from the side to move; normalize to White's perspective.
     if (job.fen.split(' ')[1] === 'b') val = -val
     const entry: EngineLine = { multipv, depth, pv: t.slice(pvAt + 1) }
     if (kind === 'mate') entry.mate = val
@@ -158,7 +158,7 @@ export function getPlayEngine() {
 }
 
 let batchEngine: Engine | null = null
-/** Engine for long background jobs (analysing your imported games). */
+/** Engine for long background jobs (analyzing your imported games). */
 export function getBatchEngine() {
   return (batchEngine ??= new Engine())
 }

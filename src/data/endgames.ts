@@ -89,10 +89,10 @@ export const ENDGAMES: EndgameDef[] = [
     side: 'w',
     goal: 'mate',
     level: 'Advanced',
-    summary: 'The hardest basic mate: you can only mate in a corner of your bishop\'s colour, within 50 moves.',
+    summary: 'The hardest basic mate: you can only mate in a corner of your bishop\'s color, within 50 moves.',
     technique: [
       'Drive the king to the edge first, using king, bishop and knight together.',
-      "If it runs to the wrong corner (not your bishop's colour), use the W manoeuvre with the knight to herd it along the edge.",
+      "If it runs to the wrong corner (not your bishop's color), use the W maneuver with the knight to herd it along the edge.",
       'Your king stays a knight\'s move diagonally away from the enemy king while the minors take squares.',
       'Count your moves — the 50-move rule applies!',
     ],
@@ -214,7 +214,7 @@ export const ENDGAMES: EndgameDef[] = [
     goal: 'draw',
     holdMoves: 30,
     level: 'Intermediate',
-    summary: 'The essential rook-endgame defence: the 3rd-rank rook.',
+    summary: 'The essential rook-endgame defense: the 3rd-rank rook.',
     technique: [
       'Keep your rook on your 3rd rank (here the 6th) so the white king cannot advance.',
       'The moment the pawn steps to the 6th, swing your rook to the back of the board and check from behind.',
@@ -223,7 +223,7 @@ export const ENDGAMES: EndgameDef[] = [
   },
   {
     id: 'vancura',
-    name: 'Vančura defence',
+    name: 'Vančura defense',
     category: 'Rook endings',
     fen: 'R7/6k1/P4r2/8/8/8/8/6K1 b - - 0 1',
     side: 'b',
@@ -281,7 +281,7 @@ export const ENDGAMES: EndgameDef[] = [
     technique: [
       'Keep the knight next to your king — a separated knight gets trapped or forked.',
       'Avoid the corners: in a corner, the knight can run out of squares.',
-      'Head for the centre of the board when you can.',
+      'Head for the center of the board when you can.',
     ],
   },
   // ───────────── Minor pieces ─────────────
@@ -313,14 +313,14 @@ export const ENDGAMES: EndgameDef[] = [
   },
   {
     id: 'opposite-bishops',
-    name: 'Opposite-coloured bishops',
+    name: 'Opposite-colored bishops',
     category: 'Minor pieces',
     fen: '8/4k3/8/3P4/8/3B4/4K3/6b1 b - - 0 1',
     side: 'b',
     goal: 'draw',
     holdMoves: 25,
     level: 'Intermediate',
-    summary: 'A pawn down, but the bishops are on opposite colours: blockade on the dark squares and it\'s a fortress.',
+    summary: 'A pawn down, but the bishops are on opposite colors: blockade on the dark squares and it\'s a fortress.',
     technique: [
       "Put your king in front of the pawn on a square White's bishop can't attack (d6 is dark — perfect).",
       'Your bishop controls the squares in front of the pawn; never trade it.',
@@ -336,7 +336,7 @@ export const ENDGAMES: EndgameDef[] = [
     side: 'w',
     goal: 'win',
     level: 'Intermediate',
-    summary: 'A centre pawn on the 7th loses to the queen: force the king in front of the pawn, then bring your king one step closer.',
+    summary: 'A center pawn on the 7th loses to the queen: force the king in front of the pawn, then bring your king one step closer.',
     technique: [
       'Check and pin until the king has to step in front of the pawn (onto d1).',
       'That gains a tempo: move your king one step closer.',

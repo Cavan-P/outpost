@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useProfile } from '../../lib/game'
 import { PUZZLES } from '../../lib/puzzles'
 import { TrapPuzzles } from './Puzzles'
-import { ColoursDrill, CoordinatesDrill, CountingDrill, KnightDrill } from './Vision'
+import { ColorsDrill, CoordinatesDrill, CountingDrill, KnightDrill } from './Vision'
 import { CalculationDrill, NotationDrill } from './Visualize'
 import { MatingPatterns } from './Mates'
 import { MATES } from '../../data/mates'
@@ -12,11 +12,11 @@ import { DefendIt } from './Defend'
 import { MasterGames } from './Masters'
 import { StructureQuiz } from './Structures'
 
-type Group = 'Vision' | 'Tactics' | 'Judgement'
+type Group = 'Vision' | 'Tactics' | 'Judgment'
 const GROUPS: { id: Group; blurb: string }[] = [
   { id: 'Vision', blurb: 'See the board in your head: name squares, follow lines, count forcing moves.' },
   { id: 'Tactics', blurb: 'Patterns that win games.' },
-  { id: 'Judgement', blurb: 'Know who is better, and why.' },
+  { id: 'Judgment', blurb: 'Know who is better, and why.' },
 ]
 
 type Drill = 'coords' | 'colours' | 'knight' | 'count' | 'puzzles' | 'notation' | 'calc' | 'mates' | 'plans' | 'evalguess' | 'nameopening' | 'defend' | 'masters' | 'structures'
@@ -26,14 +26,14 @@ const DRILLS: { id: Drill; group: Group; name: string; desc: string; bestKey?: s
   { id: 'calc', group: 'Vision', name: 'Calculate it', desc: 'Follow a narrated line in your head — "knight b4, bishop e2 check" — then say what\'s where.', bestKey: 'calc' },
   { id: 'notation', group: 'Vision', name: 'Name the move', desc: 'An arrow appears; type the move by its squares. Builds fluent notation.', bestKey: 'notation' },
   { id: 'defend', group: 'Tactics', name: 'Defend it', desc: 'The reverse of trap puzzles: you are the one being tricked. Find the move that does not walk into it.' },
-  { id: 'masters', group: 'Judgement', name: "Guess the master's move", desc: 'Play through famous games — the Opera Game, the Immortal, Fischer\'s Game of the Century — and guess each move.' },
-  { id: 'structures', group: 'Judgement', name: 'Pawn structures', desc: 'Carlsbad, IQP, Maróczy, Stonewall… recognise the structure, pick the plan.', bestKey: 'structures' },
+  { id: 'masters', group: 'Judgment', name: "Guess the master's move", desc: 'Play through famous games — the Opera Game, the Immortal, Fischer\'s Game of the Century — and guess each move.' },
+  { id: 'structures', group: 'Judgment', name: 'Pawn structures', desc: 'Carlsbad, IQP, Maróczy, Stonewall… recognize the structure, pick the plan.', bestKey: 'structures' },
   { id: 'mates', group: 'Tactics', name: 'Mating patterns', desc: 'Back-rank, smothered, Arabian, Anastasia, Boden and more — learn them on the board.' },
-  { id: 'evalguess', group: 'Judgement', name: 'Guess the eval', desc: "Who's better, and by how much? Uses your own games when you've imported some.", bestKey: 'evalguess' },
-  { id: 'plans', group: 'Judgement', name: 'Plans & ideas', desc: 'Match each opening to its plans — understanding, not just memory.', bestKey: 'plans' },
-  { id: 'nameopening', group: 'Judgement', name: 'Name that opening', desc: 'Recognise openings from the position or just the pawns.', bestKey: 'nameopening' },
+  { id: 'evalguess', group: 'Judgment', name: 'Guess the eval', desc: "Who's better, and by how much? Uses your own games when you've imported some.", bestKey: 'evalguess' },
+  { id: 'plans', group: 'Judgment', name: 'Plans & ideas', desc: 'Match each opening to its plans — understanding, not just memory.', bestKey: 'plans' },
+  { id: 'nameopening', group: 'Judgment', name: 'Name that opening', desc: 'Recognize openings from the position or just the pawns.', bestKey: 'nameopening' },
   { id: 'coords', group: 'Vision', name: 'Coordinates', desc: 'Find or name squares against the clock, from either side.', bestKey: 'coords' },
-  { id: 'colours', group: 'Vision', name: 'Light or dark', desc: 'Name square colours without a board — pure visualisation.', bestKey: 'colours' },
+  { id: 'colours', group: 'Vision', name: 'Light or dark', desc: 'Name square colors without a board — pure visualization.', bestKey: 'colours' },
   { id: 'knight', group: 'Vision', name: 'Knight routes', desc: 'Shortest knight paths. Builds fork vision.', bestKey: 'knight' },
   { id: 'count', group: 'Vision', name: 'Checks & captures', desc: 'Count the forcing moves in real opening positions.', bestKey: 'count' },
 ]
@@ -49,7 +49,7 @@ export function Training({ onBlindfold }: { onBlindfold: () => void }) {
           ← All training
         </button>
         {drill === 'coords' && <CoordinatesDrill />}
-        {drill === 'colours' && <ColoursDrill />}
+        {drill === 'colours' && <ColorsDrill />}
         {drill === 'knight' && <KnightDrill />}
         {drill === 'count' && <CountingDrill />}
         {drill === 'puzzles' && <TrapPuzzles />}

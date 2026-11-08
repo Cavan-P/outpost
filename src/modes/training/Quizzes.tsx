@@ -154,7 +154,7 @@ function PlanRound({ answer }: { answer: (n: number) => void }) {
 const BUCKETS = ['Black is winning', 'Black is better', 'About equal', 'White is better', 'White is winning'] as const
 const bucketOf = (v: number) => (v <= -2.5 ? 0 : v <= -0.8 ? 1 : v < 0.8 ? 2 : v < 2.5 ? 3 : 4)
 
-/** Positions from your analysed games (eval already known) and from the opening lines (evaluated on the fly). */
+/** Positions from your analyzed games (eval already known) and from the opening lines (evaluated on the fly). */
 async function evalQuestion(): Promise<{ fen: string; value: number; label: string; bestSan: string; source: string }> {
   const games = getGames().games.filter((g) => g.analysis)
   if (games.length && Math.random() < 0.5) {
@@ -174,7 +174,7 @@ async function evalQuestion(): Promise<{ fen: string; value: number; label: stri
 
 export function EvalGuess() {
   return (
-    <RoundShell id="evalguess" title="Guess the eval" blurb="Who's better, and by how much? Calibrating your judgement makes you pick better plans — and know when a gambit has really paid off. Exact bucket = 2 points, one off = 1." rounds={8} xpPer={3}>
+    <RoundShell id="evalguess" title="Guess the eval" blurb="Who's better, and by how much? Calibrating your judgment makes you pick better plans — and know when a gambit has really paid off. Exact bucket = 2 points, one off = 1." rounds={8} xpPer={3}>
       {({ answer }) => <EvalRound answer={answer} />}
     </RoundShell>
   )
@@ -254,7 +254,7 @@ function openingQuestion() {
 export function NameOpening() {
   const [pawnsOnly, setPawnsOnly] = useState(false)
   return (
-    <DrillShell id="nameopening" title="Name that opening" blurb="60 seconds. Recognise openings from the position (or just the pawn structure — much harder). Great for spotting transpositions." seconds={60} xpPerPoint={3}>
+    <DrillShell id="nameopening" title="Name that opening" blurb="60 seconds. Recognize openings from the position (or just the pawn structure — much harder). Great for spotting transpositions." seconds={60} xpPerPoint={3}>
       {(api) => (
         <div className="space-y-3">
           <label className="flex items-center gap-2 text-sm text-zinc-400">

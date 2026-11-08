@@ -98,7 +98,7 @@ export const STRUCTURES: Structure[] = [
     question: "Black's key central break in this Sicilian structure?",
     answer: '…d5 (often prepared by …Qc7 and …Rd8)',
     wrong: ['…f5 to open the f-file', '…h5 to gain space'],
-    why: "The d6/e6 pair is solid but passive. Freeing with …d5 at the right moment equalises — or better.",
+    why: "The d6/e6 pair is solid but passive. Freeing with …d5 at the right moment equalizes — or better.",
   },
   {
     id: 'benoni',

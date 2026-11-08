@@ -6,7 +6,7 @@ export const SOLID_OPENINGS: OpeningDef[] = [
   // ───────────────────────────── Black vs 1.e4 ─────────────────────────────
   {
     id: 'french',
-    name: 'French Defence',
+    name: 'French Defense',
     eco: 'C00–C19',
     side: 'b',
     tags: ['vs-e4', 'solid', 'classical'],
@@ -17,7 +17,7 @@ export const SOLID_OPENINGS: OpeningDef[] = [
       'Your c8-bishop is the problem piece — look for …b6/…Ba6 or …Bd7-b5 to trade it.',
     ],
     lines: [
-      "e4 e6{The French Defence.} d4 d5{Challenging e4.} Nc3{The main line.} Bb4{The Winawer: pinning the knight that defends e4.} e5 c5{Hitting the chain at once.} a3 Bxc3+ bxc3 Ne7{Heading for f5 or c6; keeps …Qc7 and …Qa5 flexible.} Qg4{Attacking g7 — the critical test.} Qc7{Counterattacking c3 and e5; Black happily gives g7 for central play.}",
+      "e4 e6{The French Defense.} d4 d5{Challenging e4.} Nc3{The main line.} Bb4{The Winawer: pinning the knight that defends e4.} e5 c5{Hitting the chain at once.} a3 Bxc3+ bxc3 Ne7{Heading for f5 or c6; keeps …Qc7 and …Qa5 flexible.} Qg4{Attacking g7 — the critical test.} Qc7{Counterattacking c3 and e5; Black happily gives g7 for central play.}",
       "e4 e6 d4 d5 Nc3 Nf6{The Classical French.} Bg5 Be7{Unpinning.} e5 Nfd7 Bxe7 Qxe7 f4 O-O{Black prepares …c5 and …f6 to break up the chain.}",
       "e4 e6 d4 d5 e5{The Advance Variation.} c5{Strike the base of the chain.} c3 Nc6 Nf3 Qb6{Triple pressure on d4.} a3 c4{Grabbing queenside space; Black plans …Na5-b3.}",
       "e4 e6 d4 d5 exd5{The Exchange Variation.} exd5 Bd3 Bd6{Mirroring; a calm, equal position.}",
@@ -27,11 +27,11 @@ export const SOLID_OPENINGS: OpeningDef[] = [
   },
   {
     id: 'petrov',
-    name: 'Petrov Defence',
+    name: 'Petrov Defense',
     eco: 'C42–C43',
     side: 'b',
     tags: ['vs-e4', 'solid'],
-    summary: 'The Russian Game: 2…Nf6 mirrors White. Super-solid and a favourite of world champions defending with Black — but you must know the …d6 move order.',
+    summary: 'The Russian Game: 2…Nf6 mirrors White. Super-solid and a favorite of world champions defending with Black — but you must know the …d6 move order.',
     ideas: [
       'Never copy with 3…Nxe4? — play 3…d6 first, then take on e4.',
       'Black gets a symmetrical, healthy structure and easy development.',
@@ -48,7 +48,7 @@ export const SOLID_OPENINGS: OpeningDef[] = [
   },
   {
     id: 'colorado',
-    name: 'Nimzowitsch Defence & Colorado Gambit',
+    name: 'Nimzowitsch Defense & Colorado Gambit',
     eco: 'B00',
     side: 'b',
     tags: ['gambit', 'vs-e4', 'offbeat', 'aggressive'],
@@ -59,7 +59,7 @@ export const SOLID_OPENINGS: OpeningDef[] = [
       'Against 2.d4, play …d5 with a French/Caro-like structure.',
     ],
     lines: [
-      "e4 Nc6{The Nimzowitsch Defence.} Nf3 f5!?{The Colorado Countergambit.} exf5{The main test.} d5{Grabbing the center; …Bxf5 regains the pawn.} d4 Bxf5 Bd3 Qd7{Preparing …O-O-O.} O-O O-O-O{Opposite-side castling: Black's pieces point at the white king.}",
+      "e4 Nc6{The Nimzowitsch Defense.} Nf3 f5!?{The Colorado Countergambit.} exf5{The main test.} d5{Grabbing the center; …Bxf5 regains the pawn.} d4 Bxf5 Bd3 Qd7{Preparing …O-O-O.} O-O O-O-O{Opposite-side castling: Black's pieces point at the white king.}",
       "e4 Nc6 Nf3 f5 exf5 d5 d4 Bxf5 Bd3 Qd7 O-O O-O-O Re1?!{Natural, but it gives Black a useful pin.} Bg4!{Pinning the knight and piling up on d4 and f3.}",
       "e4 Nc6 Nf3 f5 exf5 d5 Bb5{The sharpest answer.} Bxf5 Ne5{Hitting c6 and opening the queen's path to h5+.} Qd6{Defending c6 and keeping an eye on e5.}",
       "e4 Nc6 Nf3 f5 d3{Declining quietly.} fxe4 dxe4 e5{Black gets a free center.}",
@@ -71,7 +71,7 @@ export const SOLID_OPENINGS: OpeningDef[] = [
   // ───────────────────────────── Black vs 1.d4 ─────────────────────────────
   {
     id: 'kings-indian',
-    name: "King's Indian Defence",
+    name: "King's Indian Defense",
     eco: 'E60–E99',
     side: 'b',
     tags: ['vs-d4', 'aggressive', 'classical'],
@@ -115,7 +115,7 @@ export const SOLID_OPENINGS: OpeningDef[] = [
     eco: 'D30–D69',
     side: 'b',
     tags: ['vs-d4', 'solid', 'classical'],
-    summary: 'The rock: …e6 supports d5 and Black develops patiently. Very reliable at every level, with classic plans like the Tartakower and Lasker defences.',
+    summary: 'The rock: …e6 supports d5 and Black develops patiently. Very reliable at every level, with classic plans like the Tartakower and Lasker defenses.',
     ideas: [
       'Hold d5; develop with …Nf6, …Be7, …O-O.',
       'Free your game with …c5 or …dxc4 and …c5 at the right moment.',
@@ -132,7 +132,7 @@ export const SOLID_OPENINGS: OpeningDef[] = [
   },
   {
     id: 'slav',
-    name: 'Slav Defence',
+    name: 'Slav Defense',
     eco: 'D10–D19',
     side: 'b',
     tags: ['vs-d4', 'solid'],
@@ -175,7 +175,7 @@ export const SOLID_OPENINGS: OpeningDef[] = [
     eco: 'E00–E09',
     side: 'w',
     tags: ['d4', 'solid', 'positional'],
-    summary: "Queen's Gambit meets fianchetto: the g2-bishop pressures the long diagonal and the queenside. Pure positional pressure — a favourite of Kramnik and Carlsen.",
+    summary: "Queen's Gambit meets fianchetto: the g2-bishop pressures the long diagonal and the queenside. Pure positional pressure — a favorite of Kramnik and Carlsen.",
     ideas: [
       'The g2-bishop x-rays b7 and a8 — that\'s the whole point.',
       'If Black takes on c4, Qc2/Qa4+ regain it with pressure.',

@@ -22,7 +22,7 @@ export interface MoveAnalysis {
 }
 
 export interface GameAnalysis {
-  /** labelling rules version; older analyses are relabelled from their stored evals */
+  /** labeling rules version; older analyzes are relabelled from their stored evals */
   version?: number
   depth: number
   moves: MoveAnalysis[]

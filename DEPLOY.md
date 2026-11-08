@@ -8,7 +8,7 @@ Recommended: **Cloudflare Pages** (free, fast worldwide, applies the security he
 
 ## 1. Put the code on GitHub
 
-1. Create a **public** repository on GitHub named `outpost`. Leave it empty: no README, no licence (the project already has both).
+1. Create a **public** repository on GitHub named `outpost`. Leave it empty: no README, no license (the project already has both).
 2. In a terminal, from the project folder:
 
    ```bash

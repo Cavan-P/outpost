@@ -69,7 +69,7 @@ export function GapFinder({ tree, onJump, onAnalyze }: { tree: OpeningTree; onJu
                     onAnalyze(c.fen())
                   }}
                 >
-                  analyse
+                  analyze
                 </button>
               </li>
             ))}

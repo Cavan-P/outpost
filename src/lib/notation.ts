@@ -50,7 +50,7 @@ export function parseTypedMove(fen: string, text: string): Move | null {
       return null
     }
   }
-  // exact SAN (case-sensitive first, then with capitalised piece letter)
+  // exact SAN (case-sensitive first, then with capitalized piece letter)
   const direct = tryMove(raw) ?? tryMove(raw.replace(/^[nbrqk]/, (x) => x.toUpperCase()))
   if (direct) return direct
   if (/^[a-h][1-8][a-h][1-8][qrbn]?$/i.test(raw)) {

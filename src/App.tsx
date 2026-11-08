@@ -121,7 +121,7 @@ export default function App() {
             </details>
             {opening.flipped && (
               <p className="text-sm text-sky-200/80">
-                You're on the receiving end: the trainer plays {opening.name} against you, and the book moves for you are the defences covered by these lines. Moves marked ? or ?? are traps — don't fall for them.
+                You're on the receiving end: the trainer plays {opening.name} against you, and the book moves for you are the defenses covered by these lines. Moves marked ? or ?? are traps — don't fall for them.
               </p>
             )}
             {view.mode === 'learn' ? <Learn key={opening.id} tree={tree} onAnalyze={analyze} /> : <Practice key={opening.id} tree={tree} onAnalyze={analyze} />}

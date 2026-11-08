@@ -1,6 +1,6 @@
 // Leaderboards in D1. Opt-in: you pick a nickname and get a secret player key; only a few numbers
 // are ever posted (weekly XP, total XP, bosses, medals, streak, Gauntlet bests). Scores come from
-// the browser, so they're sanity-checked but ultimately on the honour system.
+// the browser, so they're sanity-checked but ultimately on the honor system.
 
 import { ipOf, json, limited, sha256, type Env } from './util'
 

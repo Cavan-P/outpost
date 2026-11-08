@@ -33,7 +33,7 @@ export function Review({ onDone }: { onDone: () => void }) {
       <div className="space-y-3">
         <h1 className="text-3xl font-bold text-zinc-50">Daily review</h1>
         <p className="max-w-xl text-zinc-400">
-          Nothing to review yet. The review only brings back things you've already done: positions from openings you've practised (once they're due), traps from openings you've studied, puzzles from your games you've tried, and endgames and mating patterns you've solved.
+          Nothing to review yet. The review only brings back things you've already done: positions from openings you've practiced (once they're due), traps from openings you've studied, puzzles from your games you've tried, and endgames and mating patterns you've solved.
         </p>
         <button className="btn-primary" onClick={onDone}>
           Back

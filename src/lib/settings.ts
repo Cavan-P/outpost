@@ -24,7 +24,7 @@ export const BOARDS: Record<Exclude<BoardId, 'theme'>, { name: string; colors: [
   brown: { name: 'Wood', colors: ['#f0d9b5', '#b58863'] },
   blue: { name: 'Blue', colors: ['#dee3e6', '#7393ae'] },
   red: { name: 'Red', colors: ['#f2e1dc', '#a64444'] },
-  grey: { name: 'Grey', colors: ['#d9d9d9', '#8a8a8a'] },
+  grey: { name: 'Gray', colors: ['#d9d9d9', '#8a8a8a'] },
   ink: { name: 'Ink', colors: ['#e6e1d8', '#686868'] },
   ivory: { name: 'Ivory', colors: ['#ebe3d1', '#9a7b56'] },
   slate: { name: 'Slate', colors: ['#d3d6d9', '#5b6168'] },

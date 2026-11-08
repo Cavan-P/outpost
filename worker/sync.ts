@@ -6,7 +6,7 @@ const ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ' // no 0/O, 1/I/L
 const CODE_LEN = 12 // ≈ 59 bits
 
 
-const normalise = (code: string) => code.toUpperCase().replace(/[^0-9A-Z]/g, '')
+const normalize = (code: string) => code.toUpperCase().replace(/[^0-9A-Z]/g, '')
 const validCode = (c: string) => c.length === CODE_LEN && [...c].every((ch) => ALPHABET.includes(ch))
 
 function newCode() {
@@ -44,7 +44,7 @@ export async function sync(req: Request, env: Env, path: string): Promise<Respon
 
   const m = path.match(/^\/api\/sync\/([^/]+)$/)
   if (!m) return json({ error: 'Not found' }, 404)
-  const code = normalise(decodeURIComponent(m[1]))
+  const code = normalize(decodeURIComponent(m[1]))
   if (!validCode(code)) return json({ error: 'That is not a valid sync code' }, 400)
   if (limited(ip, 'use', 240, 60 * 60_000)) return json({ error: 'Slow down a little' }, 429)
   const key = await keyFor(code)

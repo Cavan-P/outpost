@@ -10,7 +10,7 @@ import { getProgress, isDue, progressOf, type NodeStat } from './progress'
 import { PUZZLES, type Puzzle } from './puzzles'
 import { flipOpening, getTree, userDecisionNodes, type TreeNode } from './tree'
 
-// A daily mixed session made only of things you've already practised:
+// A daily mixed session made only of things you've already practiced:
 // due repertoire positions (both sides), traps from openings you've studied or puzzles you've tried,
 // puzzles from your own games you've attempted, and endgames / mating patterns you've solved.
 
@@ -29,7 +29,7 @@ export function dueItems(): { def: OpeningDef; node: TreeNode; stat?: NodeStat }
   for (const base of allOpenings()) {
     for (const def of [base, flipOpening(base)]) {
       const p = getProgress(def.id)
-      if (!Object.keys(p.nodes).length) continue // only openings you've practised
+      if (!Object.keys(p.nodes).length) continue // only openings you've practiced
       for (const node of userDecisionNodes(getTree(def))) {
         const stat = p.nodes[node.id]
         if (stat && isDue(stat, now)) out.push({ def, node, stat }) // only positions you've answered before
@@ -39,7 +39,7 @@ export function dueItems(): { def: OpeningDef; node: TreeNode; stat?: NodeStat }
   return out.sort((a, b) => progressOf(a.stat) - progressOf(b.stat) || (a.stat?.last ?? 0) - (b.stat?.last ?? 0))
 }
 
-/** An opening counts as studied if you've practised it (either side) or walked a line in Learn. */
+/** An opening counts as studied if you've practiced it (either side) or walked a line in Learn. */
 function studied(openingId: string) {
   return [openingId, `${openingId}~flip`].some((id) => {
     const p = getProgress(id)

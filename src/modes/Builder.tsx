@@ -86,7 +86,7 @@ export function Builder({ onOpen }: { onOpen: (id: string) => void }) {
 }
 
 /** Serialise a played path to our line format: `e4 e5 f4!{note} …` */
-function serialise(sans: string[], ann: Record<number, string>, notes: Record<number, string>) {
+function serialize(sans: string[], ann: Record<number, string>, notes: Record<number, string>) {
   return sans.map((s, i) => `${s}${ann[i] ?? ''}${notes[i]?.trim() ? `{${notes[i].replace(/[{}]/g, '').trim()}}` : ''}`).join(' ')
 }
 
@@ -139,7 +139,7 @@ function Editor({ initial, onClose, onOpen }: { initial: Draft; onClose: () => v
 
   function addLine() {
     if (!sans.length) return
-    setD((x) => ({ ...x, lines: [...x.lines, serialise(sans.slice(0, cursor || sans.length), ann, notes)] }))
+    setD((x) => ({ ...x, lines: [...x.lines, serialize(sans.slice(0, cursor || sans.length), ann, notes)] }))
     setSaved(false)
   }
 

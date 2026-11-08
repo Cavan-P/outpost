@@ -14,7 +14,7 @@ export interface OpeningDef {
   summary: string
   ideas: string[]
   lines: string[]
-  /** set on the mirrored copy used to practise facing this opening */
+  /** set on the mirrored copy used to practice facing this opening */
   flipped?: boolean
 }
 
@@ -39,15 +39,15 @@ const CORE_OPENINGS: OpeningDef[] = [
       "Against ...g5 lines, hit the pawn chain with h4 to loosen Black's kingside.",
     ],
     lines: [
-      "e4 e5 f4{The King's Gambit. White offers a wing pawn to deflect e5, open the f-file and grab the center with d4.} exf4{Accepting. Black takes the pawn and will often try to hold it with ...g5.} Nf3{The main move: develops and, crucially, stops ...Qh4+.} g5{Classical: Black defends f4 with the g-pawn and aims to keep the extra material.} h4{Undermining the pawn chain before Black can consolidate with ...Bg7 and ...h6.} g4 Ne5{The Kieseritzky Gambit. The knight jumps forward, eyeing f7 and g4.} Nf6{The Berlin Defence, Black's most respected reply: counterattacks e4.} d4{Building the center and opening the c1-bishop to recapture on f4.} d6 Nd3{Retreat, keeping the knight guarding f4 and e5.} Nxe4 Bxf4{White regains the pawn with active pieces; theory considers the position roughly balanced.}",
+      "e4 e5 f4{The King's Gambit. White offers a wing pawn to deflect e5, open the f-file and grab the center with d4.} exf4{Accepting. Black takes the pawn and will often try to hold it with ...g5.} Nf3{The main move: develops and, crucially, stops ...Qh4+.} g5{Classical: Black defends f4 with the g-pawn and aims to keep the extra material.} h4{Undermining the pawn chain before Black can consolidate with ...Bg7 and ...h6.} g4 Ne5{The Kieseritzky Gambit. The knight jumps forward, eyeing f7 and g4.} Nf6{The Berlin Defense, Black's most respected reply: counterattacks e4.} d4{Building the center and opening the c1-bishop to recapture on f4.} d6 Nd3{Retreat, keeping the knight guarding f4 and e5.} Nxe4 Bxf4{White regains the pawn with active pieces; theory considers the position roughly balanced.}",
       "e4 e5 f4 exf4 Nf3 g5 h4 g4 Ne5 d6{Black hits the knight immediately.} Nxg4{Taking back a pawn and keeping material balance.} Nf6 Nxf6+{Trading to simplify; Black's kingside pawns are broken.} Qxf6 Nc3{Developing and preparing Nd5 / d4. White has easy play against Black's loose position.}",
-      "e4 e5 f4 exf4 Nf3 d6{The Fischer Defence: prevents Ne5 and prepares ...g5 under better circumstances.} d4{Take the center while Black spends time on pawns.} g5 h4{Same theme: undermine the g5 pawn.} g4 Ng1{The quirky but correct retreat — the knight was attacked and has no better square. White will recapture f4 with Bxf4 and develop with Ne2.}",
-      "e4 e5 f4 exf4 Nf3 d5{The Modern Defence: Black gives back the pawn immediately for fast development.} exd5{Take it; the d5 pawn is now a target, but Black's f4 pawn is weak too.} Nf6 Nc3{Developing and defending d5.} Nxd5 Nxd5 Qxd5 d4{Grab the center; White will regain f4 with Bxf4 and has a comfortable game.}",
-      "e4 e5 f4 exf4 Nf3 Nf6{The Schallopp Defence: counterattacks e4 straight away.} e5{Kick the knight; it has to go to the edge.} Nh5 d4{Building the center. Ideas like Qe2 and g4 to trap the h5-knight are in the air.}",
+      "e4 e5 f4 exf4 Nf3 d6{The Fischer Defense: prevents Ne5 and prepares ...g5 under better circumstances.} d4{Take the center while Black spends time on pawns.} g5 h4{Same theme: undermine the g5 pawn.} g4 Ng1{The quirky but correct retreat — the knight was attacked and has no better square. White will recapture f4 with Bxf4 and develop with Ne2.}",
+      "e4 e5 f4 exf4 Nf3 d5{The Modern Defense: Black gives back the pawn immediately for fast development.} exd5{Take it; the d5 pawn is now a target, but Black's f4 pawn is weak too.} Nf6 Nc3{Developing and defending d5.} Nxd5 Nxd5 Qxd5 d4{Grab the center; White will regain f4 with Bxf4 and has a comfortable game.}",
+      "e4 e5 f4 exf4 Nf3 Nf6{The Schallopp Defense: counterattacks e4 straight away.} e5{Kick the knight; it has to go to the edge.} Nh5 d4{Building the center. Ideas like Qe2 and g4 to trap the h5-knight are in the air.}",
       "e4 e5 f4 exf4 Nf3 Be7{The Cunningham: Black eyes ...Bh4+ to annoy the white king.} Bc4{Develop with tempo toward f7. If ...Bh4+, White plays Kf1 — the king is safe enough and the rook comes to f1 naturally after g3.}",
       "e4 e5 f4 Bc5{King's Gambit Declined, Classical. The bishop on c5 stops White castling short and makes taking on e5 dangerous (…Qh4+).} Nf3{Develop and cover h4. Don't play fxe5?? because of ...Qh4+ winning material.} d6 Nc3{Calm development. White prepares Bc4, d3 and perhaps f5 or Na4 to trade the strong c5-bishop.} Nf6 Bc4{Aiming at f7. White keeps a pleasant, flexible position.} Nc6 d3{Solidly protecting e4; White can later castle and push f5.}",
       "e4 e5 f4 d5{The Falkbeer Countergambit: Black strikes back in the center immediately.} exd5{Take it.} e4{Black gives a pawn to cramp White.} d3{Challenge the e4 pawn right away.} Nf6 dxe4 Nxe4 Nf3 Bc5 Qe2{Pinning the e4-knight against the king. White is a pawn up and Black must play accurately.}",
-      "e4 e5 f4 d5 exd5 exf4{Black transposes into a sort of Modern Defence.} Nf3{Stops ...Qh4+ and prepares to win f4 back with d4/Bxf4 or c4.}",
+      "e4 e5 f4 d5 exd5 exf4{Black transposes into a sort of Modern Defense.} Nf3{Stops ...Qh4+ and prepares to win f4 back with d4/Bxf4 or c4.}",
       "e4 e5 f4 Nc6{A quiet decline.} Nf3{Develop; e5 is attacked again and fxe5 is coming next.}",
       "e4 e5 f4 exf4 Nf3 Nc6{Developing instead of holding the pawn.} d4{Center first; Bxf4 regains the pawn.} g5 h4{The familiar lever against …g5.}",
       "e4 e5 f4 d6{A solid decline.} Nf3 Nc6 Bc4{Normal development with pressure on f7.}",
@@ -74,7 +74,7 @@ const CORE_OPENINGS: OpeningDef[] = [
       "e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Be7{The Lasker-style retreat: the bishop goes back to safety.} d4{Center again.} Na5{Hitting the c4-bishop.} Be2{Keeping the bishop (Kasparov's choice).} exd4 Qxd4{Centralized queen, hitting g7 and a7.} Nf6 e5{Gaining space with tempo.} Nc6 Qh4{White's queen swings toward the kingside; White has open lines for the pawn.}",
       "e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Bc5{Retreating to the original square.} d4{The bishop gets hit again after dxe5 or cxd4.} exd4 O-O d6 cxd4 Bb6{The so-called Normal Position: White has a broad center for the pawn.} Nc3{Development; d5 and e5 pushes are in the air.}",
       "e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bb6{Evans Gambit Declined.} a4{Threatening a5 to trap or harass the bishop.} a6 Nc3{Developing; Nd5 is a common follow-up to trade the bishop.}",
-      "e4 e5 Nf3 Nc6 Bc4 Nf6{The Two Knights Defence — Black avoids the Evans entirely.} Ng5{Attacking f7 directly.} d5{The correct reply: block the bishop.} exd5 Na5{The main line: Black gives a pawn and hits the c4-bishop.} Bb5+ c6 dxc6 bxc6 Be2 h6 Nf3 e4 Ne5{Black has activity for the pawn — a principled theoretical battle.}",
+      "e4 e5 Nf3 Nc6 Bc4 Nf6{The Two Knights Defense — Black avoids the Evans entirely.} Ng5{Attacking f7 directly.} d5{The correct reply: block the bishop.} exd5 Na5{The main line: Black gives a pawn and hits the c4-bishop.} Bb5+ c6 dxc6 bxc6 Be2 h6 Nf3 e4 Ne5{Black has activity for the pawn — a principled theoretical battle.}",
       "e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5?!{A natural move, but it walks into the Fried Liver Attack.} Nxf7!{Sacrificing the knight to drag the king out.} Kxf7 Qf3+{Forking the king and the d5-knight.} Ke6 Nc3{Piling up on the pinned knight. White's attack is very dangerous in practice.}",
     ],
   },
@@ -85,17 +85,17 @@ const CORE_OPENINGS: OpeningDef[] = [
     side: 'w',
     tags: ['gambit', 'e4', 'romantic'],
     summary:
-      'White gives up to two pawns for two raking bishops aimed at f7 and g7. Lethal in fast games; the critical defence returns material with ...d5.',
+      'White gives up to two pawns for two raking bishops aimed at f7 and g7. Lethal in fast games; the critical defense returns material with ...d5.',
     ideas: [
       'Bishops on c4 and b2 slice toward the black king.',
-      'Know the Schlechter defence (…d5!) — it forces an equal endgame.',
+      'Know the Schlechter defense (…d5!) — it forces an equal endgame.',
       "Don't grab material back early; development and initiative are your compensation.",
     ],
     lines: [
-      "e4 e5 d4{Opening the center immediately.} exd4 c3{The Danish Gambit: offering a second pawn.} dxc3 Bc4{Offering a third! White wants speed above everything.} cxb2 Bxb2{Two bishops aimed at f7 and g7, and Black is still undeveloped.} d5!{The Schlechter Defence — Black gives a pawn back to blunt the c4-bishop.} Bxd5{Recapture — the bishop keeps eyeing f7.} Nf6 Bxf7+{Forcing matters: White removes f7 and trades queens.} Kxf7 Qxd8 Bb4+{An important zwischenzug: Black blocks with check before recapturing.} Qd2{The only good block.} Bxd2+ Nxd2{An equal endgame. White has the safer king and easy development; it's still fun to play.}",
+      "e4 e5 d4{Opening the center immediately.} exd4 c3{The Danish Gambit: offering a second pawn.} dxc3 Bc4{Offering a third! White wants speed above everything.} cxb2 Bxb2{Two bishops aimed at f7 and g7, and Black is still undeveloped.} d5!{The Schlechter Defense — Black gives a pawn back to blunt the c4-bishop.} Bxd5{Recapture — the bishop keeps eyeing f7.} Nf6 Bxf7+{Forcing matters: White removes f7 and trades queens.} Kxf7 Qxd8 Bb4+{An important zwischenzug: Black blocks with check before recapturing.} Qd2{The only good block.} Bxd2+ Nxd2{An equal endgame. White has the safer king and easy development; it's still fun to play.}",
       "e4 e5 d4 exd4 c3 dxc3 Bc4 cxb2 Bxb2 Nc6{Natural development, but it lets White's attack roll.} Nf3{Develop and prepare O-O, Qb3 or Nc3 with heavy pressure on f7.}",
       "e4 e5 d4 exd4 c3 dxc3 Bc4 cxb2 Bxb2 Bb4+{Black develops with check.} Nc3{Block with development.} Nf6 Ne2{Supporting c3 and keeping f2 flexible; White castles next with a strong initiative.}",
-      "e4 e5 d4 exd4 c3 d5{The Sørensen Defence: declining with a central counterstrike.} exd5 Qxd5 cxd4{White has the isolated d-pawn but free development.} Nc6 Nf3 Bg4 Be2{Calm development, unpinning. Roughly equal.}",
+      "e4 e5 d4 exd4 c3 d5{The Sørensen Defense: declining with a central counterstrike.} exd5 Qxd5 cxd4{White has the isolated d-pawn but free development.} Nc6 Nf3 Bg4 Be2{Calm development, unpinning. Roughly equal.}",
     ],
   },
   {
@@ -162,7 +162,7 @@ const CORE_OPENINGS: OpeningDef[] = [
       "d4 d5 c4 dxc4 Nf3 b5?!{Trying to hold the pawn is dubious.} a4{Undermine the b5 pawn.} c6 e3{Bxc4 or axb5 will win the material back with a better position.}",
       "d4 d5 c4 c6{The Slav: supports d5 while keeping the c8-bishop free.} Nf3 Nf6 Nc3 dxc4 a4{Stops ...b5 holding the pawn.} Bf5 e3 e6 Bxc4 Bb4 O-O{The main line of the Slav. Balanced, but White has the center to play with.}",
       "d4 d5 c4 e5{The Albin Countergambit.} dxe5{Take it.} d4 Nf3{Defending against ...dxe3 tricks and preparing g3.} Nc6 g3{Fianchetto pressure on the long diagonal.} Be6 Nbd2 Qd7 Bg2{White plans O-O, a3 and b4 to attack Black's long-castled king.}",
-      "d4 d5 c4 Nc6{The Chigorin Defence: Black gives up the center for piece play.} Nf3{Calmly stops ...e5.} Bg4 cxd5{Exploiting the pin-free moment.} Bxf3 gxf3{Bishop pair and center for White.}",
+      "d4 d5 c4 Nc6{The Chigorin Defense: Black gives up the center for piece play.} Nf3{Calmly stops ...e5.} Bg4 cxd5{Exploiting the pin-free moment.} Bxf3 gxf3{Bishop pair and center for White.}",
     ],
   },
   // ───────────────────────────── White solid ─────────────────────────────
@@ -181,8 +181,8 @@ const CORE_OPENINGS: OpeningDef[] = [
     ],
     lines: [
       "e4 e5 Nf3 Nc6 Bc4 Bc5{Giuoco Piano.} c3{Preparing d4 one day; also gives the bishop a retreat square on c2/b3 later.} Nf6 d3{The Pianissimo: White keeps everything protected and plays slowly.} d6 O-O O-O Re1{Supporting e4 and preparing Nbd2-f1.} a6 a4{Making space for the bishop on a2 and stopping ...b5.}",
-      "e4 e5 Nf3 Nc6 Bc4 Nf6{Two Knights Defence.} d3{The solid approach: protect e4.} Be7 O-O O-O Re1 d6 c3{A classical setup, aiming for Nbd2-f1-g3 and d4 later.}",
-      "e4 e5 Nf3 Nc6 Bc4 Be7{The Hungarian Defence: very solid.} d4{Strike while Black is passive.} d6 Nc3{White has easy development and a nice center.}",
+      "e4 e5 Nf3 Nc6 Bc4 Nf6{Two Knights Defense.} d3{The solid approach: protect e4.} Be7 O-O O-O Re1 d6 c3{A classical setup, aiming for Nbd2-f1-g3 and d4 later.}",
+      "e4 e5 Nf3 Nc6 Bc4 Be7{The Hungarian Defense: very solid.} d4{Strike while Black is passive.} d6 Nc3{White has easy development and a nice center.}",
       "e4 e5 Nf3 Nc6 Bc4 Nd4?!{The Blackburne Shilling Gambit: a cheap trap.} Nxe5?{Greedy — exactly what Black wants.} Qg5{Forking the knight and g2.} Nxf7??{Grabbing more…} Qxg2 Rf1 Qxe4+ Be2 Nf3#{Smothered! Know this so you never fall for it.}",
       "e4 e5 Nf3 Nc6 Bc4 Nd4 Nxd4{The simple answer.} exd4 O-O{White is comfortably better: Black wasted time with the knight.}",
     ],
@@ -228,7 +228,7 @@ const CORE_OPENINGS: OpeningDef[] = [
       "d4 Nf6 c4 e5 dxe5 Ng4 Nf3{Defending e5 with the knight instead.} Bc5{Attacking f2.} e3 Nc6 Be2 Ngxe5 Nxe5 Nxe5 O-O O-O{Again material is level with a comfortable game for Black.}",
       "d4 Nf6 c4 e5 dxe5 Ng4 e4{The Alekhine Variation: White gives back the pawn for a big center.} Nxe5 f4{Chasing the knight.} Nec6{The knight heads back but keeps pressure on d4/e5.} Be3 Bb4+ Nc3{Black will play ...Qe7 / ...O-O and strike with ...f5 or ...d6.}",
       "d4 Nf6 c4 e5 d5{Declining by closing the center.} Bc5{An active post; Black plays ...d6, ...O-O and ...a5 like a Czech Benoni.} Nc3 O-O",
-      "d4 Nf6 c4 e5 dxe5 Ne4!?{The Fajarowicz Variation: the knight jumps in and eyes f2 and c3.} Nf3 Nc6{Hitting e5.} a3 d6{Opening the d-file for the queen.} exd6 Bxd6 g3?{Natural, but it walks into a trap.} Nxf2!{A knight sacrifice on f2…} Kxf2 Bxg3+!{…and a bishop sacrifice that deflects the h2-pawn (or the king) from the defence.} hxg3 Qxd1{The d-file is open — Black wins the queen. A reverse ICBM!}",
+      "d4 Nf6 c4 e5 dxe5 Ne4!?{The Fajarowicz Variation: the knight jumps in and eyes f2 and c3.} Nf3 Nc6{Hitting e5.} a3 d6{Opening the d-file for the queen.} exd6 Bxd6 g3?{Natural, but it walks into a trap.} Nxf2!{A knight sacrifice on f2…} Kxf2 Bxg3+!{…and a bishop sacrifice that deflects the h2-pawn (or the king) from the defense.} hxg3 Qxd1{The d-file is open — Black wins the queen. A reverse ICBM!}",
       "d4 Nf6 c4 e5 dxe5 Ne4 Nf3 Nc6 a3 d6 exd6 Bxd6 Nbd2{The careful move: challenging the e4-knight.} Bf5{Supporting the knight; Black has active pieces for the pawn.}",
       "d4 Nf6 c4 e5 dxe5 Ne4 Qc2{Attacking the knight immediately.} Bb4+ Nd2 d5{Defending the knight with a pawn and opening lines.} exd6 Bf5{Black has rapid development for the pawn.}",
     ],
@@ -290,8 +290,8 @@ const CORE_OPENINGS: OpeningDef[] = [
     lines: [
       "e4 e5 Nf3 Nf6{The Petrov move order.} Nxe5{White takes; now the Stafford.} Nc6{The Stafford Gambit: offering a pawn.} Nxc6 dxc6{Opening lines for the queen and c8-bishop.} d3{The calm, best reply: protect e4.} Bc5{Aiming at f2.} Be2{Simple development, avoiding Bg5.} h5{Preparing ...Ng4 and preventing Bg5. The play is double-edged.}",
       "e4 e5 Nf3 Nf6 Nxe5 Nc6 Nxc6 dxc6 d3 Bc5 Bg5??{The natural pin is a blunder.} Nxe4!{Sacrificing the queen.} Bxd8 Bxf2+ Ke2 Bg4#{Checkmate! The bishops and knight cover every escape square.}",
-      "e4 e5 Nf3 Nf6 Nxe5 Nc6 Nxc6 dxc6 e5{Kicking the knight.} Ne4 d4{White's best move — but Black has a trick ready.} Qh4{Threatening …Qxf2#.} g3?{The natural defence loses material.} Nxg3{The knight sac opens the h1-rook.} fxg3 Qe4+{Forking the king and the h1 rook.}",
-      "e4 e5 Nf3 Nf6 Nxe5 Nc6 Nxc6 dxc6 e5 Ne4 d4 Qh4 Qf3{The correct defence: f2 is covered and g3 stays safe. White is clearly better.}",
+      "e4 e5 Nf3 Nf6 Nxe5 Nc6 Nxc6 dxc6 e5{Kicking the knight.} Ne4 d4{White's best move — but Black has a trick ready.} Qh4{Threatening …Qxf2#.} g3?{The natural defense loses material.} Nxg3{The knight sac opens the h1-rook.} fxg3 Qe4+{Forking the king and the h1 rook.}",
+      "e4 e5 Nf3 Nf6 Nxe5 Nc6 Nxc6 dxc6 e5 Ne4 d4 Qh4 Qf3{The correct defense: f2 is covered and g3 stays safe. White is clearly better.}",
       "e4 e5 Nf3 Nf6 Nxe5 Nc6 Nxc6 dxc6 Nc3{Natural development.} Bc5 Be2 h5{The same plan as before: ...Ng4 and kingside play.}",
       "e4 e5 Nf3 Nf6 Nc3{White avoids the gambit — Four Knights.} Nc6{Simply develop; a normal game.}",
       "e4 e5 Nf3 Nf6 d4{The Steinitz attack of the Petrov.} Nxe4{Take the central pawn.} dxe5 d5{Supporting the e4-knight.}",
@@ -300,7 +300,7 @@ const CORE_OPENINGS: OpeningDef[] = [
   // ───────────────────────────── Black solid ─────────────────────────────
   {
     id: 'caro-kann',
-    name: 'Caro-Kann Defence',
+    name: 'Caro-Kann Defense',
     eco: 'B10–B19',
     side: 'b',
     tags: ['vs-e4', 'solid'],

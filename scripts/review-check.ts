@@ -1,4 +1,4 @@
-// Checks the daily review only serves material you've already practised (uses an in-memory localStorage).
+// Checks the daily review only serves material you've already practiced (uses an in-memory localStorage).
 import { mem } from './mock-storage'
 import { buildSession, type Item } from '../src/lib/reviewSession'
 const describe = (items: Item[]) => items.map((i) => (i.kind === 'book' ? `book:${i.def.id}` : i.kind === 'trap' ? `trap:${i.puzzle.openingId}` : i.kind === 'endgame' ? `endgame:${i.endgame.id}` : i.kind === 'mate' ? `mate:${i.pattern.id}` : `own:${i.puzzle.id}`))
@@ -13,7 +13,7 @@ const expect = (name: string, ok: boolean, got: unknown) => {
 let s = describe(buildSession({}))
 expect('fresh profile → empty review', s.length === 0, s)
 
-// 2. practised the Italian (one due position) and solved one endgame + one mate pattern
+// 2. practiced the Italian (one due position) and solved one endgame + one mate pattern
 mem['ctt.progress.v1'] = JSON.stringify({ italian: { nodes: { 'e4 e5': { correct: 1, wrong: 0, streak: 1, last: 1, box: 1, due: 0 } }, learned: [] } })
 for (let k = 0; k < 20; k++) {
   s = describe(buildSession({ endgames: ['mate-kq'], mates: ['back-rank'] }))

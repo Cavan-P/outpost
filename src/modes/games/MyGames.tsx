@@ -11,7 +11,7 @@ type Sub = { kind: 'report' } | { kind: 'game'; id: string; ply?: number } | { k
 export function MyGames({ onOpenOpening }: { onOpenOpening: (id: string, flip: boolean) => void }) {
   const store = useGames()
   const [sub, setSub] = useState<Sub>({ kind: 'report' })
-  // only your own games feed the report and puzzles; ones imported "just to analyse" are listed but left out
+  // only your own games feed the report and puzzles; ones imported "just to analyze" are listed but left out
   const report = useMemo(() => buildReport(myGames(store.games)), [store.games])
 
   if (sub.kind === 'game') {
@@ -29,8 +29,8 @@ export function MyGames({ onOpenOpening }: { onOpenOpening: (id: string, flip: b
         <p className="mt-1 text-sm text-zinc-500">Import your games, let Stockfish go through every move, and see the patterns behind your mistakes.</p>
       </header>
       <Importer />
-      <RunnerBar count={store.games.length} unanalysed={store.games.filter((g) => !g.analysis).length} />
-      {report.analysed > 0 ? (
+      <RunnerBar count={store.games.length} unanalyzed={store.games.filter((g) => !g.analysis).length} />
+      {report.analyzed > 0 ? (
         <ReportView report={report} onTrain={(tag) => setSub({ kind: 'puzzles', tag })} onOpenOpening={onOpenOpening} />
       ) : (
         store.games.length > 0 && (
@@ -63,7 +63,7 @@ function Importer() {
       const games = source === 'lichess' ? await fetchLichess(user.trim(), count) : source === 'chess.com' ? await fetchChessCom(user.trim(), count) : parsePgnText(pgn, user)
       if (!games.length) throw new Error(source === 'pgn' ? "Couldn't read any games from that PGN." : 'No standard games found.')
       const added = addGames(user.trim(), source, games, notMine)
-      setMsg({ ok: true, text: `Imported ${games.length} game${games.length === 1 ? '' : 's'} (${added} new)${notMine ? ' to analyse only — they won\'t count towards your report or puzzles' : ''}.` })
+      setMsg({ ok: true, text: `Imported ${games.length} game${games.length === 1 ? '' : 's'} (${added} new)${notMine ? ' to analyze only — they won\'t count towards your report or puzzles' : ''}.` })
     } catch (e) {
       setMsg({ ok: false, text: e instanceof TypeError ? "Couldn't reach the server — check your connection." : (e as Error).message })
     } finally {
@@ -91,9 +91,9 @@ function Importer() {
             ))}
           </select>
         )}
-        <label className="flex items-center gap-2 text-sm text-zinc-400" title="For games you didn't play: you can analyse them, but they stay out of your mistake report, puzzles and daily review">
+        <label className="flex items-center gap-2 text-sm text-zinc-400" title="For games you didn't play: you can analyze them, but they stay out of your mistake report, puzzles and daily review">
           <input type="checkbox" checked={notMine} onChange={(e) => setNotMine(e.target.checked)} />
-          Not my games — just analyse
+          Not my games — just analyze
         </label>
         <button className="btn-primary" onClick={go} disabled={busy || (source === 'pgn' ? !pgn.trim() : !user.trim())}>
           {busy ? 'Importing…' : 'Import'}
@@ -106,7 +106,7 @@ function Importer() {
   )
 }
 
-function RunnerBar({ count, unanalysed }: { count: number; unanalysed: number }) {
+function RunnerBar({ count, unanalyzed }: { count: number; unanalyzed: number }) {
   const r = useRunner()
   const [depth, setDepth] = useState(12)
   if (!count) return null
@@ -115,7 +115,7 @@ function RunnerBar({ count, unanalysed }: { count: number; unanalysed: number })
     <section className="space-y-2 rounded-xl p-4 ring-1 ring-white/5">
       <div className="flex flex-wrap items-center gap-3 text-sm">
         <span className="text-zinc-300">
-          {count} games · {count - unanalysed} analysed
+          {count} games · {count - unanalyzed} analyzed
         </span>
         <label className="ml-auto flex items-center gap-2 text-zinc-400">
           Depth
@@ -130,8 +130,8 @@ function RunnerBar({ count, unanalysed }: { count: number; unanalysed: number })
             Stop
           </button>
         ) : (
-          <button className="btn-primary" onClick={() => runAnalysis(depth)} disabled={!unanalysed && depth <= 12}>
-            {unanalysed ? `Analyse ${unanalysed} game${unanalysed === 1 ? '' : 's'}` : 'Re-analyse deeper'}
+          <button className="btn-primary" onClick={() => runAnalysis(depth)} disabled={!unanalyzed && depth <= 12}>
+            {unanalyzed ? `Analyze ${unanalyzed} game${unanalyzed === 1 ? '' : 's'}` : 'Re-analyze deeper'}
           </button>
         )}
         <button
@@ -188,7 +188,7 @@ function ReportView({ report: r, onTrain, onOpenOpening }: { report: Report; onT
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        {tile('average accuracy', `${r.accuracy.toFixed(0)}%`, `${r.analysed} analysed games`)}
+        {tile('average accuracy', `${r.accuracy.toFixed(0)}%`, `${r.analyzed} analyzed games`)}
         {tile('blunders per game', r.perGame.blunders.toFixed(1), `${r.perGame.mistakes.toFixed(1)} mistakes, ${r.perGame.inaccuracies.toFixed(1)} inaccuracies`)}
         {tile('results', `${r.results.win}-${r.results.draw}-${r.results.loss}`, 'wins · draws · losses')}
         {tile('puzzles from your mistakes', String(r.puzzles.length))}
@@ -358,7 +358,7 @@ function GameList({ games, onOpen }: { games: ImportedGame[]; onOpen: (id: strin
               </span>
               <span className="text-xs text-zinc-500">{g.speed ?? g.source}</span>
               <span className="w-24 text-right text-xs text-zinc-400">
-                {!g.analysis ? 'not analysed' : g.notMine ? `${g.analysis.accuracy.w.toFixed(0)}% / ${g.analysis.accuracy.b.toFixed(0)}%` : `${g.analysis.accuracy[g.userColor].toFixed(0)}% · ${blunders}✗`}
+                {!g.analysis ? 'not analyzed' : g.notMine ? `${g.analysis.accuracy.w.toFixed(0)}% / ${g.analysis.accuracy.b.toFixed(0)}%` : `${g.analysis.accuracy[g.userColor].toFixed(0)}% · ${blunders}✗`}
               </span>
               <span className="w-20 text-right text-xs text-zinc-600">{g.date ? new Date(g.date).toLocaleDateString() : ''}</span>
             </button>

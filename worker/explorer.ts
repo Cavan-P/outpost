@@ -13,7 +13,7 @@ export async function explorer(req: Request, env: Env, url: URL, ctx: ExecutionC
   const db = url.searchParams.get('db') === 'masters' ? 'masters' : 'lichess'
   if (!FEN.test(fen)) return json({ error: 'Bad position' }, 400)
 
-  // normalise so equivalent requests share a cache entry (move counters don't matter)
+  // normalize so equivalent requests share a cache entry (move counters don't matter)
   const parts = fen.split(' ')
   const key = new URL(`https://explorer-cache.outpost/${db}`)
   key.searchParams.set('fen', `${parts.slice(0, 4).join(' ')} 0 1`)

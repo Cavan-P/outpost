@@ -147,15 +147,15 @@ export function CoordinatesDrill() {
 
 // ───────────── Light or dark ─────────────
 
-export function ColoursDrill() {
+export function ColorsDrill() {
   return (
-    <DrillShell id="colours" title="Light or dark?" blurb="30 seconds, no board. Knowing square colours instantly helps with bishops, knight forks and blindfold play. Keys: ← light, → dark." seconds={30} xpPerPoint={1}>
-      {(api) => <Colours {...api} />}
+    <DrillShell id="colours" title="Light or dark?" blurb="30 seconds, no board. Knowing square colors instantly helps with bishops, knight forks and blindfold play. Keys: ← light, → dark." seconds={30} xpPerPoint={1}>
+      {(api) => <Colors {...api} />}
     </DrillShell>
   )
 }
 
-function Colours({ running, hit, miss }: DrillApi) {
+function Colors({ running, hit, miss }: DrillApi) {
   const [lightSq, darkSq] = boardColors(useSettings())
   const [sq, setSq] = useState(randomSquare)
   const [last, setLast] = useState<boolean | null>(null)

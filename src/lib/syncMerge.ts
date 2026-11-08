@@ -65,7 +65,7 @@ function maxRecord(a: Record<string, number> = {}, b: Record<string, number> = {
   return out
 }
 
-/** Union by id, honouring deletions on either side since the last sync. */
+/** Union by id, honoring deletions on either side since the last sync. */
 function mergeById<T>(local: T[], remote: T[], baseIds: string[], id: (x: T) => string, pick: (l: T, r: T) => T): T[] {
   const base = new Set(baseIds)
   const L = new Map(local.map((x) => [id(x), x]))

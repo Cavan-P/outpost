@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 
-// About, credits and licences — plus the "your data" controls (backup / restore / delete).
+// About, credits and licenses — plus the "your data" controls (backup / restore / delete).
 // The source link is required once the site is public: the bundled Stockfish engine is GPL-3.0.
 
 /** Set VITE_REPO_URL (see .env.example) to your public repository before publishing. */
@@ -100,13 +100,13 @@ export function About() {
       </header>
 
       <section className="space-y-2">
-        <h2 className="text-lg font-semibold text-zinc-50">Source code & licence</h2>
+        <h2 className="text-lg font-semibold text-zinc-50">Source code & license</h2>
         <p className="text-sm text-zinc-300">
           Outpost is free software, licensed under the{' '}
           <a className="text-brand-400 hover:underline" href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener noreferrer">
             GNU General Public License v3.0 or later
           </a>
-          . You can read, copy, change and share the code under the same licence.
+          . You can read, copy, change and share the code under the same license.
         </p>
         {REPO_URL ? (
           <a className="btn-primary inline-block" href={REPO_URL} target="_blank" rel="noopener noreferrer">
@@ -132,7 +132,7 @@ export function About() {
           ))}
         </div>
         <p className="text-xs text-zinc-500">
-          The engine files are served unmodified from <code>/engine/</code> together with their licence (<a className="hover:underline" href={`${import.meta.env.BASE_URL}engine/COPYING.txt`} target="_blank" rel="noopener noreferrer">COPYING.txt</a>). Opening notes, endgame lessons and drills were written for this project.
+          The engine files are served unmodified from <code>/engine/</code> together with their license (<a className="hover:underline" href={`${import.meta.env.BASE_URL}engine/COPYING.txt`} target="_blank" rel="noopener noreferrer">COPYING.txt</a>). Opening notes, endgame lessons and drills were written for this project.
         </p>
       </section>
 

@@ -6,7 +6,7 @@ import { MATES, type MatePattern } from '../../data/mates'
 import { getPlayEngine } from '../../lib/engine'
 import { addToSet, award, count, useProfile } from '../../lib/game'
 
-/** Learn the classic mating patterns: deliver mate in N against Stockfish's best defence. */
+/** Learn the classic mating patterns: deliver mate in N against Stockfish's best defense. */
 export function MatingPatterns() {
   const profile = useProfile()
   const solved = new Set(profile.sets.mates ?? [])

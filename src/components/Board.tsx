@@ -187,7 +187,7 @@ export function Board({ fen, orientation, onMove, interactive = true, arrows = [
 
 const GLYPH = { w: { q: '♕', r: '♖', b: '♗', n: '♘' }, b: { q: '♛', r: '♜', b: '♝', n: '♞' } } as const
 
-/** Four pieces stacked over the promotion square (towards the board's centre), like on Lichess. */
+/** Four pieces stacked over the promotion square (towards the board's center), like on Lichess. */
 function PromotionPicker({ promo, orientation, onPick, onCancel }: { promo: { to: string; color: 'w' | 'b' }; orientation: 'white' | 'black'; onPick: (p: 'q' | 'r' | 'b' | 'n') => void; onCancel: () => void }) {
   const file = promo.to.charCodeAt(0) - 97
   const col = orientation === 'white' ? file : 7 - file

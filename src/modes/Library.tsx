@@ -12,7 +12,7 @@ type SideFilter = 'any' | 'w' | 'b'
 
 const SORTS: { id: Sort; label: string }[] = [
   { id: 'recommended', label: 'Recommended' },
-  { id: 'recent', label: 'Recently practised' },
+  { id: 'recent', label: 'Recently practiced' },
   { id: 'due', label: 'Most due for review' },
   { id: 'least', label: 'Least progress' },
   { id: 'most', label: 'Most progress' },
@@ -135,7 +135,7 @@ export function Library({ onOpen }: { onOpen: (id: string, mode: 'learn' | 'prac
               <button key={s.def.id} onClick={() => onOpen(s.def.id, 'practice', false)} className="group rounded-xl p-4 text-left ring-1 ring-white/5 transition hover:ring-brand-500/40">
                 <p className="truncate font-medium text-zinc-100">{s.def.name}</p>
                 <p className="mt-1 text-xs text-zinc-500">{s.due ? <span className="text-amber-300">{s.due} due for review</span> : `${Math.round(s.progress * 100)}% progress`}</p>
-                <p className="mt-3 text-xs text-brand-400 opacity-70 group-hover:opacity-100">Practise →</p>
+                <p className="mt-3 text-xs text-brand-400 opacity-70 group-hover:opacity-100">Practice →</p>
               </button>
             ))}
           </div>
@@ -252,7 +252,7 @@ function Card({ s, onOpen }: { s: Stats; onOpen: (id: string, mode: 'learn' | 'p
         <button className="text-zinc-300 hover:text-zinc-50" onClick={() => onOpen(o.id, 'learn', false)}>
           Learn
         </button>
-        <button className="text-zinc-500 hover:text-zinc-200" onClick={() => onOpen(o.id, 'learn', true)} title={`Train the defence as ${sideName(o.side === 'w' ? 'b' : 'w')}`}>
+        <button className="text-zinc-500 hover:text-zinc-200" onClick={() => onOpen(o.id, 'learn', true)} title={`Train the defense as ${sideName(o.side === 'w' ? 'b' : 'w')}`}>
           Face it
         </button>
         <span className="ml-auto text-xs tabular-nums text-zinc-500" title={s.medalHint}>{pct}%</span>
@@ -288,7 +288,7 @@ function Row({ s, onOpen }: { s: Stats; onOpen: (id: string, mode: 'learn' | 'pr
         <button className="btn-primary !px-2.5 !py-1 text-xs" onClick={() => onOpen(o.id, 'practice', false)}>
           Practice
         </button>
-        <button className="btn-secondary !px-2.5 !py-1 text-xs" onClick={() => onOpen(o.id, 'learn', true)} title="Train the defence against it">
+        <button className="btn-secondary !px-2.5 !py-1 text-xs" onClick={() => onOpen(o.id, 'learn', true)} title="Train the defense against it">
           Face it
         </button>
       </div>

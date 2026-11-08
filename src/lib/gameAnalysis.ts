@@ -127,10 +127,10 @@ export function labelMove(fenBefore: string, fenAfter: string, m: Omit<MoveAnaly
   return { cls, tags: cls === 'inaccuracy' ? [] : tags }
 }
 
-/** Bump when the labelling rules change; stored analyses get relabelled by `relabel()`. */
+/** Bump when the labeling rules change; stored analyzes get relabelled by `relabel()`. */
 export const ANALYSIS_VERSION = 4
 
-/** Re-apply the current labelling rules to a stored analysis — no engine needed, the evals are saved. */
+/** Re-apply the current labeling rules to a stored analysis — no engine needed, the evals are saved. */
 export function relabel(game: ImportedGame): GameAnalysis | null {
   const a = game.analysis
   if (!a || a.version === ANALYSIS_VERSION) return null
@@ -146,7 +146,7 @@ export function relabel(game: ImportedGame): GameAnalysis | null {
 const SEVERITY: MoveAnalysis['cls'][] = ['best', 'good', 'inaccuracy', 'mistake', 'blunder']
 
 /**
- * How a move is labelled, from the evaluation before and after it (both from White's point of view).
+ * How a move is labeled, from the evaluation before and after it (both from White's point of view).
  * Two yardsticks, and the worse verdict wins:
  *  - winning chances (lichess-style): catches throwing away a win or a draw, and missed mates;
  *  - pawns of evaluation lost: catches tactical errors in positions that are already lopsided,
@@ -166,7 +166,7 @@ export function classifyMove(before: Score, after: Score, mover: Color, isBest: 
   return SEVERITY[Math.max(byChances, byPawns)]
 }
 
-/** Analyse every move of a game. `onProgress(done, total)` is called as positions are evaluated. */
+/** Analyze every move of a game. `onProgress(done, total)` is called as positions are evaluated. */
 export async function analyzeGame(game: ImportedGame, depth: number, onProgress?: (done: number, total: number) => void, shouldStop?: () => boolean): Promise<GameAnalysis | null> {
   const fens = fensOf(game.sans, game.startFen)
   const engine = getBatchEngine()
@@ -291,7 +291,7 @@ export interface MistakePuzzle {
 
 export interface Report {
   games: number
-  analysed: number
+  analyzed: number
   results: { win: number; draw: number; loss: number }
   accuracy: number
   perGame: { blunders: number; mistakes: number; inaccuracies: number }
@@ -304,7 +304,7 @@ export interface Report {
 }
 
 export function buildReport(games: ImportedGame[]): Report {
-  const analysed = games.filter((g) => g.analysis)
+  const analyzed = games.filter((g) => g.analysis)
   const results = { win: 0, draw: 0, loss: 0 }
   const phases = { opening: { moves: 0, errors: 0 }, middlegame: { moves: 0, errors: 0 }, endgame: { moves: 0, errors: 0 } }
   const hung: Record<PieceSymbol, number> = { q: 0, r: 0, b: 0, n: 0, p: 0, k: 0 }
@@ -358,10 +358,10 @@ export function buildReport(games: ImportedGame[]): Report {
     }
   }
 
-  const n = Math.max(1, analysed.length)
+  const n = Math.max(1, analyzed.length)
   return {
     games: games.length,
-    analysed: analysed.length,
+    analyzed: analyzed.length,
     results,
     accuracy: accs.length ? accs.reduce((a, b) => a + b, 0) / accs.length : 0,
     perGame: { blunders: blunders / n, mistakes: mistakes / n, inaccuracies: inaccuracies / n },

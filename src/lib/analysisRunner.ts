@@ -2,7 +2,7 @@ import { useSyncExternalStore } from 'react'
 import { analyzeGame } from './gameAnalysis'
 import { getGames, saveAnalysis } from './games'
 
-// Analyses imported games one after another in the background; keeps running while you use other pages.
+// Analyzes imported games one after another in the background; keeps running while you use other pages.
 
 export interface RunnerState {
   running: boolean
@@ -31,7 +31,7 @@ export function useRunner() {
   )
 }
 
-/** Analyse every game that isn't analysed yet (or was analysed shallower than `depth`). */
+/** Analyze every game that isn't analyzed yet (or was analyzed shallower than `depth`). */
 export async function runAnalysis(depth: number) {
   if (state.running) return
   stopRequested = false
