@@ -75,6 +75,9 @@ export function Practice({ tree, onAnalyze }: Props) {
   const [blind, setBlind] = useState(false)
   const [peek, setPeek] = useState(false)
   const [combo, setCombo] = useState(0)
+  // positions with two book moves: which branch to nudge you toward, and the last branch you skipped
+  const [showBranch, setShowBranch] = useState(false)
+  const [skipped, setSkipped] = useState<TreeNode | null>(null)
   const [step, setStep] = useState<{ label: string; before: Stage; after: Stage; promoted: boolean; outcome: Outcome } | null>(null)
   // per-line bookkeeping for bonuses; refs because the opponent's reply runs from a timer
   const line = useRef({ mistakes: 0, peeked: false, blind: false, xp: 0, moves: 0, learning: 0 })
@@ -87,6 +90,27 @@ export function Practice({ tree, onAnalyze }: Props) {
   for (const n of decisions) stageCounts[stageOf(progress.nodes[n.id])]++
   const seenDue = decisions.filter((n) => progress.nodes[n.id] && isDue(progress.nodes[n.id], now)).length
   const fading = decisions.filter((n) => isFading(progress.nodes[n.id], now)).length
+  const unseen = (c: TreeNode) => decisions.filter((d) => (d.id === c.id || d.id.startsWith(c.id + ' ')) && !progress.nodes[d.id]).length
+  // When you have two book moves here, Practice can't steer you — so it asks you to pick the less-practised one.
+  const branch = useMemo(() => {
+    if (phase !== 'user') return null
+    const book = bookMoves(node)
+    if (book.length < 2) return null
+    const scored = book.map((c) => ({ c, w: weakness(c, def.side, progress), fresh: unseen(c) })).sort((a, b) => b.w - a.w)
+    return scored[0].w - scored[1].w >= 1 ? { target: scored[0].c, fresh: scored[0].fresh, count: book.length } : null
+  }, [phase, node, progress]) // eslint-disable-line react-hooks/exhaustive-deps
+  // new positions that only an alternative book move of yours leads to (for the status line)
+  const hiddenNew = useMemo(() => {
+    for (const d of decisions) {
+      const book = bookMoves(d)
+      if (book.length < 2) continue
+      const seen = (c: TreeNode) => decisions.filter((x) => (x.id === c.id || x.id.startsWith(c.id + ' ')) && progress.nodes[x.id]).length
+      // a branch you've barely touched while you keep playing its sibling
+      const best = book.map((c) => ({ c, fresh: unseen(c), seen: seen(c) })).sort((a, b) => b.fresh - a.fresh)[0]
+      if (best.fresh > 0 && book.some((c) => c !== best.c && seen(c) > best.seen)) return best
+    }
+    return null
+  }, [decisions, progress]) // eslint-disable-line react-hooks/exhaustive-deps
   const nextDue = Math.min(...decisions.map((n) => progress.nodes[n.id]?.due ?? Infinity).filter((d) => d > now))
 
   const startLine = useCallback(() => {
@@ -96,6 +120,8 @@ export function Practice({ tree, onAnalyze }: Props) {
     setReview(null)
     setHint(false)
     setFlash(null)
+    setShowBranch(false)
+    setSkipped(null)
     setPhase(def.side === 'w' ? 'user' : 'opponent')
   }, [tree, def.side])
 
@@ -205,6 +231,8 @@ export function Practice({ tree, onAnalyze }: Props) {
     setTrap(node.children.find((c) => isMistake(c) && same(c)) ?? null)
     if (hit) {
       setTimedOut(false)
+      setSkipped(branch && hit !== branch.target ? branch.target : null)
+      setShowBranch(false)
       score(hint ? 'hinted' : 'correct', moveLabel(hit))
       setReview(null)
       setHint(false)
@@ -229,6 +257,7 @@ export function Practice({ tree, onAnalyze }: Props) {
   const arrows: Arrow[] = []
   if ((phase === 'wrong' && (review || timedOut)) || hint)
     for (const c of bookMoves(node)) arrows.push({ startSquare: c.uci.slice(0, 2), endSquare: c.uci.slice(2, 4), color: 'rgba(16,185,129,0.85)' })
+  if (showBranch && branch) arrows.push({ startSquare: branch.target.uci.slice(0, 2), endSquare: branch.target.uci.slice(2, 4), color: 'rgba(245,158,11,0.85)' })
   if (engineOn && bestUci && phase !== 'user') arrows.push({ startSquare: bestUci.slice(0, 2), endSquare: bestUci.slice(2, 4), color: 'rgba(59,130,246,0.75)' })
   const lastMove = node.uci ? { from: node.uci.slice(0, 2), to: node.uci.slice(2, 4) } : null
 
@@ -306,6 +335,39 @@ export function Practice({ tree, onAnalyze }: Props) {
             </span>
           </div>
           <MoveTrail node={node} onJump={() => {}} />
+          {branch && (
+            <div className="rounded-lg bg-amber-500/10 p-3 text-sm text-amber-100 ring-1 ring-amber-400/30">
+              <p>
+                You have {branch.count} book moves here. Play the one you've practised less this time
+                {branch.fresh > 0 && <> — it leads to <b>{branch.fresh} new position{branch.fresh === 1 ? '' : 's'}</b></>}.
+              </p>
+              {!showBranch && (
+                <button className="mt-1 text-xs text-amber-300 underline-offset-2 hover:underline" onClick={() => setShowBranch(true)}>
+                  Which one?
+                </button>
+              )}
+              {showBranch && <p className="mt-1 text-xs text-amber-300">The amber arrow: {moveLabel(branch.target)}.</p>}
+            </div>
+          )}
+          {skipped && phase !== 'done' && (
+            <div className="flex flex-wrap items-center gap-2 rounded-lg bg-zinc-800/60 p-2 text-xs text-zinc-300">
+              <span>Correct — but {moveLabel(skipped)} is the line that needs work.</span>
+              <button
+                className="text-brand-400 hover:underline"
+                onClick={() => {
+                  const t = skipped
+                  setSkipped(null)
+                  setNode(t)
+                  setFlash(null)
+                  setReview(null)
+                  if (!t.children.length) finishLine()
+                  else setPhase('opponent')
+                }}
+              >
+                Switch to {moveLabel(skipped)} instead
+              </button>
+            </div>
+          )}
           {clock > 0 && phase === 'user' && (
             <div className="h-1 overflow-hidden rounded bg-zinc-800">
               <div className={`h-full transition-[width] duration-100 ${timeLeft < clock * 0.3 ? 'bg-red-500' : 'bg-brand-500'}`} style={{ width: `${(timeLeft / clock) * 100}%` }} />
@@ -400,7 +462,7 @@ export function Practice({ tree, onAnalyze }: Props) {
           </div>
           {fading > 0 && <p className="text-xs text-amber-300">{fading} position{fading > 1 ? 's are' : ' is'} fading — overdue reviews slip a box each week.</p>}
           <p className="text-xs text-zinc-400">
-            {seenDue > 0 ? `${seenDue} due for review now` : stageCounts.new > 0 ? 'Nothing due — keep going to meet the new positions' : 'All caught up'}
+            {seenDue > 0 ? `${seenDue} due for review now` : stageCounts.new > 0 ? (hiddenNew ? `Nothing due. ${hiddenNew.fresh} new position${hiddenNew.fresh === 1 ? ' is' : 's are'} behind your other book move ${moveLabel(hiddenNew.c)} — choose it when that position comes up` : 'Nothing due — keep going to meet the new positions') : 'All caught up'}
             {Number.isFinite(nextDue) && ` · next review ${untilText(nextDue - now)}`}.
           </p>
           <details className="text-xs text-zinc-500">
