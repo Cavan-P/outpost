@@ -4,7 +4,7 @@ import { Board, type BoardMove } from '../../components/Board'
 import { ResultCard } from '../../components/ResultCard'
 import { MATES, type MatePattern } from '../../data/mates'
 import { getPlayEngine } from '../../lib/engine'
-import { addToSet, award, useProfile } from '../../lib/game'
+import { addToSet, award, count, useProfile } from '../../lib/game'
 
 /** Learn the classic mating patterns: deliver mate in N against Stockfish's best defence. */
 export function MatingPatterns() {
@@ -33,7 +33,8 @@ export function MatingPatterns() {
     if (result) return
     if (chess.isCheckmate()) {
       const first = addToSet('mates', pat.id)
-      award(first ? 30 : 8, first ? `${pat.name} learned!` : 'Mate delivered')
+      count('mateSolves')
+      award(first ? 30 : 4, first ? `${pat.name} learned!` : 'Mate delivered', 'mates')
       setResult({ ok: true, text: pat.idea })
       return
     }

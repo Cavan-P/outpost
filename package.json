@@ -13,6 +13,7 @@
     "test:explain": "rolldown scripts/explain-check.ts --file node_modules/.cache/explain-check.mjs --platform node --format esm --transform.define 'import.meta.env.BASE_URL=\"/\"' --log-level silent && node node_modules/.cache/explain-check.mjs",
     "audit": "rolldown scripts/audit.ts --file node_modules/.cache/audit.mjs --platform node --format esm --transform.define 'import.meta.env.BASE_URL=\"/\"' --log-level silent && node node_modules/.cache/audit.mjs",
     "test:review": "rolldown scripts/review-check.ts --file node_modules/.cache/review-check.mjs --platform node --format esm --transform.define 'import.meta.env.BASE_URL=\"/\"' --log-level silent && node node_modules/.cache/review-check.mjs",
+    "test:economy": "rolldown scripts/economy-check.ts --file node_modules/.cache/economy-check.mjs --platform node --format esm --transform.define 'import.meta.env.BASE_URL=\"/\"' --log-level silent && node node_modules/.cache/economy-check.mjs",
     "analyze-pgn": "rolldown scripts/analyze-pgn.ts --file node_modules/.cache/analyze-pgn.mjs --platform node --format esm --transform.define 'import.meta.env.BASE_URL=\"/\"' --log-level silent && node node_modules/.cache/analyze-pgn.mjs"
   },
   "dependencies": {

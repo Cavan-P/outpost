@@ -6,7 +6,7 @@ import { MoveTrail, historyText } from '../components/MoveTrail'
 import { ResultCard } from '../components/ResultCard'
 import { bookMoves, isMistake, leavesUnder, moveLabel, sideToMove, type OpeningTree, type TreeNode } from '../lib/tree'
 import { getProgress, markLearned } from '../lib/progress'
-import { addToSet, award } from '../lib/game'
+import { addToSet, award, count } from '../lib/game'
 
 interface Props {
   tree: OpeningTree
@@ -41,7 +41,8 @@ export function Learn({ tree, onAnalyze }: Props) {
       if (n.children.length === 0 && !learned.has(n.id)) {
         markLearned(def.id, n.id)
         addToSet('openingsStudied', def.id)
-        award(15, 'New line studied')
+        count('linesLearned')
+        award(10, 'New line studied', `learn:${def.id}`)
         setLearned((s) => new Set(s).add(n.id))
       }
     },

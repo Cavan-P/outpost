@@ -102,8 +102,25 @@ function terminalScore(fen: string): Score | null {
   return null
 }
 
+/** Mistake tags that mean the move let the opponent win material or start a mating attack. */
+const TACTICAL = (t: string) => t.startsWith('hung-') || t === 'allowed-fork' || t === 'allowed-discovered' || t === 'lost-material' || t === 'allowed-mate'
+
+/**
+ * Label one move and explain what went wrong. Any move that loses ground (inaccuracy or worse)
+ * gets checked for a concrete tactic it allowed — a fork, a hung piece, a mating attack — and if
+ * there is one, it's at least a mistake: Stockfish may only score a hung knight at −1.2 when the
+ * position offers some compensation, but "you walked into a fork" is what a player wants flagged.
+ */
+export function labelMove(fenBefore: string, fenAfter: string, m: Omit<MoveAnalysis, 'tags' | 'cls'>, mover: Color): { cls: MoveAnalysis['cls']; tags: string[] } {
+  let cls = classifyMove(m.before, m.after, mover, m.uci === m.best)
+  if (cls !== 'inaccuracy' && cls !== 'mistake' && cls !== 'blunder') return { cls, tags: [] }
+  const tags = tagMistake(fenBefore, fenAfter, m, mover)
+  if (cls === 'inaccuracy' && tags.some(TACTICAL)) cls = 'mistake'
+  return { cls, tags: cls === 'inaccuracy' ? [] : tags }
+}
+
 /** Bump when the labelling rules change; stored analyses get relabelled by `relabel()`. */
-export const ANALYSIS_VERSION = 2
+export const ANALYSIS_VERSION = 3
 
 /** Re-apply the current labelling rules to a stored analysis — no engine needed, the evals are saved. */
 export function relabel(game: ImportedGame): GameAnalysis | null {
@@ -112,10 +129,8 @@ export function relabel(game: ImportedGame): GameAnalysis | null {
   const fens = fensOf(game.sans, game.startFen)
   const moves = a.moves.map((m, i) => {
     const mover: Color = new Chess(fens[i]).turn()
-    const cls = classifyMove(m.before, m.after, mover, m.uci === m.best)
-    const tags = [m.tags[0]]
-    if (cls === 'mistake' || cls === 'blunder') tags.push(...tagMistake(fens[i], fens[i + 1], m, mover))
-    return { ...m, cls, tags }
+    const { cls, tags } = labelMove(fens[i], fens[i + 1], m, mover)
+    return { ...m, cls, tags: [m.tags[0], ...tags] }
   })
   return { ...a, version: ANALYSIS_VERSION, moves }
 }
@@ -183,10 +198,8 @@ export async function analyzeGame(game: ImportedGame, depth: number, onProgress?
       reply: evals[i + 1].pv.slice(0, 10),
       loss,
     }
-    const cls = classifyMove(before, afterScore, mover, uci === best)
-    const tags: string[] = [phaseOf(fens[i], i + 1)]
-    if (cls === 'mistake' || cls === 'blunder') tags.push(...tagMistake(fens[i], fens[i + 1], base, mover))
-    moves.push({ ...base, cls, tags })
+    const label = labelMove(fens[i], fens[i + 1], base, mover)
+    moves.push({ ...base, cls: label.cls, tags: [phaseOf(fens[i], i + 1), ...label.tags] })
     // lichess-style per-move accuracy from the drop in winning chances
     acc[mover].push(Math.max(0, Math.min(100, 103.1668 * Math.exp(-0.04354 * loss * 100) - 3.1669)))
   }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getSettings } from '../lib/settings'
-import { ACHIEVEMENTS, DAILY_GOAL, lastDays, levelInfo, liveStreak, onGameEvent, resetProfile, titleFor, todayXp, useProfile, type GameEvent } from '../lib/game'
+import { ACHIEVEMENTS, DAILY_GOAL, MEDALS, MAX_LEVEL, lastDays, levelInfo, liveStreak, onGameEvent, questProgress, resetProfile, titleFor, todaysQuests, todayXp, useProfile, type GameEvent } from '../lib/game'
 
 /** Compact level / XP / streak / daily-goal widget for the header. */
 export function HeaderStats({ onOpen }: { onOpen: () => void }) {
@@ -33,6 +33,59 @@ export function HeaderStats({ onOpen }: { onOpen: () => void }) {
   )
 }
 
+export const MEDAL_ICON: Record<string, string> = { Bronze: '🥉', Silver: '🥈', Gold: '🥇', Diamond: '💠' }
+
+/** A small medal pip for an opening (nothing for tier 0). */
+export function MedalBadge({ tier, title }: { tier: number; title?: string }) {
+  const m = MEDALS.find((x) => x.tier === tier)
+  if (!m) return null
+  return (
+    <span title={title ?? `${m.name} medal`} className="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1" style={{ color: m.color, boxShadow: `inset 0 0 0 1px ${m.color}55` }}>
+      <span className="h-1.5 w-1.5 rounded-full" style={{ background: m.color }} />
+      {m.name}
+    </span>
+  )
+}
+
+/** Today's three quests with progress. `compact` for the sidebar. */
+export function DailyQuests({ compact = false }: { compact?: boolean }) {
+  const p = useProfile()
+  const quests = todaysQuests()
+  const done = quests.filter((q) => questProgress(p, q).done).length
+  return (
+    <div className={compact ? 'space-y-1.5' : 'space-y-2'}>
+      <div className="flex items-baseline justify-between">
+        <span className="text-xs uppercase tracking-widest text-zinc-500">Daily quests</span>
+        <span className="text-[11px] text-zinc-500" title="Finish all three for +50 XP and a streak freeze (max 2)">
+          {done}/3 · ❄️ {p.freezes ?? 0}
+        </span>
+      </div>
+      {quests.map((q) => {
+        const { value, done } = questProgress(p, q)
+        return (
+          <div key={q.id} className={compact ? '' : 'rounded-lg bg-zinc-900/60 p-3 ring-1 ring-white/5'}>
+            <div className="flex items-start gap-2">
+              <span className={`mt-px text-xs ${done ? 'text-emerald-400' : 'text-zinc-600'}`}>{done ? '✓' : '○'}</span>
+              <span className={`flex-1 ${compact ? 'text-[11px] leading-snug' : 'text-sm'} ${done ? 'text-zinc-500 line-through' : 'text-zinc-300'}`}>{q.text}</span>
+              {!compact && <span className="text-xs text-amber-300">+{q.xp} XP</span>}
+            </div>
+            {!done && q.target > 1 && (
+              <div className="ml-5 mt-1 flex items-center gap-2">
+                <div className="h-0.5 flex-1 overflow-hidden rounded bg-zinc-800">
+                  <div className="h-full bg-brand-400" style={{ width: `${(value / q.target) * 100}%` }} />
+                </div>
+                <span className="text-[10px] tabular-nums text-zinc-500">
+                  {value}/{q.target}
+                </span>
+              </div>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 interface Toast {
   id: number
   text: string
@@ -52,7 +105,13 @@ export function Toasts() {
           ? { id, text: `+${e.amount} XP${e.label ? ` · ${e.label}` : ''}`, tone: 'xp' }
           : e.kind === 'level'
             ? { id, text: `⬆ Level ${e.level}! ${titleFor(e.level)}`, tone: 'level' }
-            : { id, text: `${ACHIEVEMENTS.find((a) => a.id === e.id)?.icon} Achievement: ${ACHIEVEMENTS.find((a) => a.id === e.id)?.name} (+50 XP)`, tone: 'gold' }
+            : e.kind === 'quest'
+              ? { id, text: `📜 Quest done: ${e.text} (+${e.xp} XP)`, tone: 'gold' }
+              : e.kind === 'freeze'
+                ? { id, text: `❄️ ${e.text}`, tone: 'level' }
+                : e.kind === 'medal'
+                  ? { id, text: `${MEDAL_ICON[e.name] ?? '🏅'} ${e.name} medal · ${e.opening} (+${e.xp} XP)`, tone: 'gold' }
+                  : { id, text: `${ACHIEVEMENTS.find((a) => a.id === e.id)?.icon} Achievement: ${ACHIEVEMENTS.find((a) => a.id === e.id)?.name} (+50 XP)`, tone: 'gold' }
       setToasts((ts) => [...ts.slice(-3), t])
       setTimeout(() => setToasts((ts) => ts.filter((x) => x.id !== id)), e.kind === 'xp' ? 1800 : 4500)
     })
@@ -93,7 +152,7 @@ export function ProfilePage() {
             Level {lv.level} <span className="text-amber-300">{lv.title}</span>
           </h1>
           <p className="text-zinc-400 mt-1">
-            {p.xp.toLocaleString()} XP total · {lv.need - lv.into} XP to level {lv.level + 1}
+            {p.xp.toLocaleString()} XP total · {lv.level >= MAX_LEVEL ? 'max level' : `${(lv.need - lv.into).toLocaleString()} XP to level ${lv.level + 1}`}
           </p>
         </div>
       </div>
@@ -101,8 +160,19 @@ export function ProfilePage() {
         <div className="h-full bg-gradient-to-r from-amber-500 to-amber-300" style={{ width: `${(lv.into / lv.need) * 100}%` }} />
       </div>
 
+      <section className="rounded-xl bg-zinc-900/80 ring-1 ring-white/5 p-4">
+        <DailyQuests />
+        <p className="mt-3 text-xs text-zinc-500">
+          Finish all three for +50 XP and a streak freeze ❄️ (you can bank 2). A freeze covers a missed day so your streak survives. XP is
+          for learning: new positions and reviews that come due pay well; repeating what you just answered pays 1 XP, and grinding the same
+          opening or drill all day pays less and less.
+        </p>
+      </section>
+
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {stat('day streak 🔥', liveStreak(p))}
+        {stat('streak freezes ❄️', p.freezes ?? 0)}
+        {stat('opening medals', Object.values(p.medals ?? {}).filter((t) => t > 0).length)}
         {stat('lines completed', p.counters.lines ?? 0)}
         {stat('best combo', p.counters.bestCombo ?? 0)}
         {stat('openings mastered', (p.sets.openingsMastered ?? []).length)}

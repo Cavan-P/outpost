@@ -4,12 +4,13 @@ import { Board, type BoardMove } from '../components/Board'
 import { EnginePanel, EvalBar, WhyList, useAnalysis } from '../components/EnginePanel'
 import { MoveTrail } from '../components/MoveTrail'
 import { formatScore } from '../lib/engine'
-import { STAGES, getProgress, isDue, isMastered, progressOf, recordAnswer, resetProgress, stageOf, untilText, type OpeningProgress, type Outcome, type Stage } from '../lib/progress'
+import { STAGES, getProgress, isDue, isFading, isMastered, medalOf, nextMedalHint, progressOf, recordAnswer, resetProgress, stageOf, untilText, type OpeningProgress, type Outcome, type Stage } from '../lib/progress'
 import { reviewMove, type MoveReview } from '../lib/review'
 import { getSettings } from '../lib/settings'
-import { addToSet, award, count, record } from '../lib/game'
+import { addToSet, award, count, reachMedal, record } from '../lib/game'
 import { BlindfoldBar } from '../components/Blindfold'
 import { ResultCard } from '../components/ResultCard'
+import { MedalBadge } from '../components/GameUI'
 import { bookMoves, isMistake, moveLabel, sideToMove, userDecisionNodes, type OpeningTree, type TreeNode } from '../lib/tree'
 
 type Phase = 'user' | 'opponent' | 'wrong' | 'done'
@@ -75,7 +76,7 @@ export function Practice({ tree, onAnalyze }: Props) {
   const [combo, setCombo] = useState(0)
   const [step, setStep] = useState<{ label: string; before: Stage; after: Stage; promoted: boolean; outcome: Outcome } | null>(null)
   // per-line bookkeeping for bonuses; refs because the opponent's reply runs from a timer
-  const line = useRef({ mistakes: 0, peeked: false, blind: false, xp: 0, moves: 0 })
+  const line = useRef({ mistakes: 0, peeked: false, blind: false, xp: 0, moves: 0, learning: 0 })
   line.current.blind = blind
   if (peek) line.current.peeked = true
 
@@ -84,11 +85,12 @@ export function Practice({ tree, onAnalyze }: Props) {
   const stageCounts = Object.fromEntries(STAGES.map((st) => [st.id, 0])) as Record<Stage, number>
   for (const n of decisions) stageCounts[stageOf(progress.nodes[n.id])]++
   const seenDue = decisions.filter((n) => progress.nodes[n.id] && isDue(progress.nodes[n.id], now)).length
+  const fading = decisions.filter((n) => isFading(progress.nodes[n.id], now)).length
   const nextDue = Math.min(...decisions.map((n) => progress.nodes[n.id]?.due ?? Infinity).filter((d) => d > now))
 
   const startLine = useCallback(() => {
     answered.current.clear()
-    line.current = { mistakes: 0, peeked: false, blind: line.current.blind, xp: 0, moves: 0 }
+    line.current = { mistakes: 0, peeked: false, blind: line.current.blind, xp: 0, moves: 0, learning: 0 }
     setNode(tree.root)
     setReview(null)
     setHint(false)
@@ -113,22 +115,23 @@ export function Practice({ tree, onAnalyze }: Props) {
     return () => clearTimeout(t)
   }, [phase, node, def.side, def.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const src = `opening:${def.id}`
   const blindBonus = () => (line.current.blind && !line.current.peeked ? 2 : 1)
 
   function finishLine() {
     setPhase('done')
     setSession((s) => ({ ...s, lines: s.lines + 1 }))
-    const { mistakes } = line.current
+    const { mistakes, learning } = line.current
     count('lines')
     if (def.flipped) count('flippedLines')
     if (blindBonus() === 2) count('blindLines')
-    line.current.xp += 20 * blindBonus()
-    award(20 * blindBonus(), 'Line complete')
-    if (!mistakes) {
-      count('flawless')
-      line.current.xp += 15 * blindBonus()
-      award(15 * blindBonus(), 'Flawless line!')
-    }
+    // A line only pays properly if it taught you something (a new or due position);
+    // replaying a line you already know well is worth a token amount.
+    const base = learning ? 10 : 2
+    const xp = (base + (!mistakes && learning ? 5 : 0)) * blindBonus()
+    line.current.xp += xp
+    award(xp, !mistakes ? 'Flawless line!' : 'Line complete', src)
+    if (!mistakes) count('flawless')
   }
 
   function score(outcome: Outcome, label: string) {
@@ -144,11 +147,28 @@ export function Practice({ tree, onAnalyze }: Props) {
       const next = combo + 1
       setCombo(next)
       record('bestCombo', next)
-      const xp = Math.round(10 * (1 + Math.min(next, 20) * 0.05) * blindBonus())
+      if (next === 10) count('combo10')
+      // XP is for learning: new positions and reviews that come due pay; answering a position
+      // you nailed five minutes ago is worth 1 XP. Deeper boxes (longer gaps) pay more.
+      let xp = 1
+      if (change.fresh) {
+        xp = 6
+        count('newCorrect')
+      } else if (change.promoted) {
+        xp = 4 + 2 * change.box
+        count('dueCorrect')
+      }
+      if (change.promoted) {
+        line.current.learning++
+        xp *= (1 + Math.min(next, 20) * 0.03) * blindBonus()
+      }
+      xp = Math.round(xp)
       line.current.xp += xp
       line.current.moves++
-      award(xp, next >= 3 ? `Combo ×${next}` : undefined)
-      if (decisions.every((n) => isMastered(p.nodes[n.id])) && addToSet('openingsMastered', def.id)) award(150, `${def.name} mastered!`)
+      award(xp, next >= 3 ? `Combo ×${next}` : undefined, src)
+      const tier = medalOf(decisions.map((n) => n.id), p)
+      if (tier) reachMedal(def.id, def.name, tier)
+      if (decisions.every((n) => isMastered(p.nodes[n.id]))) addToSet('openingsMastered', def.id)
     } else {
       setCombo(0)
       line.current.mistakes++
@@ -373,6 +393,11 @@ export function Practice({ tree, onAnalyze }: Props) {
             ))}
             <span className="text-zinc-500">of {decisions.length} positions</span>
           </div>
+          <div className="flex items-center gap-2 text-xs text-zinc-400">
+            <MedalBadge tier={medalOf(decisions.map((n) => n.id), progress, now)} />
+            <span>{nextMedalHint(decisions.map((n) => n.id), progress, now)}</span>
+          </div>
+          {fading > 0 && <p className="text-xs text-amber-300">{fading} position{fading > 1 ? 's are' : ' is'} fading — overdue reviews slip a box each week.</p>}
           <p className="text-xs text-zinc-400">
             {seenDue > 0 ? `${seenDue} due for review now` : stageCounts.new > 0 ? 'Nothing due — keep going to meet the new positions' : 'All caught up'}
             {Number.isFinite(nextDue) && ` · next review ${untilText(nextDue - now)}`}.
@@ -381,8 +406,9 @@ export function Practice({ tree, onAnalyze }: Props) {
             <summary className="cursor-pointer hover:text-zinc-300">How mastery works</summary>
             <p className="mt-1">
               Each position climbs New → Learning → Familiar → Mastered, one step per correct answer — but only after a waiting period (5 min, 1 h, 1 day, then 3 days), so mastering a move takes several
-              sessions spread over days. Answering again before it's due still earns XP but doesn't move it up. A mistake drops a move back to Learning; using Hint caps it there too. The opponent
-              steers toward new, weak and due positions.
+              sessions spread over days. Answering again before it's due doesn't move it up and is worth just 1 XP — new positions and due reviews are where the XP is. A mistake drops a move back to
+              Learning; using Hint caps it there too. Knowledge fades: a position left overdue slips a box for every week it waits. Medals — Bronze (every position seen), Silver (half Familiar),
+              Gold (90% Familiar, half Mastered), Diamond (all Mastered) — pay a one-off XP bonus and can fade too. The opponent steers toward new, weak and due positions.
             </p>
           </details>
         </section>

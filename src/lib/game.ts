@@ -12,14 +12,26 @@ export interface Profile {
   counters: Record<string, number>
   sets: Record<string, string[]>
   bests: Record<string, number>
+  /** streak freezes in the bank (earned by finishing all daily quests, max 2) */
+  freezes: number
+  /** today's quest progress and per-source XP (for diminishing returns); reset each day */
+  today: { day: string; counts: Record<string, number>; done: string[]; xpBySource: Record<string, number>; quests?: string[] }
+  /** highest medal ever reached per opening, so medal XP is paid once */
+  medals: Record<string, number>
 }
 
-export type GameEvent = { kind: 'xp'; amount: number; label?: string } | { kind: 'achievement'; id: string } | { kind: 'level'; level: number }
+export type GameEvent =
+  | { kind: 'xp'; amount: number; label?: string }
+  | { kind: 'achievement'; id: string }
+  | { kind: 'level'; level: number }
+  | { kind: 'quest'; text: string; xp: number }
+  | { kind: 'freeze'; text: string }
+  | { kind: 'medal'; name: string; opening: string; xp: number }
 
 const KEY = 'ctt.profile.v1'
-export const DAILY_GOAL = 150
+export const DAILY_GOAL = 120
 
-const empty = (): Profile => ({ xp: 0, daily: {}, streak: 0, lastDay: '', achievements: {}, counters: {}, sets: {}, bests: {} })
+const empty = (): Profile => ({ xp: 0, daily: {}, streak: 0, lastDay: '', achievements: {}, counters: {}, sets: {}, bests: {}, freezes: 0, today: { day: '', counts: {}, done: [], xpBySource: {} }, medals: {} })
 
 function load(): Profile {
   try {
@@ -52,6 +64,8 @@ export function onGameEvent(f: (e: GameEvent) => void) {
   return () => void eventSubs.delete(f)
 }
 
+export const getProfile = () => profile
+
 export function useProfile(): Profile {
   return useSyncExternalStore(
     (f) => {
@@ -64,42 +78,70 @@ export function useProfile(): Profile {
 
 // ───────────── levels ─────────────
 
-const TITLES = ['Patzer', 'Beginner', 'Novice', 'Club Player', 'Tournament Player', 'Expert', 'Candidate Master', 'FIDE Master', 'International Master', 'Grandmaster', 'Super-GM', 'World Champion']
+export const MAX_LEVEL = 100
 
-/** XP needed to go from `level` to `level + 1`. */
-const step = (level: number) => 100 + (level - 1) * 60
+// 20 titles × 5 steps each ("Club Player III"); level 100 is World Champion.
+const TITLES = [
+  'Patzer', 'Beginner', 'Novice', 'Casual', 'Hobbyist',
+  'Club Player', 'Club Regular', 'Club Champion', 'Tournament Player', 'Rated Player',
+  'Class C', 'Class B', 'Class A', 'Expert', 'Candidate Master',
+  'FIDE Master', 'International Master', 'Grandmaster', 'Super-GM', 'World Champion',
+]
+const ROMAN = ['I', 'II', 'III', 'IV', 'V']
+
+/** XP needed to go from `level` to `level + 1` — gently steeper as you climb (≈290k XP to reach 100). */
+export const step = (level: number) => Math.round(80 + 25 * Math.pow(level, 1.2))
 
 export function levelInfo(xp: number) {
   let level = 1
   let floor = 0
-  while (xp >= floor + step(level)) {
+  while (level < MAX_LEVEL && xp >= floor + step(level)) {
     floor += step(level)
     level++
   }
-  const need = step(level)
-  return { level, into: xp - floor, need, title: titleFor(level) }
+  const need = level >= MAX_LEVEL ? 1 : step(level)
+  return { level, into: level >= MAX_LEVEL ? 1 : xp - floor, need, title: titleFor(level) }
 }
 
-export const titleFor = (level: number) => TITLES[Math.min(TITLES.length - 1, Math.floor((level - 1) / 3))]
+export function titleFor(level: number) {
+  if (level >= MAX_LEVEL) return TITLES[TITLES.length - 1]
+  const tier = Math.floor((level - 1) / 5)
+  return `${TITLES[Math.min(tier, TITLES.length - 1)]} ${ROMAN[(level - 1) % 5]}`
+}
 
 // ───────────── days & streaks ─────────────
 
 const dayKey = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 
+/** Whole days between two yyyy-mm-dd keys. */
+function daysBetween(a: string, b: string) {
+  const [ya, ma, da] = a.split('-').map(Number)
+  const [yb, mb, db] = b.split('-').map(Number)
+  return Math.round((Date.UTC(yb, mb - 1, db) - Date.UTC(ya, ma - 1, da)) / 86_400_000)
+}
+
+/** Days you missed since you last trained (not counting today). */
+const missedDays = (p: Profile) => (p.lastDay ? Math.max(0, daysBetween(p.lastDay, dayKey()) - 1) : 0)
+
 function touchDay() {
   const today = dayKey()
   if (profile.lastDay === today) return
-  const y = new Date()
-  y.setDate(y.getDate() - 1)
-  profile.streak = profile.lastDay === dayKey(y) ? profile.streak + 1 : 1
+  const missed = missedDays(profile)
+  if (!profile.lastDay) profile.streak = 1
+  else if (missed === 0) profile.streak += 1
+  else if (missed <= profile.freezes) {
+    // streak freezes cover the gap
+    profile.freezes -= missed
+    profile.streak += 1
+    emit({ kind: 'freeze', text: `${missed === 1 ? 'A streak freeze' : `${missed} streak freezes`} saved your ${profile.streak - 1}-day streak` })
+  } else profile.streak = 1
   profile.lastDay = today
 }
 
-/** The streak shown to the user: it lapses if yesterday and today were both missed. */
+/** The streak shown to the user: it survives missed days only while you have freezes to cover them. */
 export function liveStreak(p: Profile) {
-  const y = new Date()
-  y.setDate(y.getDate() - 1)
-  return p.lastDay === dayKey() || p.lastDay === dayKey(y) ? p.streak : 0
+  if (!p.lastDay) return 0
+  return missedDays(p) <= p.freezes ? p.streak : 0
 }
 
 export const todayXp = (p: Profile) => p.daily[dayKey()] ?? 0
@@ -116,7 +158,24 @@ export function lastDays(p: Profile, n: number) {
 
 // ───────────── mutations ─────────────
 
-export function award(amount: number, label?: string) {
+/** Today's bucket (quest progress, XP per source), started fresh each day. */
+function today() {
+  if (profile.today?.day !== dayKey()) profile.today = { day: dayKey(), counts: {}, done: [], xpBySource: {} }
+  return profile.today
+}
+
+/**
+ * Give XP. With a `source` (e.g. "opening:italian", "drill:coords") repeated XP from the same thing on
+ * the same day tapers off — after 120 XP it's worth half, after 360 a quarter — so grinding one
+ * opening all day is less rewarding than spreading out.
+ */
+export function award(amount: number, label?: string, source?: string) {
+  if (source && amount > 0) {
+    const t = today()
+    const earned = t.xpBySource[source] ?? 0
+    amount = Math.max(1, amount / (1 + earned / 120))
+    t.xpBySource = { ...t.xpBySource, [source]: earned + amount }
+  }
   amount = Math.round(amount)
   if (amount <= 0) return
   const before = levelInfo(profile.xp).level
@@ -132,6 +191,116 @@ export function award(amount: number, label?: string) {
 
 export function count(name: string, n = 1) {
   profile.counters = { ...profile.counters, [name]: (profile.counters[name] ?? 0) + n }
+  const t = today()
+  t.counts = { ...t.counts, [name]: (t.counts[name] ?? 0) + n }
+  checkQuests()
+  checkAchievements()
+  commit()
+}
+
+// ───────────── daily quests ─────────────
+
+export interface Quest {
+  id: string
+  text: string
+  counter: string // a count() name; progress is today's total
+  target: number
+  xp: number
+  available?: () => boolean
+}
+
+export const QUESTS: Quest[] = [
+  { id: 'due-10', text: 'Answer 10 positions that are due for review', counter: 'dueCorrect', target: 10, xp: 40 },
+  { id: 'due-25', text: 'Answer 25 due positions', counter: 'dueCorrect', target: 25, xp: 70 },
+  { id: 'learn-1', text: 'Study a line you haven\'t seen before', counter: 'linesLearned', target: 1, xp: 30 },
+  { id: 'new-5', text: 'Get 5 brand-new positions right', counter: 'newCorrect', target: 5, xp: 40 },
+  { id: 'lines-3', text: 'Complete 3 practice lines', counter: 'lines', target: 3, xp: 30 },
+  { id: 'flawless-2', text: 'Finish 2 lines without a mistake', counter: 'flawless', target: 2, xp: 40 },
+  { id: 'traps-3', text: 'Solve 3 trap puzzles', counter: 'trapSolves', target: 3, xp: 30 },
+  { id: 'endgame-1', text: 'Solve an endgame', counter: 'endgameSolves', target: 1, xp: 40 },
+  { id: 'review-1', text: 'Finish the daily review', counter: 'reviews', target: 1, xp: 40, available: () => totals.hasDue() },
+  { id: 'mates-2', text: 'Deliver 2 mating patterns', counter: 'mateSolves', target: 2, xp: 25 },
+  { id: 'own-2', text: 'Fix 2 mistakes from your own games', counter: 'ownSolves', target: 2, xp: 45, available: () => totals.hasGameAnalysis() },
+  { id: 'drill-3', text: 'Play 3 vision drills', counter: 'drills', target: 3, xp: 30 },
+  { id: 'blind-1', text: 'Complete a line blindfolded', counter: 'blindLines', target: 1, xp: 50 },
+  { id: 'combo-10', text: 'Reach a 10-move combo in Practice', counter: 'combo10', target: 1, xp: 35 },
+  { id: 'playout-1', text: 'Get a play-out graded', counter: 'playouts', target: 1, xp: 30 },
+]
+
+const hashDay = (d: string) => [...d].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) | 0, 7)
+
+/** Today's three quests — picked once in the morning and kept all day, different tomorrow. */
+export function todaysQuests(): Quest[] {
+  const t = today()
+  if (!t.quests?.length) t.quests = pickQuests().map((q) => q.id)
+  return t.quests.map((id) => QUESTS.find((q) => q.id === id)).filter((q): q is Quest => !!q)
+}
+
+function pickQuests(): Quest[] {
+  const pool = QUESTS.filter((q) => !q.available || q.available())
+  let h = Math.abs(hashDay(dayKey()))
+  const picked: Quest[] = []
+  while (picked.length < 3 && pool.length) {
+    const q = pool.splice(h % pool.length, 1)[0]
+    // don't pair two quests that count the same thing
+    if (!picked.some((x) => x.counter === q.counter)) picked.push(q)
+    h = Math.abs((h * 1103515245 + 12345) | 0)
+  }
+  return picked
+}
+
+export function questProgress(p: Profile, q: Quest) {
+  const t: { counts: Record<string, number>; done: string[] } = p.today?.day === dayKey() ? p.today : { counts: {}, done: [] }
+  return { value: Math.min(q.target, t.counts[q.counter] ?? 0), done: t.done.includes(q.id) }
+}
+
+function checkQuests() {
+  const t = today()
+  const quests = todaysQuests()
+  for (const q of quests) {
+    if (t.done.includes(q.id) || (t.counts[q.counter] ?? 0) < q.target) continue
+    t.done = [...t.done, q.id]
+    grant(q.xp)
+    emit({ kind: 'quest', text: q.text, xp: q.xp })
+    if (quests.every((x) => t.done.includes(x.id))) {
+      grant(50)
+      if (profile.freezes < 2) {
+        profile.freezes += 1
+        emit({ kind: 'freeze', text: 'All quests done: +50 XP and a streak freeze' })
+      } else emit({ kind: 'freeze', text: 'All quests done: +50 XP' })
+      profile.counters = { ...profile.counters, questDays: (profile.counters.questDays ?? 0) + 1 }
+    }
+  }
+}
+
+/** Add XP without the source/label machinery (quests, medals, achievements). */
+function grant(xp: number) {
+  const before = levelInfo(profile.xp).level
+  touchDay()
+  profile.xp += xp
+  profile.daily = { ...profile.daily, [dayKey()]: (profile.daily[dayKey()] ?? 0) + xp }
+  const after = levelInfo(profile.xp).level
+  if (after > before) emit({ kind: 'level', level: after })
+}
+
+// ───────────── opening medals ─────────────
+
+export const MEDALS = [
+  { tier: 1, name: 'Bronze', xp: 60, color: '#c08457' },
+  { tier: 2, name: 'Silver', xp: 120, color: '#c7ccd1' },
+  { tier: 3, name: 'Gold', xp: 250, color: '#d4b06a' },
+  { tier: 4, name: 'Diamond', xp: 500, color: '#9fd8ff' },
+]
+
+/** Pays the medal bonus the first time an opening reaches a tier (decaying and re-earning pays nothing). */
+export function reachMedal(openingId: string, name: string, tier: number) {
+  const prev = profile.medals?.[openingId] ?? 0
+  if (tier <= prev) return
+  profile.medals = { ...profile.medals, [openingId]: tier }
+  for (const m of MEDALS) if (m.tier > prev && m.tier <= tier) {
+    grant(m.xp)
+    emit({ kind: 'medal', name: m.name, opening: name, xp: m.xp })
+  }
   checkAchievements()
   commit()
 }
@@ -170,7 +339,7 @@ export function resetProfile() {
 // ───────────── achievements ─────────────
 
 /** Content sizes the achievements compare against; set once at startup from the data files. */
-const totals = { puzzles: Infinity, mates: Infinity, endgames: Infinity, gambits: [] as string[] }
+const totals = { puzzles: Infinity, mates: Infinity, endgames: Infinity, gambits: [] as string[], hasDue: () => true, hasGameAnalysis: () => false }
 export function configureTotals(t: Partial<typeof totals>) {
   Object.assign(totals, t)
 }
@@ -221,6 +390,14 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'goal-1', name: 'Goal Getter', desc: `Hit the daily goal (${DAILY_GOAL} XP)`, icon: '✅', test: (p) => Object.values(p.daily).some((x) => x >= DAILY_GOAL) },
   { id: 'level-10', name: 'Rising Star', desc: 'Reach level 10', icon: '⭐', test: (p) => levelInfo(p.xp).level >= 10 },
   { id: 'level-25', name: 'Titled Player', desc: 'Reach level 25', icon: '🌟', test: (p) => levelInfo(p.xp).level >= 25 },
+  { id: 'level-50', name: 'Master Class', desc: 'Reach level 50', icon: '🎖️', test: (p) => levelInfo(p.xp).level >= 50 },
+  { id: 'level-100', name: 'World Champion', desc: 'Reach level 100', icon: '🏆', test: (p) => levelInfo(p.xp).level >= MAX_LEVEL },
+  { id: 'medal-bronze', name: 'On the Podium', desc: 'Earn a Bronze medal in any opening', icon: '🥉', test: (p) => Object.values(p.medals ?? {}).some((t) => t >= 1) },
+  { id: 'medal-gold', name: 'Golden Repertoire', desc: 'Earn a Gold medal in any opening', icon: '🥇', test: (p) => Object.values(p.medals ?? {}).some((t) => t >= 3) },
+  { id: 'medal-diamond', name: 'Flawless Theory', desc: 'Earn a Diamond medal in any opening', icon: '💠', test: (p) => Object.values(p.medals ?? {}).some((t) => t >= 4) },
+  { id: 'medal-5', name: 'Well Prepared', desc: 'Earn medals in 5 different openings', icon: '🏅', test: (p) => Object.values(p.medals ?? {}).filter((t) => t >= 1).length >= 5 },
+  { id: 'quests-1', name: 'Quest Giver', desc: 'Finish all three daily quests', icon: '📜', test: (p) => c(p, 'questDays') >= 1 },
+  { id: 'quests-14', name: 'Fortnight of Focus', desc: 'Finish all daily quests on 14 days', icon: '🗺️', test: (p) => c(p, 'questDays') >= 14 },
 ]
 
 function checkAchievements() {
@@ -228,8 +405,6 @@ function checkAchievements() {
     if (profile.achievements[a.id] || !a.test(profile)) continue
     profile.achievements = { ...profile.achievements, [a.id]: Date.now() }
     emit({ kind: 'achievement', id: a.id })
-    // achievements give a little XP too (without recursing through award)
-    profile.xp += 50
-    profile.daily = { ...profile.daily, [dayKey()]: (profile.daily[dayKey()] ?? 0) + 50 }
+    grant(50) // achievements give a little XP too
   }
 }

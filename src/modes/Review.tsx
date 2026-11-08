@@ -65,7 +65,7 @@ export function Review({ onDone }: { onDone: () => void }) {
     if (item.kind === 'trap' && ok) addToSet('puzzles', item.puzzle.id)
     if (item.kind === 'own' && ok) addToSet('ownPuzzles', item.puzzle.id)
     if (item.kind === 'trap') addToSet('puzzlesSeen', item.puzzle.id)
-    if (ok) award(8, undefined)
+    if (ok && item.kind !== 'book') award(5, undefined, 'review')
   }
 
   function onMove(m: BoardMove) {
@@ -73,7 +73,11 @@ export function Review({ onDone }: { onDone: () => void }) {
     const uci = m.from + m.to + (m.promotion ?? '')
     const hit = q.answers.some((a) => a === uci || a.slice(0, 4) === uci.slice(0, 4))
     if (item.kind === 'book') {
-      recordAnswer(item.def.id, item.node.id, hit ? 'correct' : 'wrong')
+      const change = recordAnswer(item.def.id, item.node.id, hit ? 'correct' : 'wrong')
+      if (hit) {
+        if (change.promoted) count('dueCorrect')
+        award(change.promoted ? 4 + 2 * change.box : 1, undefined, 'review')
+      }
       const book = bookMoves(item.node)
       finish(hit, hit ? book.find((b) => b.uci.slice(0, 4) === uci.slice(0, 4))?.note || 'Correct.' : `The book move is ${book.map(moveLabel).join(' / ')}. ${book[0]?.note ?? ''}`)
       return hit
@@ -96,7 +100,8 @@ export function Review({ onDone }: { onDone: () => void }) {
   function next() {
     if (idx + 1 >= items.length) {
       count('reviews')
-      award(40, 'Daily review complete')
+      // the completion bonus is once a day — rerunning the review doesn't pay it again
+      if (addToSet('reviewDays', new Date().toDateString())) award(40, 'Daily review complete')
     }
     setIdx((i) => i + 1)
     setState('ask')

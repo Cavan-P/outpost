@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import type { OpeningDef } from '../data/openings'
 import { allOpenings, useCustomOpenings } from '../lib/custom'
-import { getProgress, isDue, isMastered, progressOf } from '../lib/progress'
+import { getProgress, isDue, isMastered, medalOf, nextMedalHint, progressOf } from '../lib/progress'
+import { MedalBadge } from '../components/GameUI'
 import { getTree, userDecisionNodes } from '../lib/tree'
 
 type Filter = 'all' | 'gambit' | 'solid' | 'aggressive' | 'trappy' | 'dubious' | 'due'
@@ -38,6 +39,8 @@ interface Stats {
   seen: number
   mastered: number
   progress: number
+  medal: number
+  medalHint: string
   due: number
   last: number
 }
@@ -55,6 +58,8 @@ function statsOf(def: OpeningDef): Stats {
     seen: t.leaves.filter((l) => p.learned.includes(l.id)).length,
     mastered: decisions.filter((n) => isMastered(p.nodes[n.id])).length,
     progress: decisions.reduce((sum, n) => sum + progressOf(p.nodes[n.id]), 0) / Math.max(1, decisions.length),
+    medal: medalOf(decisions.map((n) => n.id), p, now),
+    medalHint: nextMedalHint(decisions.map((n) => n.id), p, now),
     due: decisions.filter((n) => p.nodes[n.id] && isDue(p.nodes[n.id], now)).length,
     last,
   }
@@ -201,7 +206,10 @@ function Card({ s, onOpen }: { s: Stats; onOpen: (id: string, mode: 'learn' | 'p
     <article className="group flex flex-col gap-3 rounded-xl p-5 ring-1 ring-white/5 transition hover:ring-white/15">
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="text-xl leading-tight text-zinc-50">{o.name}</h2>
-        {s.due > 0 && <span className="shrink-0 text-xs text-brand-400">{s.due} due</span>}
+        <span className="flex shrink-0 items-center gap-2">
+          {s.due > 0 && <span className="text-xs text-brand-400">{s.due} due</span>}
+          <MedalBadge tier={s.medal} title={s.medalHint} />
+        </span>
       </div>
       <p className="text-[11px] uppercase tracking-[0.18em] text-zinc-500">
         {sideName(o.side)} · {o.eco || 'custom'} · {s.lines} lines{kind.length ? ` · ${kind.join(' · ')}` : ''}
@@ -220,7 +228,7 @@ function Card({ s, onOpen }: { s: Stats; onOpen: (id: string, mode: 'learn' | 'p
         <button className="text-zinc-500 hover:text-zinc-200" onClick={() => onOpen(o.id, 'learn', true)} title={`Train the defence as ${sideName(o.side === 'w' ? 'b' : 'w')}`}>
           Face it
         </button>
-        <span className="ml-auto text-xs tabular-nums text-zinc-500">{pct}%</span>
+        <span className="ml-auto text-xs tabular-nums text-zinc-500" title={s.medalHint}>{pct}%</span>
       </div>
     </article>
   )
@@ -235,7 +243,7 @@ function Row({ s, onOpen }: { s: Stats; onOpen: (id: string, mode: 'learn' | 'pr
         {o.side === 'w' ? '♔' : '♚'}
       </span>
       <div className="min-w-0 flex-1 basis-48">
-        <p className="truncate font-medium text-zinc-100">{o.name}</p>
+        <p className="flex items-center gap-2 truncate font-medium text-zinc-100">{o.name} <MedalBadge tier={s.medal} title={s.medalHint} /></p>
         <p className="text-xs text-zinc-500">
           {o.eco} · {s.lines} lines{s.due ? <span className="text-amber-300"> · {s.due} due</span> : null}
         </p>

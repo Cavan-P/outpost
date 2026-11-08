@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Chessboard } from 'react-chessboard'
-import { award, best, useProfile } from '../../lib/game'
+import { award, count, best, useProfile } from '../../lib/game'
 import { boardColors, useSettings } from '../../lib/settings'
 
 export const FILES = 'abcdefgh'
@@ -90,7 +90,8 @@ export function DrillShell({
         setRunning(false)
         const final = scoreRef.current
         const isBest = best(id, final)
-        award(final * xpPerPoint + (isBest && final > 0 ? 25 : 0), isBest && final > 0 ? `New best in ${title}!` : `${title}: ${final}`)
+        award(final * xpPerPoint + (isBest && final > 0 ? 25 : 0), isBest && final > 0 ? `New best in ${title}!` : `${title}: ${final}`, `drill:${title}`)
+        count('drills')
         setSummary(isBest && final > 0 ? `🏆 New personal best: ${final}!` : `Score: ${final}`)
       }
     }, 200)

@@ -13,3 +13,9 @@
 
 /engine/*
   Cache-Control: public, max-age=604800
+
+# the page itself must always be revalidated, so a reload picks up a new deploy straight away
+/
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache

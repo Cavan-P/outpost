@@ -7,7 +7,7 @@ import { ResultCard } from '../../components/ResultCard'
 import { uciToSan } from '../../lib/engine'
 import { explainMove } from '../../lib/explain'
 import { TAG_LABEL, type MistakePuzzle } from '../../lib/gameAnalysis'
-import { addToSet, award, useProfile } from '../../lib/game'
+import { addToSet, award, count, useProfile } from '../../lib/game'
 import { reviewMove } from '../../lib/review'
 
 /** Positions where you went wrong in your own games: find the move you missed. */
@@ -67,7 +67,8 @@ export function MistakePuzzles({ puzzles, title, onBack, onOpenGame }: { puzzles
     setState('solved')
     setNote(text)
     setScore((s) => ({ ...s, ok: s.ok + 1 }))
-    award(addToSet('ownPuzzles', p.id) ? 25 : 8, 'Fixed one of your mistakes')
+    count('ownSolves')
+    award(addToSet('ownPuzzles', p.id) ? 25 : 6, 'Fixed one of your mistakes', 'own')
   }
 
   const arrows: Arrow[] = state === 'failed' || state === 'solved' ? [{ startSquare: p.best.slice(0, 2), endSquare: p.best.slice(2, 4), color: 'rgba(16,185,129,0.85)' }] : []

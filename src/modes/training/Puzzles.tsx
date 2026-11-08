@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Arrow } from 'react-chessboard'
 import { Board, type BoardMove } from '../../components/Board'
-import { addToSet, award, useProfile } from '../../lib/game'
+import { addToSet, award, count, useProfile } from '../../lib/game'
 import { PUZZLES, type Puzzle } from '../../lib/puzzles'
 import { reviewMove } from '../../lib/review'
 import { moveLabel } from '../../lib/tree'
@@ -41,7 +41,8 @@ export function TrapPuzzles() {
     setNote(text)
     const first = addToSet('puzzles', puzzle.id)
     setStreak((s) => s + 1)
-    award(first ? 30 : 10, first ? 'Trap puzzle solved!' : 'Puzzle solved')
+    count('trapSolves')
+    award(first ? 30 : 4, first ? 'Trap puzzle solved!' : 'Puzzle solved', 'puzzles')
   }
 
   // opponent replies along the book line

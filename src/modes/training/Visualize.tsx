@@ -2,7 +2,7 @@ import { Chess, type Color, type Move, type PieceSymbol, type Square } from 'che
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Chessboard } from 'react-chessboard'
 import { OPENINGS } from '../../data/openings'
-import { award, best, useProfile } from '../../lib/game'
+import { award, count, best, useProfile } from '../../lib/game'
 import { colorWord, moveToWords, parseTypedMove, pieceWord, speak } from '../../lib/notation'
 import { boardColors, useSettings } from '../../lib/settings'
 import { START_FEN as START_POS, getTree } from '../../lib/tree'
@@ -198,7 +198,8 @@ export function CalculationDrill() {
     if (round >= ROUNDS) {
       const max = ROUNDS * 3
       const isBest = best('calc', score)
-      award(score * 4 + (isBest ? 25 : 0), isBest ? 'New best in Calculate it!' : `Calculate it: ${score}`)
+      award(score * 4 + (isBest ? 25 : 0), isBest ? 'New best in Calculate it!' : `Calculate it: ${score}`, 'drill:calc')
+      count('drills')
       setDone(`${score} correct answers out of about ${max}${isBest ? ' — new personal best!' : ''}`)
       setRound(0)
       return

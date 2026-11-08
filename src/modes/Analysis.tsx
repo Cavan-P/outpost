@@ -9,7 +9,7 @@ import { START_FEN } from '../lib/tree'
 import { BlindfoldBar } from '../components/Blindfold'
 import { analyzeGame } from '../lib/gameAnalysis'
 import type { GameAnalysis } from '../lib/games'
-import { award } from '../lib/game'
+import { award, count } from '../lib/game'
 
 const GRADE_MOVES = 10
 
@@ -101,7 +101,8 @@ export function Analysis({ initialFen, blindfold = false }: Props) {
       setGrading(null)
       if (!a) return
       setGrade(a)
-      award(5 + Math.round(a.accuracy[userColor] / 5), `Play-out graded: ${a.accuracy[userColor].toFixed(0)}% accuracy`)
+      award(5 + Math.round(a.accuracy[userColor] / 5), `Play-out graded: ${a.accuracy[userColor].toFixed(0)}% accuracy`, 'playout')
+      count('playouts')
     })
   }, [graded, grade, grading, myMoveCount, finalGameOver, fen, userColor, allSans, startFen, opponent])
 

@@ -17,6 +17,7 @@ import { Endgames } from './modes/Endgames'
 import { Training } from './modes/training/Training'
 import { ProfilePage, Toasts } from './components/GameUI'
 import { configureTotals } from './lib/game'
+import { getGames } from './lib/games'
 import { PUZZLES } from './lib/puzzles'
 import { ENDGAMES } from './data/endgames'
 
@@ -25,6 +26,8 @@ configureTotals({
   endgames: ENDGAMES.length,
   mates: ENDGAMES.filter((e) => e.id.startsWith('mate-')).length,
   gambits: OPENINGS.filter((o) => o.tags.includes('gambit')).map((o) => o.id),
+  hasDue: () => dueItems().length > 0,
+  hasGameAnalysis: () => getGames().games.some((g) => g.analysis),
 })
 
 type View = { kind: 'home' } | { kind: 'opening'; id: string; mode: 'learn' | 'practice'; flip: boolean } | { kind: 'analysis'; fen?: string; key: number; blind?: boolean } | { kind: 'endgames' } | { kind: 'training' } | { kind: 'profile' } | { kind: 'games' } | { kind: 'review'; key: number } | { kind: 'builder' } | { kind: 'about' }

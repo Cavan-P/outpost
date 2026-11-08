@@ -95,7 +95,8 @@ export function Endgames() {
     const mult = blind && !assisted.current ? 2 : 1
     if (def.goal === 'draw') count('drawsHeld')
     if (mult === 2) count('blindEndgames')
-    award((first ? 100 : 25) * mult * (assisted.current && !blind ? 0.5 : 1), first ? `${def.name} solved!` : 'Endgame solved')
+    count('endgameSolves')
+    award((first ? 100 : 10) * mult * (assisted.current && !blind ? 0.5 : 1), first ? `${def.name} solved!` : 'Endgame solved', `endgame:${def.id}`)
     if (stars && best(`eg-${def.id}`, stars) && stars === 3) award(50, 'Perfect technique ★★★')
   }, [result?.ok, def, blind])
 

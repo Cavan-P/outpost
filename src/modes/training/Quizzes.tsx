@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Chessboard } from 'react-chessboard'
 import { OPENINGS, type OpeningDef } from '../../data/openings'
 import { formatScore, getCheckEngine, scoreValue, uciToSan } from '../../lib/engine'
-import { award, best, useProfile } from '../../lib/game'
+import { award, count, best, useProfile } from '../../lib/game'
 import { getGames } from '../../lib/games'
 import { boardColors, useSettings } from '../../lib/settings'
 import { START_FEN as START_POS, getTree, pathTo } from '../../lib/tree'
@@ -36,7 +36,8 @@ function RoundShell({ id, title, blurb, rounds, xpPer, children }: { id: string;
     if (round >= rounds) {
       const final = scoreRef.current
       const isBest = best(id, final)
-      award(final * xpPer + (isBest && final ? 25 : 0), isBest && final ? `New best in ${title}!` : `${title}: ${final}`)
+      award(final * xpPer + (isBest && final ? 25 : 0), isBest && final ? `New best in ${title}!` : `${title}: ${final}`, `drill:${title}`)
+      count('drills')
       setSummary(`Score ${final}${isBest && final ? ' — new personal best!' : ''}`)
       setRound(0)
     } else setRound((r) => r + 1)
