@@ -71,6 +71,12 @@ export function onGameEvent(f: (e: GameEvent) => void) {
 
 export const getProfile = () => profile
 
+/** Re-read the profile from storage (after a sync wrote a merged copy) and re-render. */
+export function reloadProfile() {
+  profile = load()
+  subs.forEach((f) => f())
+}
+
 export function useProfile(): Profile {
   return useSyncExternalStore(
     (f) => {

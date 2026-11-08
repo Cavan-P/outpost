@@ -1,9 +1,16 @@
-// Cloudflare Workers config: serves the static `dist/` build (no server code).
-// `public/_headers` is copied into dist and applied by Cloudflare automatically.
+// Cloudflare Workers config: serves the static `dist/` build, plus the sync API in worker/index.ts.
+// `public/_headers` is copied into dist and applied to static files by Cloudflare automatically.
+//
+// One-time setup for sync: create the R2 bucket (dashboard → R2 → Create bucket "outpost-sync",
+// or `npx wrangler r2 bucket create outpost-sync`).
 {
   "name": "outpost",
+  "main": "worker/index.ts",
   "compatibility_date": "2025-10-01",
   "assets": {
-    "directory": "./dist"
-  }
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  },
+  "r2_buckets": [{ "binding": "SYNC", "bucket_name": "outpost-sync" }]
 }

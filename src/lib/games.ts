@@ -92,6 +92,12 @@ export function useGames(): Store {
 
 export const getGames = () => store
 
+/** Re-read from storage (after a sync) and re-render. */
+export function reloadGames() {
+  store = load()
+  subs.forEach((f) => f())
+}
+
 export function addGames(username: string, source: Store['source'], games: ImportedGame[], notMine = false) {
   const known = new Set(store.games.map((g) => g.id))
   // importing someone else's games shouldn't overwrite the username you use for your own

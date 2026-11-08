@@ -39,6 +39,14 @@ export function useCustomOpenings(): OpeningDef[] {
 
 export const getCustomOpenings = () => custom
 
+/** Re-read from storage (after a sync) and re-render. */
+export function reloadCustom() {
+  for (const d of custom) invalidateTree(d.id)
+  custom = load()
+  for (const d of custom) invalidateTree(d.id)
+  subs.forEach((f) => f())
+}
+
 /** Built-in plus custom openings. */
 export const allOpenings = (): OpeningDef[] => [...OPENINGS, ...custom]
 
@@ -46,7 +54,7 @@ export const newCustomId = () => `custom-${Date.now().toString(36)}`
 
 /** Validates (every move must be legal) and saves. Throws with a readable message on an illegal line. */
 export function saveCustomOpening(def: OpeningDef) {
-  const clean: OpeningDef = { ...def, tags: [...new Set(['custom', ...def.tags])], lines: def.lines.map((l) => l.trim()).filter(Boolean), ideas: def.ideas.map((x) => x.trim()).filter(Boolean) }
+  const clean: OpeningDef & { updatedAt: number } = { ...def, updatedAt: Date.now(), tags: [...new Set(['custom', ...def.tags])], lines: def.lines.map((l) => l.trim()).filter(Boolean), ideas: def.ideas.map((x) => x.trim()).filter(Boolean) }
   buildTree(clean) // throws on illegal moves
   invalidateTree(clean.id)
   const i = custom.findIndex((d) => d.id === clean.id)

@@ -18,6 +18,8 @@ import { Training } from './modes/training/Training'
 import { Arena } from './modes/Arena'
 import { ProfilePage, Toasts } from './components/GameUI'
 import { configureTotals, getProfile, onGameEvent } from './lib/game'
+import { SyncPanel } from './components/SyncPanel'
+import { startAutoSync } from './lib/sync'
 import { claimSeason, isCollectible, isUnlocked, settleLeague } from './lib/meta'
 import { getGames, myGames } from './lib/games'
 import { PUZZLES } from './lib/puzzles'
@@ -45,6 +47,7 @@ export default function App() {
       settleLeague()
       claimSeason()
     }, 800)
+    startAutoSync()
     const off = onGameEvent((e) => {
       if (e.kind === 'xp') setTimeout(claimSeason, 0)
     })
@@ -217,6 +220,9 @@ function SettingsDialog({ onClose }: { onClose: () => void }) {
         </label>
         {toggle('Always promote to queen', s.autoQueen, (v) => set({ autoQueen: v }), 'Off: you pick the piece — some puzzles need a knight')}
         {toggle('XP pop-ups', s.xpPopups, (v) => set({ xpPopups: v }), 'Achievements and level-ups always show')}
+
+        {section('Sync')}
+        <SyncPanel />
 
         {section('Training')}
         <label className="block space-y-1">

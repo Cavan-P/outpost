@@ -23,4 +23,6 @@ export default defineConfig({
   base: process.env.BASE_PATH ?? '/',
   plugins: [react(), tailwindcss()],
   preview: { headers: siteHeaders() },
+  // the sync API lives in the Worker: run `npx wrangler dev` (port 8787) alongside `npm run dev`
+  server: { proxy: { '/api': 'http://localhost:8787' } },
 })

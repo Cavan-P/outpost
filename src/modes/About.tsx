@@ -95,7 +95,7 @@ export function About() {
         <p className="text-xs uppercase tracking-[0.25em] text-brand-400">About</p>
         <h1 className="mt-1 text-3xl font-bold text-zinc-50">Outpost</h1>
         <p className="mt-2 text-zinc-400">
-          A free chess trainer for opening theory, tactics, endgames and board vision. Everything runs in your browser: the Stockfish engine runs locally as WebAssembly, and your progress is stored on this device only. There are no accounts and no tracking.
+          A free chess trainer for opening theory, tactics, endgames and board vision. Everything runs in your browser: the Stockfish engine runs locally as WebAssembly, and your progress is stored on this device unless you turn on sync. There are no accounts and no tracking.
         </p>
       </header>
 
@@ -152,10 +152,13 @@ export function About() {
       <section className="space-y-3">
         <h2 className="text-lg font-semibold text-zinc-50">Your data</h2>
         <p className="text-sm text-zinc-300">
-          Your progress, XP, imported games, custom repertoires and settings live in this browser's local storage ({keys.length} items, about {Math.max(1, Math.round(bytes / 1024))} KB). Nothing is uploaded anywhere. Clearing your browser data erases it, so download a backup now and then.
+          Your progress, XP, imported games, custom repertoires and settings live in this browser's local storage ({keys.length} items, about {Math.max(1, Math.round(bytes / 1024))} KB). Nothing is uploaded unless you turn on sync. Clearing your browser data erases it, so download a backup now and then.
         </p>
         <p className="text-sm text-zinc-400">
           The only outside requests are the Google Fonts stylesheet when the page loads, and the services above when you use them — the username you type goes to Lichess or chess.com, and endgame positions to the Lichess tablebase.
+        </p>
+        <p className="text-sm text-zinc-400">
+          <b className="text-zinc-200">Sync (optional).</b> If you turn it on in Settings, a compressed copy of your progress, XP, custom repertoires and imported games (including the usernames in them) is stored on Cloudflare R2, under a one-way hash of your sync code — the code itself is never stored. Anyone who has your code can read and change that copy. Settings stay on each device. "Delete synced copy" in Settings removes it from the server.
         </p>
         <div className="flex flex-wrap gap-2">
           <button className="btn-primary" onClick={backup}>

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { DAILY_GOAL, levelInfo, liveStreak, todayXp, useProfile } from '../lib/game'
 import { DailyQuests, HeaderStats } from './GameUI'
 import { LeagueLine } from './MetaUI'
+import { SyncStatus } from './SyncPanel'
 
 export type NavId = 'openings' | 'review' | 'games' | 'builder' | 'arena' | 'training' | 'endgames' | 'analysis' | 'profile' | 'about'
 
@@ -95,6 +96,7 @@ function Sidebar({ active, onNav, onSettings, badges }: { active: NavId; onNav: 
             Today {Math.min(today, DAILY_GOAL)}/{DAILY_GOAL} XP{today >= DAILY_GOAL ? ' ✓' : ''}
           </p>
           <LeagueLine />
+          <SyncStatus />
         </button>
         <button onClick={() => onNav('profile')} className="block w-full rounded-lg px-2 py-3 text-left ring-1 ring-white/5 hover:ring-white/10">
           <DailyQuests compact />
