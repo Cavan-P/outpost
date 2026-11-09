@@ -18,15 +18,15 @@ export const MiniBoard = memo(function MiniBoard({ fen, orientation = 'white', l
   const files = orientation === 'white' ? [0, 1, 2, 3, 4, 5, 6, 7] : [7, 6, 5, 4, 3, 2, 1, 0]
   const hi = new Set(lastMove ? [lastMove.slice(0, 2), lastMove.slice(2, 4)] : [])
   return (
-    <div className="grid aspect-square w-full grid-cols-8 overflow-hidden rounded">
+    <div className="grid aspect-square w-full grid-cols-8 grid-rows-8 overflow-hidden rounded">
       {ranks.map((r) =>
         files.map((f) => {
           const sq = `${'abcdefgh'[f]}${8 - r}`
           const piece = grid[r]?.[f]
           return (
-            <div key={sq} className="relative" style={{ background: (r + f) % 2 ? dark : light }}>
+            <div key={sq} className="relative min-h-0 min-w-0" style={{ background: (r + f) % 2 ? dark : light }}>
               {hi.has(sq) && <div className="absolute inset-0 bg-yellow-300/40" />}
-              {piece && <PieceIcon code={piece} className="relative h-full w-full" />}
+              {piece && <PieceIcon code={piece} className="absolute inset-0 h-full w-full" />}
             </div>
           )
         }),
