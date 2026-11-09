@@ -35,6 +35,13 @@ export function HeaderStats({ onOpen }: { onOpen: () => void }) {
   )
 }
 
+const METAL: Record<string, string> = {
+  Bronze: 'linear-gradient(135deg, #e3a878 0%, #b8743f 55%, #8f5527 100%)',
+  Silver: 'linear-gradient(135deg, #f4f6f8 0%, #c3c9cf 55%, #959ca3 100%)',
+  Gold: 'linear-gradient(135deg, #f7e3a1 0%, #d9b45a 55%, #b08b2f 100%)',
+  Diamond: 'linear-gradient(135deg, #e6f7ff 0%, #9fd8ff 55%, #5fb3e6 100%)',
+}
+
 export const MEDAL_ICON: Record<string, string> = { Bronze: '🥉', Silver: '🥈', Gold: '🥇', Diamond: '💠' }
 
 /** A small medal pip for an opening (nothing for tier 0). */
@@ -42,8 +49,13 @@ export function MedalBadge({ tier, title }: { tier: number; title?: string }) {
   const m = MEDALS.find((x) => x.tier === tier)
   if (!m) return null
   return (
-    <span title={title ?? `${m.name} medal`} className="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1" style={{ color: m.color, boxShadow: `inset 0 0 0 1px ${m.color}55` }}>
-      <span className="h-1.5 w-1.5 rounded-full" style={{ background: m.color }} />
+    // solid metallic pill with dark text: readable on boards, dark themes and light themes alike
+    <span
+      title={title ?? `${m.name} medal`}
+      className="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+      style={{ background: METAL[m.name] ?? m.color, color: '#1b140c', boxShadow: '0 1px 3px rgb(0 0 0 / 0.45), inset 0 0 0 1px rgb(0 0 0 / 0.25)' }}
+    >
+      <span className="text-[9px] leading-none">{MEDAL_ICON[m.name] === '💠' ? '◆' : '●'}</span>
       {m.name}
     </span>
   )
