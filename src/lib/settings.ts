@@ -2,10 +2,12 @@ import { useSyncExternalStore } from 'react'
 
 // ───────────── themes ─────────────
 
-export type ThemeId = 'onyx' | 'obsidian' | 'noir' | 'mono' | 'forest' | 'crimson' | 'midnight' | 'paper'
-export type BoardId = 'theme' | 'green' | 'brown' | 'blue' | 'red' | 'grey' | 'ink' | 'ivory' | 'slate' | 'carbon' | 'walnut' | 'marble' | 'ocean' | 'rose' | 'tournament' | 'royal' | 'emerald' | 'champion'
+export type ThemeId =
+  | 'onyx' | 'obsidian' | 'noir' | 'mono' | 'forest' | 'crimson' | 'midnight' | 'ocean' | 'ember' | 'royal' | 'coffee' | 'nord' | 'synthwave' | 'matrix'
+  | 'paper' | 'daylight' | 'sand' | 'mint' | 'lavender' | 'ivory'
+export type BoardId = 'theme' | 'green' | 'brown' | 'blue' | 'red' | 'grey' | 'ink' | 'ivory' | 'slate' | 'carbon' | 'teal' | 'lilac' | 'coffee' | 'neon' | 'nord' | 'phosphor' | 'ember' | 'walnut' | 'marble' | 'ocean' | 'rose' | 'tournament' | 'royal' | 'emerald' | 'champion'
 
-export const THEMES: { id: ThemeId; name: string; desc: string; swatch: [string, string, string]; minimal?: boolean }[] = [
+export const THEMES: { id: ThemeId; name: string; desc: string; swatch: [string, string, string]; minimal?: boolean; light?: boolean }[] = [
   { id: 'onyx', name: 'Onyx', desc: 'Black and gold', swatch: ['#000000', '#c5a059', '#9a7b56'], minimal: true },
   { id: 'obsidian', name: 'Obsidian', desc: 'Black and platinum', swatch: ['#000000', '#d6d6d6', '#5b6168'], minimal: true },
   { id: 'noir', name: 'Noir Rouge', desc: 'Black with a single red accent', swatch: ['#000000', '#ef4444', '#3a3a3a'], minimal: true },
@@ -13,8 +15,22 @@ export const THEMES: { id: ThemeId; name: string; desc: string; swatch: [string,
   { id: 'forest', name: 'Forest', desc: 'The original: charcoal and emerald', swatch: ['#18181b', '#10b981', '#779556'] },
   { id: 'crimson', name: 'Crimson', desc: 'Dark with deep red accents', swatch: ['#1a1414', '#e11d48', '#9e3b3b'] },
   { id: 'midnight', name: 'Midnight', desc: 'Navy and electric blue', swatch: ['#0f172a', '#3b82f6', '#4b7399'] },
-  { id: 'paper', name: 'Paper', desc: 'Light, with red ink', swatch: ['#f5f3ef', '#dc2626', '#b9a993'] },
+  { id: 'ocean', name: 'Ocean', desc: 'Deep teal and cyan', swatch: ['#041317', '#06b6d4', '#2f6f86'] },
+  { id: 'ember', name: 'Ember', desc: 'Charcoal and glowing orange', swatch: ['#0d0907', '#f97316', '#9a5a2c'] },
+  { id: 'royal', name: 'Royal', desc: 'Midnight purple and violet', swatch: ['#0a0612', '#8b5cf6', '#5b3f8c'] },
+  { id: 'coffee', name: 'Coffee', desc: 'Espresso brown, amber and serif type', swatch: ['#120c08', '#f59e0b', '#8a6347'] },
+  { id: 'nord', name: 'Nord', desc: 'Cool arctic blue-grey', swatch: ['#1c212b', '#0ea5e9', '#7b8ca3'] },
+  { id: 'synthwave', name: 'Synthwave', desc: 'Neon pink and cyan on purple dusk', swatch: ['#1a0b2e', '#ec4899', '#a24f9c'] },
+  { id: 'matrix', name: 'Terminal', desc: 'Phosphor green, monospace everything', swatch: ['#020603', '#22c55e', '#2e6b30'] },
+  { id: 'paper', name: 'Paper', desc: 'Light, with red ink', swatch: ['#f5f3ef', '#dc2626', '#b9a993'], light: true },
+  { id: 'daylight', name: 'Daylight', desc: 'Crisp white and blue', swatch: ['#f8fafc', '#3b82f6', '#7393ae'], light: true },
+  { id: 'sand', name: 'Sand', desc: 'Warm beige, terracotta and serif type', swatch: ['#f6ead9', '#ea580c', '#b58863'], light: true },
+  { id: 'mint', name: 'Mint', desc: 'Fresh white and teal', swatch: ['#f3faf8', '#14b8a6', '#3f8a85'], light: true },
+  { id: 'lavender', name: 'Lavender', desc: 'Soft lilac and violet', swatch: ['#f7f5fc', '#8b5cf6', '#8f7bb5'], light: true },
+  { id: 'ivory', name: 'Ivory', desc: 'Light and minimal, gold accents', swatch: ['#fbf9f4', '#c5a059', '#9a7b56'], minimal: true, light: true },
 ]
+
+export const isLight = (t: ThemeId) => !!THEMES.find((x) => x.id === t)?.light
 
 export const isMinimal = (t: ThemeId) => !!THEMES.find((x) => x.id === t)?.minimal
 
@@ -29,6 +45,13 @@ export const BOARDS: Record<Exclude<BoardId, 'theme'>, { name: string; colors: [
   ivory: { name: 'Ivory', colors: ['#ebe3d1', '#9a7b56'] },
   slate: { name: 'Slate', colors: ['#d3d6d9', '#5b6168'] },
   carbon: { name: 'Carbon', colors: ['#bdbdbd', '#4f4f4f'] },
+  teal: { name: 'Teal', colors: ['#d7ecea', '#3f8a85'] },
+  lilac: { name: 'Lilac', colors: ['#ece6f5', '#8f7bb5'] },
+  coffee: { name: 'Coffee', colors: ['#ead7c3', '#8a6347'] },
+  neon: { name: 'Neon', colors: ['#e8dff5', '#a24f9c'] },
+  nord: { name: 'Nord', colors: ['#dee3ea', '#7b8ca3'] },
+  phosphor: { name: 'Phosphor', colors: ['#c8e6c9', '#2e6b30'] },
+  ember: { name: 'Ember', colors: ['#f0d9c4', '#9a5a2c'] },
   // collectibles — unlocked by playing (see lib/meta.ts)
   walnut: { name: 'Walnut', colors: ['#e8cfa6', '#7b4f2c'] },
   marble: { name: 'Marble', colors: ['#f4f1ea', '#a9a49a'] },
@@ -40,7 +63,10 @@ export const BOARDS: Record<Exclude<BoardId, 'theme'>, { name: string; colors: [
   champion: { name: 'Champion', colors: ['#f3e7c4', '#8a6a1f'] },
 }
 
-const THEME_BOARD: Record<ThemeId, Exclude<BoardId, 'theme'>> = { onyx: 'ivory', obsidian: 'slate', noir: 'carbon', mono: 'grey', forest: 'green', crimson: 'red', midnight: 'blue', paper: 'brown' }
+const THEME_BOARD: Record<ThemeId, Exclude<BoardId, 'theme'>> = {
+  onyx: 'ivory', obsidian: 'slate', noir: 'carbon', mono: 'grey', forest: 'green', crimson: 'red', midnight: 'blue', ocean: 'teal', ember: 'ember', royal: 'lilac', coffee: 'coffee', nord: 'nord', synthwave: 'neon', matrix: 'phosphor',
+  paper: 'brown', daylight: 'blue', sand: 'brown', mint: 'teal', lavender: 'lilac', ivory: 'ivory',
+}
 
 export function boardColors(s: Settings): [string, string] {
   return BOARDS[s.board === 'theme' ? THEME_BOARD[s.theme] : s.board].colors
@@ -79,6 +105,8 @@ export function applyTheme(theme: ThemeId) {
   root.dataset.theme = theme
   if (isMinimal(theme)) root.dataset.minimal = ''
   else delete root.dataset.minimal
+  if (isLight(theme)) root.dataset.light = ''
+  else delete root.dataset.light
 }
 
 export function getSettings(): Settings {

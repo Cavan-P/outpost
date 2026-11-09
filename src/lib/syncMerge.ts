@@ -53,9 +53,9 @@ export function baseOf(s: Snapshot): Base {
 /** remote + (local − base), never below zero */
 const delta = (l: number | undefined, r: number | undefined, b: number | undefined) => Math.max(0, (r ?? 0) + ((l ?? 0) - (b ?? 0)))
 
-function mergeNumbers(l: Record<string, number>, r: Record<string, number>, b: Record<string, number>, useMax: (k: string) => boolean) {
+function mergeNumbers(l: Record<string, number>, r: Record<string, number>, b: Record<string, number>, keepMax: (k: string) => boolean) {
   const out: Record<string, number> = {}
-  for (const k of new Set([...Object.keys(l), ...Object.keys(r)])) out[k] = useMax(k) ? Math.max(l[k] ?? 0, r[k] ?? 0) : delta(l[k], r[k], b[k])
+  for (const k of new Set([...Object.keys(l), ...Object.keys(r)])) out[k] = keepMax(k) ? Math.max(l[k] ?? 0, r[k] ?? 0) : delta(l[k], r[k], b[k])
   return out
 }
 

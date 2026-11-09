@@ -105,7 +105,9 @@ export function LeaderboardCard() {
         )}
       </div>
       {!b.key && (
-        <div className="mb-3 rounded-lg bg-zinc-950/60 p-3 ring-1 ring-white/10">
+        <div className="mb-3 rounded-lg bg-brand-500/10 p-3 ring-1 ring-brand-500/40">
+          <p className="mb-1 text-sm font-semibold text-zinc-100">You're not on the leaderboards yet</p>
+          <p className="mb-2 text-xs text-zinc-400">They're opt-in: nothing about you is posted until you choose a nickname. Your XP from before you join counts too.</p>
           <JoinForm />
         </div>
       )}
@@ -134,7 +136,9 @@ export function LeaderboardCard() {
           )}
         </>
       ) : (
-        <p className="text-sm text-zinc-500">{friends ? 'No scores from your friends yet — add their nicknames below.' : 'Nobody on this board yet. Be the first!'}</p>
+        <p className="text-sm text-zinc-500">
+          {friends ? 'No scores from your friends yet — add their nicknames below.' : !b.key ? 'Nobody has joined yet — pick a nickname above to be the first.' : tab === 'gauntlet' ? 'No Gauntlet scores for this opening yet — run it in the Arena.' : 'Nobody on this board yet.'}
+        </p>
       )}
       {friends && (
         <div className="mt-3 flex flex-wrap items-center gap-2">

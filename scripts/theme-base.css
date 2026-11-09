@@ -15,10 +15,15 @@ code,
   -webkit-user-select: text;
 }
 
-/* white hairline rings become dark hairlines on the light theme */
-:root[data-theme='paper'] .ring-white\/5,
-:root[data-theme='paper'] .ring-white\/10 {
-  --tw-ring-color: rgb(0 0 0 / 0.08);
+/* white hairline rings become dark hairlines on light themes */
+:root[data-light] .ring-white\/5,
+:root[data-light] .ring-white\/10 {
+  --tw-ring-color: rgb(0 0 0 / 0.09);
+}
+:root[data-light] .bg-white\/\[0\.02\] { background-color: rgb(0 0 0 / 0.025); }
+/* light surfaces get a soft lift instead of a glow */
+:root[data-light]:not([data-minimal]) .bg-zinc-900\/80 {
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.05), 0 4px 16px rgb(0 0 0 / 0.04);
 }
 
 @layer components {
@@ -128,3 +133,64 @@ code,
 }
 :root[data-minimal] .emoji { filter: grayscale(1) brightness(1.15); }
 :root[data-minimal] .burst { display: none; }
+
+/* minimal on a light background (Ivory) */
+:root[data-minimal][data-light] .bg-zinc-900\/80,
+:root[data-minimal][data-light] .bg-zinc-900\/60 { background-color: rgb(0 0 0 / 0.02); }
+:root[data-minimal][data-light] .ring-white\/5 { --tw-ring-color: rgb(0 0 0 / 0.08); }
+:root[data-minimal][data-light] .ring-white\/10,
+:root[data-minimal][data-light] .btn-secondary { --tw-ring-color: rgb(0 0 0 / 0.12); }
+:root[data-minimal][data-light] .btn-secondary:hover { background-color: rgb(0 0 0 / 0.04); }
+:root[data-minimal][data-light] .input { background-color: rgb(0 0 0 / 0.03); }
+:root[data-minimal][data-light] .toast-in { background-color: #fbf9f4 !important; color: var(--color-brand-300) !important; --tw-ring-color: rgb(0 0 0 / 0.12) !important; }
+:root[data-theme='ivory'] .btn-primary,
+:root[data-theme='ivory'] .bg-brand-600 { color: #fff; }
+
+/* ───────────── characterful themes ───────────── */
+
+/* Synthwave: neon pink and cyan on a purple dusk */
+:root[data-theme='synthwave'] { font-family: 'Space Grotesk', Inter, ui-sans-serif, system-ui, sans-serif; }
+:root[data-theme='synthwave'] h1 {
+  background: linear-gradient(90deg, #f472b6, #22d3ee);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+:root[data-theme='synthwave'] .btn-primary,
+:root[data-theme='synthwave'] .chip-active { box-shadow: 0 0 16px rgb(236 72 153 / 0.55); }
+:root[data-theme='synthwave'] .rounded-xl { border-radius: 14px; }
+:root[data-theme='synthwave'] .bg-zinc-900\/80 { background-color: rgb(30 10 45 / 0.72); }
+:root[data-theme='synthwave'] .text-brand-400 { text-shadow: 0 0 10px rgb(244 114 182 / 0.6); }
+
+/* Matrix: terminal green, monospace everything */
+:root[data-theme='matrix'] { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+:root[data-theme='matrix'] .rounded-xl,
+:root[data-theme='matrix'] .rounded-lg,
+:root[data-theme='matrix'] .chip { border-radius: 2px; }
+:root[data-theme='matrix'] .text-brand-400,
+:root[data-theme='matrix'] .text-brand-300,
+:root[data-theme='matrix'] h1 { text-shadow: 0 0 8px rgb(34 197 94 / 0.55); }
+:root[data-theme='matrix'] .btn-primary { color: #021b07; }
+:root[data-theme='matrix'] .bg-zinc-900\/80 { background-color: rgb(0 20 6 / 0.7); }
+
+/* Sand & Coffee: warm, editorial, softly rounded */
+:root[data-theme='sand'],
+:root[data-theme='coffee'] { --font-display: 'Fraunces', Georgia, serif; }
+:root[data-theme='sand'] h1, :root[data-theme='sand'] h2,
+:root[data-theme='coffee'] h1, :root[data-theme='coffee'] h2 { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.01em; }
+:root[data-theme='sand'] .rounded-xl,
+:root[data-theme='coffee'] .rounded-xl { border-radius: 18px; }
+:root[data-theme='sand'] .btn-primary,
+:root[data-theme='coffee'] .btn-primary,
+:root[data-theme='sand'] .chip { border-radius: 999px; }
+:root[data-theme='coffee'] .btn-primary,
+:root[data-theme='coffee'] .chip-active,
+:root[data-theme='coffee'] .bg-brand-600 { color: #1c1007; }
+
+/* Daylight, Mint, Lavender: bright and friendly */
+:root[data-theme='daylight'] .rounded-xl,
+:root[data-theme='mint'] .rounded-xl,
+:root[data-theme='lavender'] .rounded-xl { border-radius: 16px; }
+:root[data-theme='daylight'] .btn-primary,
+:root[data-theme='mint'] .btn-primary,
+:root[data-theme='lavender'] .btn-primary { border-radius: 10px; box-shadow: 0 2px 8px rgb(0 0 0 / 0.12); }

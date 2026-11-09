@@ -6,6 +6,7 @@ import { award, count, best, useProfile } from '../../lib/game'
 import { colorWord, moveToWords, parseTypedMove, pieceWord, speak } from '../../lib/notation'
 import { boardColors, useSettings } from '../../lib/settings'
 import { START_FEN as START_POS, getTree } from '../../lib/tree'
+import { PieceIcon } from '../../components/PieceIcon'
 import { DrillShell, FILES, type DrillApi } from './shared'
 
 /** Real positions + continuations, taken from every opening line in the trainer. */
@@ -209,7 +210,6 @@ export function CalculationDrill() {
   }
 
   const orientation = data && new Chess(data.fen).turn() === 'w' ? 'white' : 'black'
-  const whatOptions = ['empty', ...(['w', 'b'] as const).flatMap((c) => (['p', 'n', 'b', 'r', 'q', 'k'] as const).map((p) => `${c}-${p}`))]
   const label = (v: string) => (v === 'empty' ? 'Empty' : `${colorWord(v[0] as Color)} ${pieceWord(v[2] as PieceSymbol)}`)
 
   return (
@@ -301,14 +301,39 @@ export function CalculationDrill() {
                         {q.kind === 'check' && <>Is {colorWord(q.color)} in check?</>}
                       </p>
                       {q.kind === 'what' && (
-                        <select className="input" value={a} disabled={phase === 'reveal'} onChange={(e) => setA(e.target.value)}>
-                          <option value="">choose…</option>
-                          {whatOptions.map((o) => (
-                            <option key={o} value={o}>
-                              {label(o)}
-                            </option>
+                        <div className="space-y-1">
+                          {(['w', 'b'] as const).map((c) => (
+                            <div key={c} className="flex flex-wrap gap-1">
+                              {(['k', 'q', 'r', 'b', 'n', 'p'] as const).map((p) => {
+                                const v = `${c}-${p}`
+                                const picked = a === v
+                                const right = phase === 'reveal' && v === q.answer
+                                return (
+                                  <button
+                                    key={v}
+                                    title={label(v)}
+                                    disabled={phase === 'reveal'}
+                                    onClick={() => setA(v)}
+                                    className={`rounded-md p-1 transition ${right ? 'ring-[3px] ring-emerald-400' : picked ? (phase === 'reveal' ? 'ring-[3px] ring-red-400' : 'ring-[3px] ring-brand-400') : 'ring-1 ring-black/10 opacity-90 hover:opacity-100'}`}
+                                    style={{ background: '#e9e4d8' }}
+                                  >
+                                    <PieceIcon code={`${c}${p}`} className="h-9 w-9" />
+                                  </button>
+                                )
+                              })}
+                              {c === 'w' && (
+                                <button
+                                  title="Empty square"
+                                  disabled={phase === 'reveal'}
+                                  onClick={() => setA('empty')}
+                                  className={`rounded-md px-3 text-xs ring-1 transition ${phase === 'reveal' && q.answer === 'empty' ? 'bg-emerald-500/20 ring-emerald-400 text-emerald-200' : a === 'empty' ? (phase === 'reveal' ? 'bg-red-500/20 ring-red-400' : 'bg-brand-500/25 ring-brand-400 text-zinc-100') : 'bg-zinc-800/60 ring-white/10 text-zinc-300 hover:ring-white/30'}`}
+                                >
+                                  Empty
+                                </button>
+                              )}
+                            </div>
                           ))}
-                        </select>
+                        </div>
                       )}
                       {q.kind === 'where' && (
                         <input className="input w-24 font-mono" maxLength={2} placeholder="e.g. f3" value={a} disabled={phase === 'reveal'} onChange={(e) => setA(e.target.value.toLowerCase())} />

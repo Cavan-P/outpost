@@ -15,6 +15,7 @@ export function Review({ onDone }: { onDone: () => void }) {
   const [idx, setIdx] = useState(0)
   const [state, setState] = useState<'ask' | 'checking' | 'right' | 'wrong'>('ask')
   const [note, setNote] = useState('')
+  const [played, setPlayed] = useState<string | null>(null) // your move, kept on the board after you answer
   const [tally, setTally] = useState({ right: 0, wrong: 0 })
   const item = items[idx]
 
@@ -71,6 +72,7 @@ export function Review({ onDone }: { onDone: () => void }) {
   function onMove(m: BoardMove) {
     if (state !== 'ask' || !q) return false
     const uci = m.from + m.to + (m.promotion ?? '')
+    setPlayed(uci)
     const hit = q.answers.some((a) => a === uci || (a.length === 4 && a === uci.slice(0, 4)))
     if (item.kind === 'book') {
       const change = recordAnswer(item.def.id, item.node.id, hit ? 'correct' : 'wrong')
@@ -106,8 +108,22 @@ export function Review({ onDone }: { onDone: () => void }) {
     setIdx((i) => i + 1)
     setState('ask')
     setNote('')
+    setPlayed(null)
   }
 
+  // after you answer, the board shows the position after your move (right or wrong)
+  // (plain code, not a hook: this runs after the early returns above)
+  const shownFen = (() => {
+    if (!played) return q.fen
+    try {
+      const c = new Chess(q.fen)
+      c.move({ from: played.slice(0, 2), to: played.slice(2, 4), promotion: played[4] })
+      return c.fen()
+    } catch {
+      return q.fen
+    }
+  })()
+  const last = played ?? q.lastUci
   const arrows: Arrow[] = state === 'wrong' ? q.answers.map((a) => ({ startSquare: a.slice(0, 2), endSquare: a.slice(2, 4), color: 'rgba(16,185,129,0.85)' })) : []
 
   return (
@@ -127,13 +143,14 @@ export function Review({ onDone }: { onDone: () => void }) {
       </header>
       <div className="grid gap-6 xl:grid-cols-[minmax(0,560px)_1fr]">
         <Board
-          fen={q.fen}
+          fen={shownFen}
           orientation={solver === 'w' ? 'white' : 'black'}
           onMove={onMove}
           player={solver}
           interactive={state === 'ask'}
           arrows={arrows}
-          lastMove={q.lastUci ? { from: q.lastUci.slice(0, 2), to: q.lastUci.slice(2, 4) } : null}
+          lastMove={last ? { from: last.slice(0, 2), to: last.slice(2, 4) } : null}
+          flash={played && (state === 'right' || state === 'wrong') ? { square: played.slice(2, 4), color: state === 'right' ? 'good' : 'bad' } : null}
           result={
             state === 'right' || state === 'wrong' ? (
               <ResultCard tone={state === 'right' ? 'success' : 'fail'} title={state === 'right' ? 'Right' : 'Not this time'} subtitle={note} onPrimary={next} primaryLabel={idx + 1 >= items.length ? 'Finish' : 'Next'} burst={false} />

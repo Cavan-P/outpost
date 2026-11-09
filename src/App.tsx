@@ -172,27 +172,32 @@ function SettingsDialog({ onClose }: { onClose: () => void }) {
         </div>
 
         {section('Theme')}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {THEMES.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => set({ theme: t.id })}
-              className={`rounded-lg p-2 text-left ring-2 transition ${s.theme === t.id ? 'ring-brand-500' : 'ring-transparent hover:ring-white/10'}`}
-              style={{ background: t.swatch[0] }}
-            >
-              <div className="flex gap-1">
-                <span className="h-4 w-8 rounded" style={{ background: t.swatch[1] }} />
-                <span className="h-4 w-4 rounded" style={{ background: t.swatch[2] }} />
-              </div>
-              <p className="mt-1.5 text-sm font-medium" style={{ color: t.id === 'paper' ? '#1f1b17' : '#f4f4f5' }}>
-                {t.name}
-              </p>
-              <p className="text-[11px] leading-tight" style={{ color: t.id === 'paper' ? '#5e564b' : '#a1a1aa' }}>
-                {t.desc}
-              </p>
-            </button>
-          ))}
-        </div>
+        {(['Dark', 'Light'] as const).map((group) => (
+          <div key={group} className="space-y-1.5">
+            <p className="text-[11px] uppercase tracking-widest text-zinc-500">{group}</p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {THEMES.filter((t) => !!t.light === (group === 'Light')).map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => set({ theme: t.id })}
+                  className={`rounded-lg p-2 text-left ring-2 transition ${s.theme === t.id ? 'ring-brand-500' : 'ring-transparent hover:ring-white/10'}`}
+                  style={{ background: t.swatch[0], boxShadow: t.light ? 'inset 0 0 0 1px rgb(0 0 0 / 0.08)' : undefined }}
+                >
+                  <div className="flex gap-1">
+                    <span className="h-4 w-8 rounded" style={{ background: t.swatch[1] }} />
+                    <span className="h-4 w-4 rounded" style={{ background: t.swatch[2] }} />
+                  </div>
+                  <p className="mt-1.5 text-sm font-medium" style={{ color: t.light ? '#1f1b17' : '#f4f4f5' }}>
+                    {t.name}
+                  </p>
+                  <p className="text-[11px] leading-tight" style={{ color: t.light ? '#5e564b' : '#a1a1aa' }}>
+                    {t.desc}
+                  </p>
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
 
         {section('Board')}
         <div className="flex flex-wrap gap-2">
