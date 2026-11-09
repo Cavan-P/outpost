@@ -10,6 +10,7 @@ import { getCheckEngine, getPlayEngine } from '../lib/engine'
 import { explainMove, type Explanation } from '../lib/explain'
 import { addToSet, award, best, count, useProfile } from '../lib/game'
 import { COURSES } from '../data/courses'
+import { MiniBoard } from '../components/MiniBoard'
 
 type Result = { ok: boolean; text: string } | null
 
@@ -210,13 +211,29 @@ export function Endgames() {
             {solved.size}/{ENDGAMES.length} solved
           </span>
         </div>
-        <div className="flex flex-wrap gap-1.5">
-          {ENDGAMES.filter((d) => d.category === category).map((d) => (
-            <button key={d.id} onClick={() => choose(d)} className={`chip !px-2.5 !py-0.5 text-xs ${d === def ? 'chip-active' : ''}`} title={`${d.level} · ${GOAL_LABEL[d.goal]} as ${d.side === 'w' ? 'White' : 'Black'}`}>
-              {solved.has(d.id) && <span className="mr-1 text-emerald-400">✓</span>}
-              {d.name}
-            </button>
-          ))}
+        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8">
+          {ENDGAMES.filter((d) => d.category === category).map((d) => {
+            const stars = profile.bests[`eg-${d.id}`] ?? 0
+            return (
+              <button
+                key={d.id}
+                onClick={() => choose(d)}
+                title={`${d.name} — ${d.level} · ${GOAL_LABEL[d.goal]} as ${d.side === 'w' ? 'White' : 'Black'}`}
+                className={`group overflow-hidden rounded-lg text-left ring-1 transition hover:-translate-y-0.5 ${d === def ? 'ring-2 ring-brand-400' : 'ring-white/10 hover:ring-white/30'}`}
+              >
+                <div className="relative">
+                  <MiniBoard fen={d.fen} orientation={d.side === 'w' ? 'white' : 'black'} />
+                  {solved.has(d.id) && (
+                    <span className="absolute right-1 top-1 rounded bg-black/60 px-1 text-[10px] font-semibold text-emerald-300">{stars ? '★'.repeat(stars) : '✓'}</span>
+                  )}
+                </div>
+                <div className="px-1.5 py-1">
+                  <p className={`line-clamp-2 text-[11px] leading-tight ${d === def ? 'text-zinc-50' : 'text-zinc-300 group-hover:text-zinc-100'}`}>{d.name}</p>
+                  <p className="text-[10px] text-zinc-500">{GOAL_LABEL[d.goal]}</p>
+                </div>
+              </button>
+            )
+          })}
         </div>
       </div>
 

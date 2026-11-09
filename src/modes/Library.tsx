@@ -316,22 +316,23 @@ function Card({ s, onOpen }: { s: Stats; onOpen: Open }) {
         <p className="text-[10px] uppercase tracking-[0.14em] text-zinc-500">
           {o.side === 'w' ? '♔' : '♚'} {o.eco || 'custom'} · {s.lines} lines{kind.length ? ` · ${kind[0]}` : ''}
         </p>
-        <div className="mt-auto h-0.5 overflow-hidden rounded bg-zinc-800">
-          <div className="h-full bg-brand-400" style={{ width: `${pct}%` }} />
+        {/* progress bar with the percentage beside it, so the action row never overflows */}
+        <div className="mt-auto flex items-center gap-2" title={s.medalHint}>
+          <div className="h-0.5 flex-1 overflow-hidden rounded bg-zinc-800">
+            <div className="h-full bg-brand-400" style={{ width: `${pct}%` }} />
+          </div>
+          <span className="text-[10px] tabular-nums text-zinc-500">{pct}%</span>
         </div>
-        <div className="flex items-center gap-3 text-xs">
-          <button className="font-medium text-brand-400 hover:text-brand-300" onClick={() => onOpen(o.id, 'practice', false)}>
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs">
+          <button className="font-medium text-brand-400 hover:text-brand-300 hover:underline" onClick={() => onOpen(o.id, 'practice', false)}>
             Practice
           </button>
-          <button className="text-zinc-300 hover:text-zinc-50" onClick={() => onOpen(o.id, 'learn', false)}>
+          <button className="text-zinc-300 hover:text-zinc-50 hover:underline" onClick={() => onOpen(o.id, 'learn', false)}>
             Learn
           </button>
-          <button className="text-zinc-500 hover:text-zinc-200" onClick={() => onOpen(o.id, 'learn', true)} title={`Train the defense as ${sideName(o.side === 'w' ? 'b' : 'w')}`}>
+          <button className="text-zinc-500 hover:text-zinc-200 hover:underline" onClick={() => onOpen(o.id, 'learn', true)} title={`Train the defense as ${sideName(o.side === 'w' ? 'b' : 'w')}`}>
             Face it
           </button>
-          <span className="ml-auto tabular-nums text-zinc-500" title={s.medalHint}>
-            {pct}%
-          </span>
         </div>
       </div>
     </article>

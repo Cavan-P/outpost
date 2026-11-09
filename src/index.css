@@ -1520,6 +1520,33 @@ body {
   -webkit-user-select: none;
 }
 
+/* Tailwind v4 no longer gives buttons a pointer cursor — bring it back for everything clickable */
+button:not(:disabled),
+[role='button'],
+a[href],
+select,
+summary,
+label:has(> input[type='checkbox']),
+input[type='checkbox'],
+input[type='range'] {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+/* a visible focus ring for keyboard users */
+button:focus-visible,
+a:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-brand-400);
+  outline-offset: 2px;
+}
+/* plain text links get an underline on hover */
+a[href]:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 input,
 textarea,
 code,
@@ -1541,13 +1568,13 @@ code,
 
 @layer components {
   .btn-primary {
-    @apply rounded-lg bg-brand-600 px-3.5 py-1.5 text-sm font-medium text-white transition hover:bg-brand-500 disabled:opacity-40 disabled:cursor-not-allowed;
+    @apply rounded-lg bg-brand-600 px-3.5 py-1.5 text-sm font-medium text-white transition hover:bg-brand-500 hover:-translate-y-px hover:shadow-md active:translate-y-0 disabled:opacity-40 disabled:cursor-not-allowed disabled:translate-y-0;
   }
   .btn-secondary {
-    @apply rounded-lg bg-zinc-800 px-3.5 py-1.5 text-sm font-medium text-zinc-200 ring-1 ring-white/5 transition hover:bg-zinc-700 disabled:opacity-40 disabled:cursor-not-allowed;
+    @apply rounded-lg bg-zinc-800 px-3.5 py-1.5 text-sm font-medium text-zinc-200 ring-1 ring-white/5 transition hover:bg-zinc-700 hover:ring-white/25 hover:text-zinc-50 active:translate-y-px disabled:opacity-40 disabled:cursor-not-allowed;
   }
   .chip {
-    @apply rounded-full px-3 py-1 text-sm font-medium bg-zinc-900 text-zinc-300 ring-1 ring-white/10 hover:bg-zinc-800;
+    @apply rounded-full px-3 py-1 text-sm font-medium bg-zinc-900 text-zinc-300 ring-1 ring-white/10 transition hover:bg-zinc-800 hover:text-zinc-100 hover:ring-white/30;
   }
   .chip-active {
     @apply bg-brand-600 text-white ring-brand-500;
@@ -1631,6 +1658,9 @@ code,
 }
 :root[data-minimal] .btn-secondary:hover { background-color: rgb(255 255 255 / 0.04); }
 :root[data-minimal] .chip { background-color: transparent; }
+:root[data-minimal] .chip:hover { background-color: rgb(255 255 255 / 0.05); --tw-ring-color: rgb(255 255 255 / 0.3); }
+:root[data-minimal] .btn-secondary:hover { --tw-ring-color: rgb(255 255 255 / 0.3); }
+:root[data-minimal][data-light] .chip:hover { background-color: rgb(0 0 0 / 0.04); --tw-ring-color: rgb(0 0 0 / 0.25); }
 :root[data-minimal] .chip-active {
   background-color: transparent;
   color: var(--color-brand-300);
