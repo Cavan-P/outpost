@@ -87,10 +87,12 @@ export async function board(req: Request, env: Env, path: string, url: URL): Pro
     if (!me) return json({ error: 'Unknown player key' }, 401)
     const b = (await req.json().catch(() => ({}))) as Record<string, unknown>
     const xp = int(b.xp, 2_000_000)
-    // sanity checks: no wild jumps, no impossible weeks
+    // Sanity checks: no wild jumps between updates. A player's first post brings in all the XP they
+    // earned before joining, so it's exempt (a fresh row has updated === created and 0 XP).
+    const firstPost = Number(me.updated) === Number(me.created) || Number(me.xp) === 0
     const gained = xp - Number(me.xp)
     const hours = Math.max(1, (Date.now() - Number(me.updated)) / 3_600_000)
-    if (gained > 3000 + hours * 400) return json({ error: 'That is a suspicious amount of XP' }, 422)
+    if (!firstPost && gained > 3000 + hours * 400) return json({ error: 'That is a suspicious amount of XP' }, 422)
     const weekXp = Math.min(int(b.weekXp, 25_000), xp)
     const stmts = [
       db.prepare('UPDATE players SET xp = MAX(xp, ?), level = ?, bosses = ?, medals = ?, streak = ?, updated = ? WHERE id = ?').bind(xp, levelOf(Math.max(xp, Number(me.xp))), int(b.bosses, 200), int(b.medals, 400), int(b.streak, 5000), Date.now(), me.id),
