@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { DAILY_GOAL, levelInfo, liveStreak, todayXp, useProfile } from '../lib/game'
+import { DAILY_GOAL, levelInfo, liveStreak, questProgress, todaysQuests, todayXp, useProfile } from '../lib/game'
 import { DailyQuests, HeaderStats } from './GameUI'
 import { SyncStatus } from './SyncPanel'
 
@@ -21,7 +21,7 @@ const NAV: { id: NavId; label: string; icon: string }[] = [
 const PRIMARY: NavId[] = ['openings', 'review', 'arena', 'training']
 
 /** App frame: a fixed sidebar on large screens; a slim top bar and bottom tab bar on small ones. */
-export function Shell({ active, onNav, onSettings, badges = {}, children }: { active: NavId; onNav: (id: NavId) => void; onSettings: () => void; badges?: Partial<Record<NavId, number>>; children: ReactNode }) {
+export function Shell({ active, onNav, onQuest, onSettings, badges = {}, children }: { active: NavId; onNav: (id: NavId) => void; onQuest?: (to: string) => void; onSettings: () => void; badges?: Partial<Record<NavId, number>>; children: ReactNode }) {
   const [more, setMore] = useState(false)
   const go = (id: NavId) => {
     setMore(false)
@@ -31,7 +31,7 @@ export function Shell({ active, onNav, onSettings, badges = {}, children }: { ac
   const inMore = !PRIMARY.includes(active)
   return (
     <div className="min-h-screen">
-      <Sidebar active={active} onNav={onNav} onSettings={onSettings} badges={badges} />
+      <Sidebar active={active} onNav={onNav} onQuest={onQuest} onSettings={onSettings} badges={badges} />
 
       {/* small screens: top bar */}
       <header className="sticky top-0 z-20 border-b border-white/5 bg-zinc-950/90 backdrop-blur lg:hidden">
@@ -49,7 +49,7 @@ export function Shell({ active, onNav, onSettings, badges = {}, children }: { ac
       </header>
 
       <main className="pb-24 lg:pb-0 lg:pl-60">
-        <div className="mx-auto max-w-[1400px] px-3 py-4 sm:px-4 sm:py-6 lg:px-8 lg:py-10">{children}</div>
+        <div className="mx-auto max-w-[1400px] px-3 py-4 sm:px-4 sm:py-6 lg:px-8 lg:py-6 [@media(min-height:900px)]:lg:py-10">{children}</div>
       </main>
 
       {/* small screens: bottom tab bar */}
@@ -85,7 +85,7 @@ export function Shell({ active, onNav, onSettings, badges = {}, children }: { ac
               ))}
             </div>
             <div className="mt-4 rounded-xl p-3 ring-1 ring-white/10">
-              <DailyQuests compact />
+              <DailyQuests compact onGo={(to) => (setMore(false), onQuest?.(to))} />
             </div>
           </div>
         </div>
@@ -94,24 +94,24 @@ export function Shell({ active, onNav, onSettings, badges = {}, children }: { ac
   )
 }
 
-function Sidebar({ active, onNav, onSettings, badges }: { active: NavId; onNav: (id: NavId) => void; onSettings: () => void; badges: Partial<Record<NavId, number>> }) {
+function Sidebar({ active, onNav, onQuest, onSettings, badges }: { active: NavId; onNav: (id: NavId) => void; onQuest?: (to: string) => void; onSettings: () => void; badges: Partial<Record<NavId, number>> }) {
   const p = useProfile()
   const lv = levelInfo(p.xp)
   const streak = liveStreak(p)
   const today = todayXp(p)
   return (
-    <aside className="fixed inset-y-0 left-0 z-20 hidden w-60 flex-col border-r border-white/5 bg-zinc-950/70 px-4 py-6 backdrop-blur lg:flex">
+    <aside className="fixed inset-y-0 left-0 z-20 hidden w-60 flex-col overflow-y-auto border-r border-white/5 bg-zinc-950/70 px-4 py-4 backdrop-blur lg:flex [@media(min-height:900px)]:py-6">
       <button onClick={() => onNav('openings')} className="px-2 text-left">
         <span className="font-display block text-2xl leading-none text-zinc-50">Outpost</span>
         <span className="mt-1 block text-[11px] uppercase tracking-[0.3em] text-brand-400">Chess training</span>
       </button>
 
-      <nav className="mt-10 space-y-0.5">
+      <nav className="mt-5 space-y-0.5 [@media(min-height:900px)]:mt-10">
         {NAV.map((n) => (
           <button
             key={n.id}
             onClick={() => onNav(n.id)}
-            className={`group flex w-full items-center gap-3 rounded-lg px-2 py-2 text-sm transition ${active === n.id ? 'bg-zinc-800/80 text-zinc-50' : 'text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100'}`}
+            className={`group flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-sm transition [@media(min-height:900px)]:py-2 ${active === n.id ? 'bg-zinc-800/80 text-zinc-50' : 'text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100'}`}
           >
             <span className={`w-5 text-center text-base ${active === n.id ? 'text-brand-400' : 'text-zinc-500 group-hover:text-zinc-300'}`}>{n.icon}</span>
             {n.label}
@@ -120,7 +120,7 @@ function Sidebar({ active, onNav, onSettings, badges }: { active: NavId; onNav: 
         ))}
       </nav>
 
-      <div className="mt-auto space-y-4">
+      <div className="mt-auto space-y-3 pt-4 [@media(min-height:900px)]:space-y-4">
         <button onClick={() => onNav('profile')} className="block w-full rounded-lg px-2 py-3 text-left ring-1 ring-white/5 hover:ring-white/10">
           <div className="flex items-baseline justify-between">
             <span className="text-xs uppercase tracking-widest text-zinc-500">Level {lv.level}</span>
@@ -135,9 +135,11 @@ function Sidebar({ active, onNav, onSettings, badges }: { active: NavId; onNav: 
           </p>
           <SyncStatus />
         </button>
-        <button onClick={() => onNav('profile')} className="block w-full rounded-lg px-2 py-3 text-left ring-1 ring-white/5 hover:ring-white/10">
-          <DailyQuests compact />
-        </button>
+        <div className="hidden rounded-lg px-2 py-3 ring-1 ring-white/5 [@media(min-height:820px)]:block">
+          <DailyQuests compact onGo={onQuest} />
+        </div>
+        {/* short screens (most laptops): a one-line summary instead of the full quest card */}
+        <QuestSummary onOpen={() => onNav('profile')} />
         <div>
           <button onClick={onSettings} className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-sm text-zinc-400 hover:bg-zinc-900 hover:text-zinc-100">
             <span className="w-5 text-center">⚙</span>
@@ -153,5 +155,19 @@ function Sidebar({ active, onNav, onSettings, badges }: { active: NavId; onNav: 
         </div>
       </div>
     </aside>
+  )
+}
+
+function QuestSummary({ onOpen }: { onOpen: () => void }) {
+  const p = useProfile()
+  const qs = todaysQuests()
+  const done = qs.filter((q) => questProgress(p, q).done).length
+  return (
+    <button onClick={onOpen} className="flex w-full items-center justify-between rounded-lg px-2 py-2 text-left text-xs ring-1 ring-white/5 hover:ring-white/15 [@media(min-height:820px)]:hidden">
+      <span className="uppercase tracking-widest text-zinc-500">Daily quests</span>
+      <span className={done === 3 ? 'text-emerald-400' : 'text-zinc-300'}>
+        {done}/3 {done === 3 ? '✓' : '→'}
+      </span>
+    </button>
   )
 }

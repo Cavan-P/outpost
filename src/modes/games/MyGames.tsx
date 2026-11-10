@@ -208,7 +208,8 @@ function ReportView({ report: r, onTrain, onOpenOpening }: { report: Report; onT
             {r.tags.slice(0, 6).map(([t, n], i) => (
               <li key={t} className="flex items-center gap-3 text-sm">
                 <span className="w-5 text-zinc-500">{i + 1}.</span>
-                <span className="w-64 shrink-0 text-zinc-200">{TAG_LABEL[t] ?? t}</span>
+                {/* a fixed 16rem name column overflowed phones: let it shrink and wrap there */}
+                <span className="min-w-0 flex-1 text-zinc-200 sm:w-64 sm:flex-none sm:shrink-0">{TAG_LABEL[t] ?? t}</span>
                 <Bar value={n} max={r.tags[0][1]} color={i === 0 ? 'bg-red-500' : 'bg-brand-500'} />
                 <span className="w-10 text-right tabular-nums text-zinc-400">{n}×</span>
                 <button className="text-xs text-brand-400 hover:underline" onClick={() => onTrain(t)}>

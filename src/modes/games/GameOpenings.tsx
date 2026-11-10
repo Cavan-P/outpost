@@ -38,7 +38,7 @@ export function GameOpenings({ games, onOpenOpening, onFind }: { games: Imported
           </span>
         )}
       </div>
-      <div className="overflow-x-auto">
+      <div className="hidden overflow-x-auto sm:block">
         <table className="w-full min-w-[560px] text-sm">
           <thead className="text-left text-xs text-zinc-500">
             <tr>
@@ -103,6 +103,52 @@ export function GameOpenings({ games, onOpenOpening, onFind }: { games: Imported
             })}
           </tbody>
         </table>
+      </div>
+      {/* phones: one card per opening instead of a wide table */}
+      <div className="space-y-2 sm:hidden">
+        {shown.map((u) => {
+          const st = status(u)
+          const b = u.book
+          const flip = !!b?.tree.def.flipped
+          const sans = u.games[0].sans.slice(0, Math.max(4, Math.min(12, Math.round(u.avgDepth) + 2)))
+          return (
+            <div key={`${u.side}|${u.family}`} className="space-y-1 rounded-lg p-3 ring-1 ring-white/10">
+              <div className="flex items-baseline gap-2">
+                <span className="text-zinc-500">{u.side === 'w' ? '♔' : '♚'}</span>
+                <span className="min-w-0 flex-1 text-sm text-zinc-200">{u.family}</span>
+                <span className={`text-xs tabular-nums ${u.score >= 0.5 ? 'text-emerald-400' : 'text-red-400'}`}>{Math.round(u.score * 100)}%</span>
+              </div>
+              <p className="text-[11px] text-zinc-500">
+                {u.games.length} game{u.games.length === 1 ? '' : 's'} · {u.avgDepth ? `${(u.avgDepth / 2).toFixed(1)} moves in book` : 'not in book'}
+                {b && covered(u) ? ` · ${b.tree.def.name}${flip ? ' (facing it)' : ''}` : ''}
+              </p>
+              <div className={`flex items-center gap-1.5 text-xs ${st.tone}`}>
+                {st.text}
+                {b && b.practiced && <MedalBadge tier={medalFor(b.tree)} />}
+              </div>
+              {u.deviations.slice(0, 2).map((d) => (
+                <p key={d.node.id + d.san} className="flex flex-wrap items-baseline gap-x-2 text-[11px] text-zinc-400">
+                  <span>
+                    {d.by === 'opponent' ? 'Opponent left book with' : 'You played'} <b className="font-mono text-zinc-200">{plyLabel(d.node, d.san)}</b>
+                    {d.count > 1 ? ` (${d.count}×)` : ''}
+                  </span>
+                  <AddLineButton tree={d.tree} node={d.node} uci={d.uci} />
+                </p>
+              ))}
+              <div className="pt-1 text-xs">
+                {b && covered(u) ? (
+                  <button className="text-brand-400 hover:underline" onClick={() => onOpenOpening(baseId(b.tree.def.id), flip)}>
+                    {b.practiced ? 'Practice →' : 'Learn it →'}
+                  </button>
+                ) : (
+                  <button className="text-brand-400 hover:underline" onClick={() => onFind(sans)}>
+                    Find openings →
+                  </button>
+                )}
+              </div>
+            </div>
+          )
+        })}
       </div>
       {usage.length > 10 && (
         <button className="text-xs text-zinc-400 hover:text-zinc-100" onClick={() => setAll((x) => !x)}>

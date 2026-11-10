@@ -37,7 +37,7 @@ function JoinForm() {
         {mode === 'new' ? (
           <input className="input w-48" placeholder="Nickname" maxLength={20} value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && go()} />
         ) : (
-          <input className="input w-72 font-mono text-xs" placeholder="Player key from your other device" value={key} onChange={(e) => setKey(e.target.value)} autoComplete="off" spellCheck={false} />
+          <input className="input w-full font-mono text-xs sm:w-72" placeholder="Player key from your other device" value={key} onChange={(e) => setKey(e.target.value)} autoComplete="off" spellCheck={false} />
         )}
         <button className="btn-primary" disabled={busy || (mode === 'new' ? name.trim().length < 3 : !key.includes('.'))} onClick={go}>
           {busy ? '…' : mode === 'new' ? 'Join' : 'Link'}

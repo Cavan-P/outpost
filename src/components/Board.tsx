@@ -183,7 +183,7 @@ export function Board({ fen, orientation, onMove, interactive = true, arrows = [
   // The board fills its container's height, so pin the container to a square.
   return (
     // sized to the window height too, so the board and the result strip under it fit on screen together
-    <div className="mx-auto w-full self-start" style={{ maxWidth: size === 'large' ? 'min(820px, max(320px, calc(100vh - 250px)))' : 'min(620px, max(320px, calc(100vh - 240px)))' }}>
+    <div className="mx-auto w-full self-start" style={{ maxWidth: size === 'large' ? 'min(820px, max(320px, calc(100vh - 250px)))' : 'min(620px, max(300px, calc(100vh - 280px)))' }}>
       <div className="relative aspect-square w-full select-none" style={{ containerType: 'inline-size' }}>
         <Chessboard
           options={{

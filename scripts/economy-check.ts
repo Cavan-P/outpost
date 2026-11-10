@@ -1,6 +1,6 @@
 // Sanity checks for the XP economy: grinding pays little, learning pays, levels/medals/quests/freezes work.
 import './mock-storage'
-import { award, count, getProfile, levelInfo, liveStreak, MAX_LEVEL, step, titleFor, todaysQuests } from '../src/lib/game'
+import { redeemCode, award, count, getProfile, levelInfo, liveStreak, MAX_LEVEL, step, titleFor, todaysQuests } from '../src/lib/game'
 import { openingOfWeek } from '../src/lib/weekly'
 import { boxOf, medalOf, recordAnswer, getProgress, type NodeStat } from '../src/lib/progress'
 
@@ -70,6 +70,13 @@ award(5)
 check('training after a missed day uses the freeze', getProfile().streak === 10 && getProfile().freezes === 0, `streak ${getProfile().streak}, freezes ${getProfile().freezes}`)
 
 check('opening of the week is stable', openingOfWeek().id === openingOfWeek().id, openingOfWeek().name)
+
+// secret codes (lowercase / missing dashes still work)
+check('a wrong code unlocks nothing', (await redeemCode('NOPE-1234')) === null)
+const arch = await redeemCode('architect 4xh2 dxde')
+check('the Architect code unlocks its achievement', arch?.id === 'architect' && !!getProfile().achievements.architect)
+const tester = await redeemCode('TESTER-VH5Z-MAGZ')
+check('the tester code unlocks Founding Tester', tester?.id === 'founding-tester' && !!getProfile().achievements['founding-tester'])
 
 console.log(fails ? `\n${fails} failed` : '\nall passed')
 process.exit(fails ? 1 : 0)

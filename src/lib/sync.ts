@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react'
 import { reloadCustom } from './custom'
 import { reloadExtensions } from './extensions'
+import { notifyProgressChanged } from './progress'
 import { onGameEvent, reloadProfile } from './game'
 import { reloadGames } from './games'
 import { baseOf, emptyBase, merge, type Base, type Snapshot } from './syncMerge'
@@ -84,6 +85,7 @@ function apply(s: Snapshot) {
   write(KEYS.games, s.games)
   write(KEYS.ext, s.ext)
   reloadExtensions()
+  notifyProgressChanged()
   reloadProfile()
   reloadGames()
   reloadCustom()

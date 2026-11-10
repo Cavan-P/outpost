@@ -29,13 +29,14 @@ function CourseStrip({ solved, stars, current, onPick }: { solved: Set<string>; 
     }
   }, [solved, stars])
   return (
-    <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
+    // phones: one row you can swipe through; wider screens: a grid
+    <div className="-mx-3 flex snap-x gap-2 overflow-x-auto px-3 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 sm:pb-0 xl:grid-cols-5">
       {COURSES.map((c) => {
         const done = c.steps.filter((s) => solved.has(s)).length
         const next = c.steps.find((s) => !solved.has(s)) ?? c.steps.find((s) => (stars[`eg-${s}`] ?? 0) < 3) ?? c.steps[0]
         const active = c.steps.includes(current)
         return (
-          <button key={c.id} onClick={() => onPick(next)} title={c.blurb} className={`rounded-lg p-3 text-left ring-1 transition ${active ? 'ring-brand-500/50' : 'ring-white/5 hover:ring-white/15'}`}>
+          <button key={c.id} onClick={() => onPick(next)} title={c.blurb} className={`w-44 shrink-0 snap-start rounded-lg p-3 text-left ring-1 transition sm:w-auto ${active ? 'ring-brand-500/50' : 'ring-white/5 hover:ring-white/15'}`}>
             <div className="flex items-baseline justify-between gap-2">
               <span className="text-sm text-zinc-100">{c.name}</span>
               <span className="text-[11px] text-zinc-500">
@@ -215,7 +216,7 @@ export function Endgames() {
 
       {/* compact picker: category tabs + the endgames in that category */}
       <div className="space-y-2">
-        <div className="flex flex-wrap items-center gap-x-1 gap-y-2 border-b border-white/10">
+        <div className="-mx-3 flex items-center gap-x-1 overflow-x-auto border-b border-white/10 px-3 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
           {categories.map((cat) => {
             const inCat = ENDGAMES.filter((d) => d.category === cat)
             const done = inCat.filter((d) => solved.has(d.id)).length
@@ -223,17 +224,17 @@ export function Endgames() {
               <button
                 key={cat}
                 onClick={() => setCategory(cat)}
-                className={`-mb-px border-b-2 px-3 py-2 text-sm transition ${category === cat ? 'border-brand-400 text-zinc-50' : 'border-transparent text-zinc-500 hover:text-zinc-200'}`}
+                className={`-mb-px shrink-0 whitespace-nowrap border-b-2 px-3 py-2 text-sm transition ${category === cat ? 'border-brand-400 text-zinc-50' : 'border-transparent text-zinc-500 hover:text-zinc-200'}`}
               >
                 {cat} <span className="text-xs text-zinc-500">{done}/{inCat.length}</span>
               </button>
             )
           })}
-          <span className="ml-auto pb-2 text-xs text-zinc-500">
+          <span className="ml-auto hidden shrink-0 pb-2 text-xs text-zinc-500 sm:inline">
             {solved.size}/{ENDGAMES.length} solved
           </span>
         </div>
-        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8">
+        <div className="-mx-3 flex snap-x gap-2 overflow-x-auto px-3 pb-1 sm:mx-0 sm:grid sm:grid-cols-4 sm:overflow-visible sm:px-0 sm:pb-0 md:grid-cols-6 xl:grid-cols-8">
           {ENDGAMES.filter((d) => d.category === category).map((d) => {
             const stars = profile.bests[`eg-${d.id}`] ?? 0
             return (
@@ -241,7 +242,7 @@ export function Endgames() {
                 key={d.id}
                 onClick={() => choose(d)}
                 title={`${d.name} — ${d.level} · ${GOAL_LABEL[d.goal]} as ${d.side === 'w' ? 'White' : 'Black'}`}
-                className={`group overflow-hidden rounded-lg text-left ring-1 transition hover:-translate-y-0.5 ${d === def ? 'ring-2 ring-brand-400' : 'ring-white/10 hover:ring-white/30'}`}
+                className={`group w-24 shrink-0 snap-start overflow-hidden rounded-lg text-left ring-1 transition hover:-translate-y-0.5 sm:w-auto ${d === def ? 'ring-2 ring-brand-400' : 'ring-white/10 hover:ring-white/30'}`}
               >
                 <div className="relative">
                   <MiniBoard fen={d.fen} orientation={d.side === 'w' ? 'white' : 'black'} />

@@ -23,6 +23,7 @@ import { LeaderboardSettings } from './components/LeaderboardUI'
 import { startBoardPosting } from './lib/leaderboard'
 import { startAutoSync } from './lib/sync'
 import { useExtensionsVersion } from './lib/extensions'
+import { useProgressVersion } from './lib/progress'
 import { isCollectible, isUnlocked } from './lib/meta'
 import { getGames, myGames } from './lib/games'
 import { PUZZLES } from './lib/puzzles'
@@ -37,7 +38,7 @@ configureTotals({
   hasGameAnalysis: () => myGames(getGames().games).some((g) => g.analysis),
 })
 
-type View = { kind: 'home'; finder?: string[]; key?: number } | { kind: 'opening'; id: string; mode: 'learn' | 'practice'; flip: boolean } | { kind: 'analysis'; fen?: string; key: number; blind?: boolean } | { kind: 'endgames' } | { kind: 'training' } | { kind: 'arena' } | { kind: 'profile' } | { kind: 'games' } | { kind: 'review'; key: number } | { kind: 'builder' } | { kind: 'about' }
+type View = { kind: 'home'; finder?: string[]; key?: number } | { kind: 'opening'; id: string; mode: 'learn' | 'practice'; flip: boolean } | { kind: 'analysis'; fen?: string; key: number; blind?: boolean } | { kind: 'endgames' } | { kind: 'training'; sub?: string; key?: number } | { kind: 'arena'; sub?: string; key?: number } | { kind: 'profile' } | { kind: 'games' } | { kind: 'review'; key: number } | { kind: 'builder' } | { kind: 'about' }
 
 const sideName = (s: 'w' | 'b') => (s === 'w' ? 'White' : 'Black')
 
@@ -58,13 +59,21 @@ export default function App() {
   const tree = useMemo(() => (opening ? getTree(opening) : null), [opening, extVersion]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const active: NavId = view.kind === 'home' || view.kind === 'opening' ? 'openings' : view.kind
+  /** Quest links: "training:mates", "arena:spar", "review"… */
+  const goQuest = (to: string) => {
+    const [page, sub] = to.split(':')
+    window.scrollTo(0, 0)
+    if (page === 'training' || page === 'arena') setView({ kind: page, sub, key: Date.now() })
+    else go(page as NavId)
+  }
   const go = (id: NavId) => setView(id === 'openings' ? { kind: 'home' } : id === 'analysis' ? { kind: 'analysis', key: Date.now() } : id === 'review' ? { kind: 'review', key: Date.now() } : { kind: id })
   // recomputed on navigation, which is when it matters
-  const dueCount = useMemo(() => dueItems().length, [view]) // eslint-disable-line react-hooks/exhaustive-deps
+  const progressVersion = useProgressVersion() // recount as you answer, not only when you change page
+  const dueCount = useMemo(() => dueItems().length, [view, progressVersion]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
-      <Shell active={active} onNav={go} onSettings={() => setShowSettings(true)} badges={{ review: dueCount }}>
+      <Shell active={active} onNav={go} onQuest={goQuest} onSettings={() => setShowSettings(true)} badges={{ review: dueCount }}>
         {view.kind === 'home' && <Library key={view.key} finder={view.finder} onOpen={(id, mode, flip) => setView({ kind: 'opening', id, mode, flip })} />}
 
         {view.kind === 'opening' && opening && tree && (
@@ -100,7 +109,7 @@ export default function App() {
                 ))}
               </div>
             </div>
-            <details className="rounded-xl bg-zinc-900/60 ring-1 ring-white/5 px-4 py-2.5 text-sm sm:py-3" open={view.mode === 'learn' && window.innerWidth >= 640}>
+            <details className="rounded-xl bg-zinc-900/60 ring-1 ring-white/5 px-4 py-2.5 text-sm sm:py-3" open={view.mode === 'learn' && window.innerWidth >= 640 && window.innerHeight >= 900}>
               <summary className="cursor-pointer text-zinc-300 font-medium">Key ideas</summary>
               <p className="text-zinc-300 mt-2">{opening.summary}</p>
               <ul className="list-disc pl-5 mt-2 space-y-1 text-zinc-400">
@@ -120,9 +129,9 @@ export default function App() {
 
         {view.kind === 'analysis' && <Analysis key={view.key} initialFen={view.fen} blindfold={view.blind} />}
         {view.kind === 'endgames' && <Endgames />}
-        {view.kind === 'arena' && <Arena onAnalyze={analyze} />}
-        {view.kind === 'training' && <Training onBlindfold={() => setView({ kind: 'analysis', key: Date.now(), blind: true })} />}
-        {view.kind === 'profile' && <ProfilePage />}
+        {view.kind === 'arena' && <Arena key={view.key} initial={view.sub} onAnalyze={analyze} />}
+        {view.kind === 'training' && <Training key={view.key} initial={view.sub} onBlindfold={() => setView({ kind: 'analysis', key: Date.now(), blind: true })} />}
+        {view.kind === 'profile' && <ProfilePage onQuest={goQuest} />}
         {view.kind === 'review' && <Review key={view.key} onDone={() => setView({ kind: 'home' })} />}
         {view.kind === 'about' && <About />}
         {view.kind === 'builder' && <Builder onOpen={(id) => setView({ kind: 'opening', id, mode: 'learn', flip: false })} />}

@@ -22,8 +22,8 @@ const MODES: { id: Mode; name: string; desc: string }[] = [
   { id: 'spar', name: 'Sparring', desc: 'Start from the end of one of your lines and play it out against Stockfish, with a graded review.' },
 ]
 
-export function Arena({ onAnalyze }: { onAnalyze: (fen: string) => void }) {
-  const [mode, setMode] = useState<Mode | null>(null)
+export function Arena({ onAnalyze, initial }: { onAnalyze: (fen: string) => void; initial?: string }) {
+  const [mode, setMode] = useState<Mode | null>(() => (MODES.some((m) => m.id === initial) ? (initial as Mode) : null))
   if (mode)
     return (
       <div className="space-y-4">
@@ -92,7 +92,7 @@ function OpeningPicker({ title, allowFlip, onPick }: { title: string; allowFlip?
     <section className="space-y-3">
       <h2 className="text-2xl font-bold text-zinc-50">{title}</h2>
       <div className="flex flex-wrap items-center gap-2">
-        <select className="input min-w-64" value={id} onChange={(e) => setId(e.target.value)}>
+        <select className="input w-full sm:w-auto sm:min-w-64" value={id} onChange={(e) => setId(e.target.value)}>
           {list.map((x) => (
             <option key={x.def.id} value={x.def.id}>
               {x.def.name} ({x.def.side === 'w' ? 'White' : 'Black'}){x.medal ? ` · ${['', 'Bronze', 'Silver', 'Gold', 'Diamond'][x.medal]}` : x.seen ? ' · studied' : ''}

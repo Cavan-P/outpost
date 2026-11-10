@@ -1,3 +1,4 @@
+import { useSyncExternalStore } from 'react'
 // Per-opening practice stats in localStorage. Keyed by tree node id (the SAN path).
 //
 // Each decision (a position where you must find the book move) lives in a spaced-repetition box.
@@ -79,6 +80,23 @@ function load<T>(key: string, fallback: T): T {
   }
 }
 
+// Listeners for "progress changed" (the daily-review badge, mainly). Bumped on every save.
+let version = 0
+const subs = new Set<() => void>()
+export function notifyProgressChanged() {
+  version++
+  subs.forEach((f) => f())
+}
+export function useProgressVersion() {
+  return useSyncExternalStore(
+    (f) => {
+      subs.add(f)
+      return () => void subs.delete(f)
+    },
+    () => version,
+  )
+}
+
 function save(key: string, value: unknown) {
   try {
     localStorage.setItem(key, JSON.stringify(value))
@@ -98,6 +116,7 @@ function update(openingId: string, fn: (p: OpeningProgress) => void) {
   fn(p)
   store[openingId] = p
   save(KEY, store)
+  notifyProgressChanged()
 }
 
 /** Records an answer and reports the decision's stage before and after. */
@@ -197,6 +216,7 @@ export function resetProgress(openingId: string) {
   const store = load<Store>(KEY, {})
   delete store[openingId]
   save(KEY, store)
+  notifyProgressChanged()
 }
 
 /** Human-friendly "in 4 min" / "in 2 h" / "in 3 days". */

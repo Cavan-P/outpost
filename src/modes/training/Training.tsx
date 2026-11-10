@@ -38,8 +38,8 @@ const DRILLS: { id: Drill; group: Group; name: string; desc: string; bestKey?: s
   { id: 'count', group: 'Vision', name: 'Checks & captures', desc: 'Count the forcing moves in real opening positions.', bestKey: 'count' },
 ]
 
-export function Training({ onBlindfold }: { onBlindfold: () => void }) {
-  const [drill, setDrill] = useState<Drill | null>(null)
+export function Training({ onBlindfold, initial }: { onBlindfold: () => void; initial?: string }) {
+  const [drill, setDrill] = useState<Drill | null>(() => (DRILLS.some((d) => d.id === initial) ? (initial as Drill) : null))
   const profile = useProfile()
 
   if (drill)

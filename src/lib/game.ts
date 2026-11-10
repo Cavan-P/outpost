@@ -178,6 +178,8 @@ function today() {
  * opening all day is less rewarding than spreading out.
  */
 export function award(amount: number, label?: string, source?: string) {
+  const hour = new Date().getHours()
+  if (hour >= 1 && hour < 4 && amount > 0) profile.counters = { ...profile.counters, nightOwl: (profile.counters.nightOwl ?? 0) + 1 }
   if (source && amount > 0) {
     const t = today()
     const earned = t.xpBySource[source] ?? 0
@@ -215,28 +217,30 @@ export interface Quest {
   target: number
   xp: number
   available?: () => boolean
+  /** where to go to work on it: a page, optionally "page:section" (e.g. "training:mates") */
+  to?: string
 }
 
 export const QUESTS: Quest[] = [
-  { id: 'due-10', text: 'Answer 10 positions that are due for review', counter: 'dueCorrect', target: 10, xp: 40 },
-  { id: 'due-25', text: 'Answer 25 due positions', counter: 'dueCorrect', target: 25, xp: 70 },
-  { id: 'learn-1', text: 'Study a line you haven\'t seen before', counter: 'linesLearned', target: 1, xp: 30 },
-  { id: 'new-5', text: 'Get 5 brand-new positions right', counter: 'newCorrect', target: 5, xp: 40 },
-  { id: 'lines-3', text: 'Complete 3 practice lines', counter: 'lines', target: 3, xp: 30 },
-  { id: 'flawless-2', text: 'Finish 2 lines without a mistake', counter: 'flawless', target: 2, xp: 40 },
-  { id: 'traps-3', text: 'Solve 3 trap puzzles', counter: 'trapSolves', target: 3, xp: 30 },
-  { id: 'endgame-1', text: 'Solve an endgame', counter: 'endgameSolves', target: 1, xp: 40 },
-  { id: 'review-1', text: 'Finish the daily review', counter: 'reviews', target: 1, xp: 40, available: () => totals.hasDue() },
-  { id: 'mates-2', text: 'Deliver 2 mating patterns', counter: 'mateSolves', target: 2, xp: 25 },
-  { id: 'own-2', text: 'Fix 2 mistakes from your own games', counter: 'ownSolves', target: 2, xp: 45, available: () => totals.hasGameAnalysis() },
-  { id: 'drill-3', text: 'Play 3 vision drills', counter: 'drills', target: 3, xp: 30 },
-  { id: 'blind-1', text: 'Complete a line blindfolded', counter: 'blindLines', target: 1, xp: 50 },
-  { id: 'combo-10', text: 'Reach a 10-move combo in Practice', counter: 'combo10', target: 1, xp: 35 },
-  { id: 'playout-1', text: 'Get a play-out graded', counter: 'playouts', target: 1, xp: 30 },
-  { id: 'gauntlet-2', text: 'Run the Opening Gauntlet twice', counter: 'gauntlets', target: 2, xp: 35 },
-  { id: 'boss-1', text: 'Defeat a boss', counter: 'bossWins', target: 1, xp: 50, available: () => Object.values(profile.medals ?? {}).some((t) => t >= 1) },
-  { id: 'defend-3', text: 'Dodge 3 traps in Defend it', counter: 'defendSolves', target: 3, xp: 35 },
-  { id: 'master-1', text: "Play through a master game", counter: 'masterGames', target: 1, xp: 40 },
+  { id: 'due-10', text: 'Answer 10 positions that are due for review', counter: 'dueCorrect', target: 10, xp: 40, to: 'review' },
+  { id: 'due-25', text: 'Answer 25 due positions', counter: 'dueCorrect', target: 25, xp: 70, to: 'review' },
+  { id: 'learn-1', text: 'Study a line you haven\'t seen before', counter: 'linesLearned', target: 1, xp: 30, to: 'openings' },
+  { id: 'new-5', text: 'Get 5 brand-new positions right', counter: 'newCorrect', target: 5, xp: 40, to: 'openings' },
+  { id: 'lines-3', text: 'Complete 3 practice lines', counter: 'lines', target: 3, xp: 30, to: 'openings' },
+  { id: 'flawless-2', text: 'Finish 2 lines without a mistake', counter: 'flawless', target: 2, xp: 40, to: 'openings' },
+  { id: 'traps-3', text: 'Solve 3 trap puzzles', counter: 'trapSolves', target: 3, xp: 30, to: 'training:puzzles' },
+  { id: 'endgame-1', text: 'Solve an endgame', counter: 'endgameSolves', target: 1, xp: 40, to: 'endgames' },
+  { id: 'review-1', text: 'Finish the daily review', counter: 'reviews', target: 1, xp: 40, available: () => totals.hasDue(), to: 'review' },
+  { id: 'mates-2', text: 'Deliver 2 mating patterns', counter: 'mateSolves', target: 2, xp: 25, to: 'training:mates' },
+  { id: 'own-2', text: 'Fix 2 mistakes from your own games', counter: 'ownSolves', target: 2, xp: 45, available: () => totals.hasGameAnalysis(), to: 'games' },
+  { id: 'drill-3', text: 'Play 3 vision drills', counter: 'drills', target: 3, xp: 30, to: 'training' },
+  { id: 'blind-1', text: 'Complete a line blindfolded', counter: 'blindLines', target: 1, xp: 50, to: 'openings' },
+  { id: 'combo-10', text: 'Reach a 10-move combo in Practice', counter: 'combo10', target: 1, xp: 35, to: 'openings' },
+  { id: 'playout-1', text: 'Get a play-out graded', counter: 'playouts', target: 1, xp: 30, to: 'arena:spar' },
+  { id: 'gauntlet-2', text: 'Run the Opening Gauntlet twice', counter: 'gauntlets', target: 2, xp: 35, to: 'arena:gauntlet' },
+  { id: 'boss-1', text: 'Defeat a boss', counter: 'bossWins', target: 1, xp: 50, available: () => Object.values(profile.medals ?? {}).some((t) => t >= 1), to: 'arena:boss' },
+  { id: 'defend-3', text: 'Dodge 3 traps in Defend it', counter: 'defendSolves', target: 3, xp: 35, to: 'training:defend' },
+  { id: 'master-1', text: "Play through a master game", counter: 'masterGames', target: 1, xp: 40, to: 'training:masters' },
 ]
 
 const hashDay = (d: string) => [...d].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) | 0, 7)
@@ -286,6 +290,25 @@ function checkQuests() {
 }
 
 /** Add XP without the source/label machinery (quests, medals, achievements). */
+// ───────────── secret codes ─────────────
+
+/** Codes are stored as one-way hashes, so reading the source doesn't reveal them. */
+const CODES: Record<string, string> = {
+  '833c8c676230c563935453e421ad33ee9e7e0711b75832dca013fa8aa871ae50': 'architect',
+  e061cc12fb8ed2b52f8cb9a555c9eb29cd72a82d610821aeb6289d07ccf824f5: 'founding-tester',
+}
+
+/** Redeem a secret code; returns the achievement it unlocked, or null. */
+export async function redeemCode(code: string): Promise<Achievement | null> {
+  const norm = code.toUpperCase().replace(/[^A-Z0-9]/g, '')
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`outpost-code:${norm}`))
+  const hex = [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('')
+  const id = CODES[hex]
+  if (!id) return null
+  addToSet('codes', id)
+  return ACHIEVEMENTS.find((a) => a.id === id) ?? null
+}
+
 function grant(xp: number) {
   const before = levelInfo(profile.xp).level
   touchDay()
@@ -375,9 +398,12 @@ export interface Achievement {
   desc: string
   icon: string
   test: (p: Profile) => boolean
+  /** hidden in the list until earned */
+  secret?: boolean
 }
 
 const c = (p: Profile, k: string) => p.counters[k] ?? 0
+const hasCode = (p: Profile, id: string) => (p.sets.codes ?? []).includes(id)
 const s = (p: Profile, k: string) => (p.sets[k] ?? []).length
 
 export const ACHIEVEMENTS: Achievement[] = [
@@ -428,6 +454,10 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'masters-3', name: 'Student of the Classics', desc: "Score 70%+ on 3 master games", icon: '📚', test: (p) => (p.sets.mastersPassed ?? []).length >= 3 },
   { id: 'course-1', name: 'Graduate', desc: 'Complete an endgame course', icon: '🎓', test: (p) => (p.sets.courses ?? []).length >= 1 },
   { id: 'course-all', name: 'Endgame Professor', desc: 'Complete every endgame course', icon: '🏛️', test: (p) => (p.sets.courses ?? []).length >= 5 },
+  { id: 'night-owl', name: 'Night Owl', desc: 'Train between 1 and 4 a.m.', icon: '🦉', test: (p) => c(p, 'nightOwl') >= 1 },
+  { id: 'bongcloud', name: 'Bongcloud Believer', desc: 'Study the Bongcloud. Respect.', icon: '☁️', test: (p) => (p.sets.openingsStudied ?? []).includes('bongcloud') || !!p.medals?.bongcloud },
+  { id: 'architect', name: 'The Architect', desc: 'Built Outpost, square by square.', icon: '🏗️', test: (p) => hasCode(p, 'architect'), secret: true },
+  { id: 'founding-tester', name: 'Founding Tester', desc: 'Helped shape Outpost with early feedback. Thank you!', icon: '🧪', test: (p) => hasCode(p, 'founding-tester'), secret: true },
   { id: 'quests-1', name: 'Quest Giver', desc: 'Finish all three daily quests', icon: '📜', test: (p) => c(p, 'questDays') >= 1 },
   { id: 'quests-14', name: 'Fortnight of Focus', desc: 'Finish all daily quests on 14 days', icon: '🗺️', test: (p) => c(p, 'questDays') >= 14 },
 ]

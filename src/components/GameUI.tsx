@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { getSettings } from '../lib/settings'
 import { Collection, YearReview } from './MetaUI'
 import { LeaderboardCard } from './LeaderboardUI'
-import { ACHIEVEMENTS, DAILY_GOAL, MEDALS, MAX_LEVEL, lastDays, levelInfo, liveStreak, onGameEvent, questProgress, resetProfile, titleFor, todaysQuests, todayXp, useProfile, type GameEvent } from '../lib/game'
+import { redeemCode, ACHIEVEMENTS, DAILY_GOAL, MEDALS, MAX_LEVEL, lastDays, levelInfo, liveStreak, onGameEvent, questProgress, resetProfile, titleFor, todaysQuests, todayXp, useProfile, type GameEvent } from '../lib/game'
 
 /** Compact level / XP / streak / daily-goal widget for the header. */
 export function HeaderStats({ onOpen }: { onOpen: () => void }) {
@@ -62,7 +62,7 @@ export function MedalBadge({ tier, title }: { tier: number; title?: string }) {
 }
 
 /** Today's three quests with progress. `compact` for the sidebar. */
-export function DailyQuests({ compact = false }: { compact?: boolean }) {
+export function DailyQuests({ compact = false, onGo }: { compact?: boolean; onGo?: (to: string) => void }) {
   const p = useProfile()
   const quests = todaysQuests()
   const done = quests.filter((q) => questProgress(p, q).done).length
@@ -80,7 +80,13 @@ export function DailyQuests({ compact = false }: { compact?: boolean }) {
           <div key={q.id} className={compact ? '' : 'rounded-lg bg-zinc-900/60 p-3 ring-1 ring-white/5'}>
             <div className="flex items-start gap-2">
               <span className={`mt-px text-xs ${done ? 'text-emerald-400' : 'text-zinc-600'}`}>{done ? '✓' : '○'}</span>
-              <span className={`flex-1 ${compact ? 'text-[11px] leading-snug' : 'text-sm'} ${done ? 'text-zinc-500 line-through' : 'text-zinc-300'}`}>{q.text}</span>
+              {!done && q.to && onGo ? (
+                <button onClick={() => onGo(q.to!)} className={`flex-1 text-left ${compact ? 'text-[11px] leading-snug' : 'text-sm'} text-zinc-300 hover:text-brand-300 hover:underline`} title="Go there">
+                  {q.text} <span className="text-brand-400">→</span>
+                </button>
+              ) : (
+                <span className={`flex-1 ${compact ? 'text-[11px] leading-snug' : 'text-sm'} ${done ? 'text-zinc-500 line-through' : 'text-zinc-300'}`}>{q.text}</span>
+              )}
               {!compact && <span className="text-xs text-amber-300">+{q.xp} XP</span>}
             </div>
             {!done && q.target > 1 && (
@@ -148,12 +154,13 @@ export function Toasts() {
   )
 }
 
-export function ProfilePage() {
+export function ProfilePage({ onQuest }: { onQuest?: (to: string) => void }) {
   const p = useProfile()
   const lv = levelInfo(p.xp)
   const days = lastDays(p, 21)
   const max = Math.max(DAILY_GOAL, ...days.map((d) => d.xp))
   const unlocked = ACHIEVEMENTS.filter((a) => p.achievements[a.id]).length
+  const visibleTotal = ACHIEVEMENTS.filter((a) => !a.secret || p.achievements[a.id]).length
   const stat = (label: string, value: number | string) => (
     <div className="rounded-xl bg-zinc-900/80 ring-1 ring-white/5 p-4">
       <p className="text-2xl font-bold text-zinc-50 tabular-nums">{value}</p>
@@ -177,7 +184,7 @@ export function ProfilePage() {
       </div>
 
       <section className="rounded-xl bg-zinc-900/80 ring-1 ring-white/5 p-4">
-        <DailyQuests />
+        <DailyQuests onGo={onQuest} />
         <p className="mt-3 text-xs text-zinc-500">
           Finish all three for +50 XP and a streak freeze ❄️ (you can bank 2). A freeze covers a missed day so your streak survives. XP is
           for learning: new positions and reviews that come due pay well; repeating what you just answered pays 1 XP, and grinding the same
@@ -201,7 +208,7 @@ export function ProfilePage() {
         {stat('endgames solved', (p.sets.endgames ?? []).length)}
         {stat('trap puzzles solved', (p.sets.puzzles ?? []).length)}
         {stat('flawless lines', p.counters.flawless ?? 0)}
-        {stat('achievements', `${unlocked}/${ACHIEVEMENTS.length}`)}
+        {stat('achievements', `${unlocked}/${visibleTotal}`)}
       </div>
 
       <section className="rounded-xl bg-zinc-900/80 ring-1 ring-white/5 p-4">
@@ -216,9 +223,12 @@ export function ProfilePage() {
       </section>
 
       <section>
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-300 mb-3">Achievements</h2>
+        <div className="mb-3 flex flex-wrap items-baseline gap-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-300">Achievements</h2>
+          <RedeemCode />
+        </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {ACHIEVEMENTS.map((a) => {
+          {ACHIEVEMENTS.filter((a) => !a.secret || p.achievements[a.id]).map((a) => {
             const got = p.achievements[a.id]
             return (
               <div key={a.id} className={`flex items-center gap-3 rounded-xl p-3 ring-1 ${got ? 'bg-amber-500/10 ring-amber-400/30' : 'bg-zinc-900/60 ring-white/5 opacity-60'}`}>
@@ -243,5 +253,35 @@ export function ProfilePage() {
         Reset profile
       </button>
     </div>
+  )
+}
+
+/** "Have a code?" — secret achievements. */
+function RedeemCode() {
+  const [open, setOpen] = useState(false)
+  const [code, setCode] = useState('')
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
+  if (!open)
+    return (
+      <button className="text-xs text-zinc-500 hover:text-zinc-300" onClick={() => setOpen(true)}>
+        Have a code?
+      </button>
+    )
+  return (
+    <span className="flex flex-wrap items-center gap-2">
+      <input className="input w-44 !py-1 font-mono text-xs uppercase" placeholder="CODE-XXXX-XXXX" value={code} onChange={(e) => setCode(e.target.value)} autoFocus spellCheck={false} autoComplete="off" />
+      <button
+        className="btn-secondary !py-1 text-xs"
+        disabled={!code.trim()}
+        onClick={async () => {
+          const a = await redeemCode(code)
+          setMsg(a ? { ok: true, text: `${a.icon} ${a.name} unlocked!` } : { ok: false, text: "That code didn't work." })
+          if (a) setCode('')
+        }}
+      >
+        Redeem
+      </button>
+      {msg && <span className={`text-xs ${msg.ok ? 'text-emerald-400' : 'text-red-400'}`}>{msg.text}</span>}
+    </span>
   )
 }
