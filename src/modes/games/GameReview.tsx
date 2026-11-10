@@ -6,6 +6,9 @@ import { EvalGraph } from '../../components/EvalGraph'
 import { formatPv, formatScore } from '../../lib/engine'
 import { explainMove } from '../../lib/explain'
 import { TAG_LABEL, fensOf } from '../../lib/gameAnalysis'
+import { AddLineButton, plyLabel } from '../../components/AddLine'
+import { useExtensionsVersion } from '../../lib/extensions'
+import { bookOf } from '../../lib/openingIndex'
 import { removeGame, safeUrl, setNotMine, userResult, type ImportedGame, type MoveAnalysis } from '../../lib/games'
 
 const CLS_STYLE: Record<MoveAnalysis['cls'], { label: string; color: string; mark: string }> = {
@@ -63,6 +66,7 @@ export function GameReview({ game, initialPly = 0, onBack }: { game: ImportedGam
             </a>
           )}
         </p>
+        <BookNote game={game} onJump={setPly} />
         <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
           <label className="flex items-center gap-2 text-zinc-400" title="Games that aren't yours can be analyzed, but stay out of your mistake report, puzzles and daily review">
             <input type="checkbox" checked={!!game.notMine} onChange={(e) => setNotMine(game.id, e.target.checked)} />
@@ -163,5 +167,33 @@ function MoveDetail({ game, move, fenBefore, fenAfter }: { game: ImportedGame; m
         </>
       )}
     </div>
+  )
+}
+
+/** Where this game left Outpost's book, and a one-click way to add that move to the opening. */
+function BookNote({ game, onJump }: { game: ImportedGame; onJump: (ply: number) => void }) {
+  const ext = useExtensionsVersion()
+  const b = useMemo(() => bookOf(game), [game, ext]) // eslint-disable-line react-hooks/exhaustive-deps
+  if (!b || !(b.identified || b.depth >= 4)) return null
+  const name = `${b.tree.def.name}${b.tree.def.flipped ? ' (facing it)' : ''}`
+  if (b.leftBy === 'end' || !b.deviation) {
+    return (
+      <p className="mt-1 text-xs text-zinc-500">
+        Followed {name} to the end of its book ({Math.ceil(b.depth / 2)} moves).
+      </p>
+    )
+  }
+  const inBook = b.node.children.some((c) => c.san === b.deviation!.san)
+  return (
+    <p className="mt-1 flex flex-wrap items-baseline gap-x-2 text-xs text-zinc-500">
+      <span>
+        In {name} until{' '}
+        <button className="font-mono text-zinc-200 hover:underline" onClick={() => onJump(b.depth + 1)}>
+          {plyLabel(b.node, b.deviation.san)}
+        </button>
+        , where {b.leftBy === 'opponent' ? 'your opponent' : 'you'} left the book.
+      </span>
+      {inBook ? <span className="text-emerald-400">now in the book ✓</span> : <AddLineButton tree={b.tree} node={b.node} uci={b.deviation.uci} label="+ add this line to the opening" />}
+    </p>
   )
 }

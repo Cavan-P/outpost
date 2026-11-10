@@ -5,6 +5,7 @@ import type { ImportedGame } from '../src/lib/games'
 import { Chess } from 'chess.js'
 import { mem } from './mock-storage'
 import { coverage } from '../src/lib/coverage'
+import { addGames, getGames, parsePgnText } from '../src/lib/games'
 
 let fails = 0
 const check = (name: string, ok: boolean, info = '') => {
@@ -39,6 +40,8 @@ const usage = openingUsage([g1, g2, g3, { ...g1, id: '4' }])
 const bud = usage.find((u) => u.family === 'Budapest Defense' && u.side === 'b')!
 check('games grouped by opening and side', bud.games.length === 2 && usage.length === 3, usage.map((u) => `${u.side}:${u.family}×${u.games.length}`).join(', '))
 check('score computed from your side', bud.score === 1)
+check("the opponent's deviation is collected (with how often)", bud.deviations[0]?.san === 'h3' && bud.deviations[0].by === 'opponent' && bud.deviations[0].count === 2, bud.deviations.map((d) => `${d.san}×${d.count}`).join(', '))
+check('the deviation is recorded on the game too', b1.deviation?.san === 'h3' && b1.deviation.uci === 'h2h3')
 
 // finder: transpositions are found by position
 const c = new Chess()
@@ -65,6 +68,17 @@ const c5 = e4?.replies.find((r) => r.moves[1] === 'c5')
 check('1.e4 c5 is uncovered by the King\'s Gambit, with suggestions', !!c5 && !c5.covered.length && c5.suggest.length > 0, c5?.suggest.map((d) => d.name).join(', '))
 const e5 = e4?.replies.find((r) => r.moves[1] === 'e5')
 check('1.e4 e5 is covered', !!e5 && e5.covered.length > 0)
+
+// importing: nothing is added twice
+const pgnA = '[White "Me"]\n[Black "Opp"]\n[Result "1-0"]\n[Date "2026.11.01"]\n\n1. e4 e5 2. Nf3 Nc6 1-0'
+const pgnB = '[White "Opp"]\n[Black "Me"]\n[Result "0-1"]\n[Date "2026.11.02"]\n\n1. d4 d5 2. c4 e6 0-1'
+check('first import adds both games', addGames('Me', 'pgn', parsePgnText(pgnA + '\n\n' + pgnB, 'Me')) === 2)
+check('pasting the same games again adds nothing', addGames('Me', 'pgn', parsePgnText(pgnB + '\n\n' + pgnA, 'Me')) === 0, 'reordered paste')
+const fromLichess = { ...parsePgnText(pgnA, 'Me')[0], id: 'li:abc123', source: 'lichess' as const }
+check('the same game from Lichess is recognized as a duplicate', addGames('Me', 'lichess', [fromLichess]) === 0)
+const newGame = { ...fromLichess, id: 'li:new1', sans: ['e4', 'c5'] }
+check('a genuinely new game is still added', addGames('Me', 'lichess', [newGame]) === 1, `${getGames().games.length} games stored`)
+check('re-importing your last N Lichess games only adds the new ones', addGames('Me', 'lichess', [newGame, { ...newGame, id: 'li:new2', sans: ['e4', 'e6'] }]) === 1, `${getGames().games.length} games stored`)
 
 console.log(fails ? `\n${fails} failed` : '\nall passed')
 process.exit(fails ? 1 : 0)

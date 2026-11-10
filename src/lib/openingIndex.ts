@@ -1,6 +1,7 @@
 import { Chess } from 'chess.js'
 import type { OpeningDef } from '../data/openings'
 import { allOpenings } from './custom'
+import { getExtensions } from './extensions'
 import { getProgress, medalOf } from './progress'
 import { flipOpening, getTree, userDecisionNodes, type OpeningTree, type TreeNode } from './tree'
 import type { ImportedGame } from './games'
@@ -21,7 +22,8 @@ let indexedFor = ''
 /** Every position in every opening (built once, rebuilt when custom repertoires change). */
 export function positionIndex(): Map<string, PosHit[]> {
   const defs = allOpenings()
-  const sig = defs.map((d) => d.id + d.lines.length).join('|')
+  const ext = getExtensions().lines
+  const sig = defs.map((d) => d.id + d.lines.length + ':' + (ext[d.id]?.length ?? 0)).join('|')
   if (index && indexedFor === sig) return index
   index = new Map()
   for (const def of defs)
@@ -55,6 +57,8 @@ export interface GameBook {
   practiced: boolean
   /** the game got through the opening's defining moves (it IS this opening, just maybe not your line) */
   identified: boolean
+  /** the move the game left the book with (null when the book line simply ran out) */
+  deviation: { san: string; uci: string } | null
 }
 
 const trunks = new WeakMap<OpeningTree, number>()
@@ -129,7 +133,16 @@ export function bookOf(game: ImportedGame): GameBook | null {
     if (best && (Number(best.identified) * 1000 + best.depth >= Number(identified) * 1000 + depth)) continue
     const mover = depth % 2 === 0 ? 'w' : 'b' // who moved next, out of book
     const leftBy: GameBook['leftBy'] = !node.children.length || depth >= game.sans.length ? 'end' : mover === game.userColor ? 'you' : 'opponent'
-    best = { tree, depth, node, leftBy, practiced: false, identified }
+    let deviation: GameBook['deviation'] = null
+    if (leftBy !== 'end') {
+      try {
+        const m = new Chess(node.fen).move(game.sans[depth])
+        deviation = { san: m.san, uci: m.from + m.to + (m.promotion ?? '') }
+      } catch {
+        /* the game's move doesn't fit the book position (a transposition mismatch) */
+      }
+    }
+    best = { tree, depth, node, leftBy, practiced: false, identified, deviation }
   }
   if (best) best.practiced = practiced(best.tree)
   return best
@@ -143,6 +156,17 @@ export interface OpeningUsage {
   book: GameBook | null // the deepest Outpost match among these games
   avgDepth: number // average plies in Outpost book
   youLeft: number // games where you were the one who left book
+  /** moves that took these games out of book, most frequent first (not yet in the book) */
+  deviations: Deviation[]
+}
+
+export interface Deviation {
+  tree: OpeningTree
+  node: TreeNode // the last book position
+  san: string
+  uci: string
+  by: 'you' | 'opponent'
+  count: number
 }
 
 const family = (name?: string) => (name ?? 'Unknown opening').split(':')[0].split(',')[0].trim()
@@ -153,22 +177,30 @@ export function openingUsage(games: ImportedGame[]): OpeningUsage[] {
   for (const g of games) {
     if (g.startFen || g.sans.length < 4) continue
     const key = `${g.userColor}|${family(g.opening)}`
-    const u = groups.get(key) ?? { family: family(g.opening), side: g.userColor, games: [], score: 0, book: null, avgDepth: 0, youLeft: 0 }
+    const u = groups.get(key) ?? { family: family(g.opening), side: g.userColor, games: [], score: 0, book: null, avgDepth: 0, youLeft: 0, deviations: [] }
     u.games.push(g)
     groups.set(key, u)
   }
   for (const u of groups.values()) {
     let depthSum = 0
     let points = 0
+    const devs = new Map<string, Deviation>()
     for (const g of u.games) {
       const b = bookOf(g)
       depthSum += b?.depth ?? 0
       if (b?.leftBy === 'you') u.youLeft++
       if (b && (!u.book || b.depth > u.book.depth)) u.book = b
+      if (b?.deviation && b.leftBy !== 'end' && (b.identified || b.depth >= 4) && !b.node.children.some((c) => c.san === b.deviation!.san)) {
+        const key = `${b.tree.def.id}|${b.node.id}|${b.deviation.san}`
+        const d = devs.get(key)
+        if (d) d.count++
+        else devs.set(key, { tree: b.tree, node: b.node, san: b.deviation.san, uci: b.deviation.uci, by: b.leftBy as 'you' | 'opponent', count: 1 })
+      }
       const won = g.result === '1/2-1/2' ? 0.5 : g.result === '*' ? 0.5 : (g.result === '1-0') === (g.userColor === 'w') ? 1 : 0
       points += won
     }
     u.avgDepth = depthSum / u.games.length
+    u.deviations = [...devs.values()].sort((a, b) => b.count - a.count || a.node.ply - b.node.ply)
     u.score = points / u.games.length
   }
   return [...groups.values()].sort((a, b) => b.games.length - a.games.length)

@@ -16,6 +16,8 @@ The Openings page shows each opening as a small board of its main-line position.
 - **Repertoire coverage** checks your studied openings against the first moves you'll meet ("as Black you have no answer to 1.Nc3") and suggests what to learn next. As White it does the same for Black's common replies.
 - **Opening finder**: play or paste moves and see every opening that reaches that position, by any move order, with the book's next moves.
 
+**Add the lines you actually meet**: in Learn, play a move that isn't in the book (yours or the opponent's) and Outpost offers to add it. Stockfish grades the move (an opponent's mistake is marked `?`, so Practice drills the punishment) and plays out the best continuation for both sides, and the line becomes part of the opening everywhere. Learn lists **Your additions** with a remove button. The repertoire-gap scan, the "Openings in your games" table and each game review also offer "+ add" for the move that took a game out of book. Additions sync between devices.
+
 Every opening can be trained from either side. Use **Play it** to learn the opening itself, or **Face it** to learn how to meet it. Moves marked `?` or `??` are traps: Learn shows them in red so you can see how the punishment works, and Practice warns you if you fall for one. Where your side has two book moves, Practice nudges you toward the one you've practiced less.
 
 ## Modes

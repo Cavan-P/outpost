@@ -6,6 +6,7 @@ import { MedalBadge } from '../components/GameUI'
 import { openingOfWeek, weekBounds } from '../lib/weekly'
 import { getTree, isMistake, userDecisionNodes, type OpeningTree, type TreeNode } from '../lib/tree'
 import { MiniBoard } from '../components/MiniBoard'
+import { useExtensionsVersion } from '../lib/extensions'
 import { OpeningFinder } from './OpeningFinder'
 import { CoveragePanel } from '../components/CoveragePanel'
 
@@ -130,7 +131,8 @@ export function Library({ onOpen, finder }: { onOpen: Open; finder?: string[] })
   }
 
   const custom = useCustomOpenings()
-  const all = useMemo(() => allOpenings().map(statsOf), [custom]) // eslint-disable-line react-hooks/exhaustive-deps
+  const extVersion = useExtensionsVersion()
+  const all = useMemo(() => allOpenings().map(statsOf), [custom, extVersion]) // eslint-disable-line react-hooks/exhaustive-deps
   const q = query.trim().toLowerCase()
   const list = all.filter((s) => {
     const o = s.def

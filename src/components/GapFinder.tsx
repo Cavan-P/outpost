@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Chess } from 'chess.js'
 import { findGaps, type Gap } from '../lib/gaps'
+import { addSeenMove } from '../lib/extendLine'
 import { pathTo, type OpeningTree, type TreeNode } from '../lib/tree'
 
 const label = (n: TreeNode) =>
@@ -14,6 +15,8 @@ export function GapFinder({ tree, onJump, onAnalyze }: { tree: OpeningTree; onJu
   const [state, setState] = useState<'idle' | 'running' | 'done'>('idle')
   const [progress, setProgress] = useState<[number, number]>([0, 0])
   const [gaps, setGaps] = useState<Gap[]>([])
+  const [adding, setAdding] = useState<string | null>(null)
+  const [added, setAdded] = useState<Set<string>>(new Set())
   const stop = useRef(false)
   useEffect(() => {
     stop.current = false
@@ -61,6 +64,26 @@ export function GapFinder({ tree, onJump, onAnalyze }: { tree: OpeningTree; onJu
                   {label(g.node) || 'start'} <b className="font-mono text-amber-300">{g.node.ply % 2 === 0 ? `${g.node.ply / 2 + 1}.` : '…'}{g.san}</b>
                 </button>
                 <span className="text-[11px] text-zinc-600">{g.behind < 0.05 ? 'engine best' : `−${g.behind.toFixed(1)}`}</span>
+                {added.has(g.node.id + g.uci) ? (
+                  <span className="text-xs text-emerald-400">added ✓</span>
+                ) : (
+                  <button
+                    className="text-xs text-emerald-400 hover:underline disabled:opacity-50"
+                    disabled={!!adding}
+                    title="Add this move to the opening, with Stockfish's best continuation"
+                    onClick={async () => {
+                      setAdding(g.node.id + g.uci)
+                      try {
+                        await addSeenMove(tree.def.id, g.node, g.uci, 10, tree.def.side)
+                        setAdded((s) => new Set(s).add(g.node.id + g.uci))
+                      } finally {
+                        setAdding(null)
+                      }
+                    }}
+                  >
+                    {adding === g.node.id + g.uci ? 'adding…' : '+ add'}
+                  </button>
+                )}
                 <button
                   className="text-xs text-brand-400 hover:underline"
                   onClick={() => {
@@ -77,7 +100,7 @@ export function GapFinder({ tree, onJump, onAnalyze }: { tree: OpeningTree; onJu
         ) : (
           <p className="text-xs text-emerald-400">No holes found — every strong reply inside your lines is covered.</p>
         ))}
-      {state === 'done' && gaps.length > 0 && <p className="text-[11px] text-zinc-600">Patch them in "My Repertoire" with your own lines.</p>}
+      {state === 'done' && gaps.length > 0 && <p className="text-[11px] text-zinc-600">"+ add" puts the move into this opening with Stockfish's best continuation.</p>}
     </section>
   )
 }

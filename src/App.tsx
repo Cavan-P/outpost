@@ -22,6 +22,7 @@ import { SyncPanel } from './components/SyncPanel'
 import { LeaderboardSettings } from './components/LeaderboardUI'
 import { startBoardPosting } from './lib/leaderboard'
 import { startAutoSync } from './lib/sync'
+import { useExtensionsVersion } from './lib/extensions'
 import { isCollectible, isUnlocked } from './lib/meta'
 import { getGames, myGames } from './lib/games'
 import { PUZZLES } from './lib/puzzles'
@@ -53,7 +54,8 @@ export default function App() {
   const base = view.kind === 'opening' ? (allOpenings().find((o) => o.id === view.id) ?? null) : null
   const flip = view.kind === 'opening' && view.flip
   const opening = useMemo(() => (base && flip ? flipOpening(base) : base), [base, flip])
-  const tree = useMemo(() => (opening ? getTree(opening) : null), [opening])
+  const extVersion = useExtensionsVersion() // your added lines rebuild the tree
+  const tree = useMemo(() => (opening ? getTree(opening) : null), [opening, extVersion]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const active: NavId = view.kind === 'home' || view.kind === 'opening' ? 'openings' : view.kind
   const go = (id: NavId) => setView(id === 'openings' ? { kind: 'home' } : id === 'analysis' ? { kind: 'analysis', key: Date.now() } : id === 'review' ? { kind: 'review', key: Date.now() } : { kind: id })

@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
 import { MedalBadge } from '../../components/GameUI'
+import { AddLineButton, plyLabel } from '../../components/AddLine'
+import { useExtensionsVersion } from '../../lib/extensions'
 import { medalFor, openingUsage, type OpeningUsage } from '../../lib/openingIndex'
 import type { ImportedGame } from '../../lib/games'
 
@@ -20,7 +22,8 @@ function status(u: OpeningUsage): { tone: string; text: string } {
  * Outpost's book, and whether you've studied it — with a one-click next step for each.
  */
 export function GameOpenings({ games, onOpenOpening, onFind }: { games: ImportedGame[]; onOpenOpening: (id: string, flip: boolean) => void; onFind: (sans: string[]) => void }) {
-  const usage = useMemo(() => openingUsage(games), [games])
+  const extVersion = useExtensionsVersion() // re-check after you add a line
+  const usage = useMemo(() => openingUsage(games), [games, extVersion]) // eslint-disable-line react-hooks/exhaustive-deps
   const [all, setAll] = useState(false)
   if (!usage.length) return null
   const gaps = usage.filter((u) => u.games.length >= 2 && (!covered(u) || !u.book!.practiced))
@@ -65,6 +68,15 @@ export function GameOpenings({ games, onOpenOpening, onFind }: { games: Imported
                         {flip ? ' (facing it)' : ''}
                       </span>
                     )}
+                    {u.deviations.slice(0, 3).map((d) => (
+                      <span key={d.node.id + d.san} className="mt-0.5 flex flex-wrap items-baseline gap-x-2 text-[11px] text-zinc-400">
+                        <span>
+                          {d.by === 'opponent' ? 'Opponent left book with' : 'You played'} <b className="font-mono text-zinc-200">{plyLabel(d.node, d.san)}</b>
+                          {d.count > 1 ? ` (${d.count}×)` : ''}
+                        </span>
+                        <AddLineButton tree={d.tree} node={d.node} uci={d.uci} />
+                      </span>
+                    ))}
                   </td>
                   <td className="py-2 tabular-nums text-zinc-400">{u.games.length}</td>
                   <td className={`py-2 tabular-nums ${u.score >= 0.5 ? 'text-emerald-400' : 'text-red-400'}`}>{Math.round(u.score * 100)}%</td>

@@ -10,6 +10,7 @@ import type { OpeningDef } from '../data/openings'
 import type { Profile } from './game'
 import type { ImportedGame } from './games'
 import type { NodeStat, OpeningProgress } from './progress'
+import { mergeExtensions, type ExtStore } from './extensions'
 
 export interface GamesStore {
   username: string
@@ -23,6 +24,8 @@ export interface Snapshot {
   profile: Profile | null
   custom: (OpeningDef & { updatedAt?: number })[]
   games: GamesStore | null
+  /** your own added lines (optional: older snapshots don't have it) */
+  ext?: ExtStore | null
 }
 
 /** Just what the three-way merge needs to remember about the last sync. */
@@ -161,5 +164,6 @@ export function merge(local: Snapshot, remote: Snapshot, base: Base): Snapshot {
     profile: mergeProfile(local.profile, remote.profile, base),
     custom: mergeCustom(local.custom, remote.custom, base),
     games: mergeGames(local.games, remote.games, base),
+    ext: mergeExtensions(local.ext ?? null, remote.ext ?? null),
   }
 }

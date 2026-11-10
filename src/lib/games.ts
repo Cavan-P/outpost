@@ -98,16 +98,31 @@ export function reloadGames() {
   subs.forEach((f) => f())
 }
 
+/**
+ * The same game, whatever it was imported from: players, result and every move. Catches a game
+ * pasted as PGN that you also imported from Lichess, or the same PGN pasted twice.
+ */
+const fingerprint = (g: ImportedGame) => [g.white.toLowerCase(), g.black.toLowerCase(), g.result, g.startFen ?? '', g.sans.join(' ')].join('|')
+
 export function addGames(username: string, source: Store['source'], games: ImportedGame[], notMine = false) {
-  const known = new Set(store.games.map((g) => g.id))
+  const ids = new Set(store.games.map((g) => g.id))
+  const prints = new Set(store.games.map(fingerprint))
+  const fresh: ImportedGame[] = []
+  for (const g of games) {
+    const fp = fingerprint(g)
+    if (ids.has(g.id) || prints.has(fp)) continue // already have it (also catches duplicates within this import)
+    ids.add(g.id)
+    prints.add(fp)
+    fresh.push(g)
+  }
   // importing someone else's games shouldn't overwrite the username you use for your own
   if (!notMine) {
     store.username = username
     store.source = source
   }
-  store.games = [...store.games, ...games.filter((g) => !known.has(g.id)).map((g) => (notMine ? { ...g, notMine: true } : g))].sort((a, b) => b.date - a.date)
+  store.games = [...store.games, ...fresh.map((g) => (notMine ? { ...g, notMine: true } : g))].sort((a, b) => b.date - a.date)
   commit()
-  return games.filter((g) => !known.has(g.id)).length
+  return fresh.length
 }
 
 export function saveAnalysis(id: string, analysis: GameAnalysis) {
@@ -229,12 +244,31 @@ export function parsePgnGame(pgn: string, username?: string): Omit<ImportedGame,
   }
 }
 
+/**
+ * Split pasted text into separate games. A new game starts at a header line ("[White …]", any tag)
+ * that comes after some moves — so it works with or without [Event] tags and any blank lines.
+ */
+function splitPgn(text: string): string[] {
+  const games: string[] = []
+  let cur: string[] = []
+  let hasMoves = false
+  for (const raw of text.replace(/\r/g, '').split('\n')) {
+    const line = raw.trim()
+    if (line.startsWith('[') && hasMoves) {
+      games.push(cur.join('\n'))
+      cur = []
+      hasMoves = false
+    }
+    if (line && !line.startsWith('[')) hasMoves = true
+    cur.push(raw)
+  }
+  if (cur.join('').trim()) games.push(cur.join('\n'))
+  return games.map((g) => g.trim()).filter(Boolean)
+}
+
 /** Split pasted text into PGN games and parse them; the most frequent player name is assumed to be you. */
 export function parsePgnText(text: string, username?: string): ImportedGame[] {
-  const chunks = text
-    .split(/\n\s*\n(?=\[Event )/)
-    .map((t) => t.trim())
-    .filter(Boolean)
+  const chunks = splitPgn(text)
   let me = username?.trim()
   if (!me) {
     const counts = new Map<string, number>()
@@ -242,9 +276,9 @@ export function parsePgnText(text: string, username?: string): ImportedGame[] {
     me = [...counts].sort((a, b) => b[1] - a[1])[0]?.[0]
   }
   const out: ImportedGame[] = []
-  chunks.forEach((ch, i) => {
+  chunks.forEach((ch) => {
     const g = parsePgnGame(ch, me)
-    if (g && g.sans.length) out.push({ ...g, id: `pgn:${hash(ch)}:${i}`, source: 'pgn' })
+    if (g && g.sans.length) out.push({ ...g, id: `pgn:${hash([g.white, g.black, g.date, g.result, g.sans.join(' ')].join('|'))}`, source: 'pgn' })
   })
   return out
 }

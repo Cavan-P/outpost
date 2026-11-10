@@ -114,5 +114,13 @@ check('mid-upload XP kept on this device', final.profile!.xp === 1300, `${final.
 const next = merge(final, M, baseOf(M)) // next sync: server still has M
 check('next sync uploads it exactly once', next.profile!.xp === 1300, `${next.profile!.xp}`)
 
+// your own added lines: both devices' additions combine; a deletion on one device sticks
+const eA = { ...clone(synced), ext: { lines: { budapest: ['d4 Nf6 c4 e5 dxe5 Ng4 Bf4 g5?'], london: ['d4 d5 Bf4 h6'] }, removed: [] } }
+const eB = { ...clone(synced), ext: { lines: { budapest: ['d4 Nf6 c4 e5 dxe5 Ng4 e3'] }, removed: ['london|d4 d5 Bf4 h6'] } }
+const em = merge(eA, eB, base).ext!
+check('added lines from both devices combine', em.lines.budapest?.length === 2)
+check('a line removed on one device stays removed', !em.lines.london)
+check('older snapshots without additions still merge', merge(clone(synced), eA, base).ext?.lines.budapest?.length === 1)
+
 console.log(fails ? `\n${fails} failed` : '\nall passed')
 process.exit(fails ? 1 : 0)

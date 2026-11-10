@@ -1,5 +1,6 @@
 import { Chess } from 'chess.js'
 import type { OpeningDef, Side } from '../data/openings'
+import { extensionLines, onExtensionsChange } from './extensions'
 
 export interface TreeNode {
   id: string // space-joined SAN path from the start, '' for the root
@@ -123,10 +124,18 @@ export function invalidateTree(id: string) {
   treeCache.delete(id)
   treeCache.delete(`${id}~flip`)
 }
+// your own added lines change trees, so drop the cache when they change
+onExtensionsChange(() => treeCache.clear())
+
 export function getTree(def: OpeningDef): OpeningTree {
   let t = treeCache.get(def.id)
   if (!t) {
-    t = buildTree(def)
+    const extra = extensionLines(def.id)
+    try {
+      t = buildTree(extra.length ? { ...def, lines: [...def.lines, ...extra] } : def)
+    } catch {
+      t = buildTree(def) // a broken addition never breaks the opening itself
+    }
     treeCache.set(def.id, t)
   }
   return t

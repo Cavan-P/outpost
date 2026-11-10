@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import { reloadCustom } from './custom'
+import { reloadExtensions } from './extensions'
 import { onGameEvent, reloadProfile } from './game'
 import { reloadGames } from './games'
 import { baseOf, emptyBase, merge, type Base, type Snapshot } from './syncMerge'
@@ -7,7 +8,7 @@ import { baseOf, emptyBase, merge, type Base, type Snapshot } from './syncMerge'
 // Device sync through the Worker's /api/sync. The server only ever sees a gzipped JSON blob
 // under a hash of your code. See worker/index.ts and lib/syncMerge.ts.
 
-const KEYS = { progress: 'ctt.progress.v1', profile: 'ctt.profile.v1', custom: 'ctt.custom.v1', games: 'ctt.games.v1' } as const
+const KEYS = { progress: 'ctt.progress.v1', profile: 'ctt.profile.v1', custom: 'ctt.custom.v1', games: 'ctt.games.v1', ext: 'ctt.ext.v1' } as const
 const CONFIG = 'ctt.sync.v1'
 const BASE = 'ctt.sync.base.v1'
 
@@ -66,7 +67,7 @@ const read = <T,>(k: string, fallback: T): T => {
 }
 
 function collect(): Snapshot {
-  return { v: 1, progress: read(KEYS.progress, {}), profile: read(KEYS.profile, null), custom: read(KEYS.custom, []), games: read(KEYS.games, null) }
+  return { v: 1, progress: read(KEYS.progress, {}), profile: read(KEYS.profile, null), custom: read(KEYS.custom, []), games: read(KEYS.games, null), ext: read(KEYS.ext, null) }
 }
 
 /** A cheap fingerprint of local data, to notice changes made while a sync was in flight. */
@@ -81,6 +82,8 @@ function apply(s: Snapshot) {
   write(KEYS.profile, s.profile)
   write(KEYS.custom, s.custom)
   write(KEYS.games, s.games)
+  write(KEYS.ext, s.ext)
+  reloadExtensions()
   reloadProfile()
   reloadGames()
   reloadCustom()
@@ -107,7 +110,7 @@ async function pack(s: Snapshot): Promise<Blob> {
 async function unpack(r: Response): Promise<Snapshot> {
   const text = await new Response(r.body!.pipeThrough(new DecompressionStream('gzip'))).text()
   const s = JSON.parse(text) as Snapshot
-  return { v: 1, progress: s.progress ?? {}, profile: s.profile ?? null, custom: s.custom ?? [], games: s.games ?? null }
+  return { v: 1, progress: s.progress ?? {}, profile: s.profile ?? null, custom: s.custom ?? [], games: s.games ?? null, ext: s.ext ?? null }
 }
 
 class SyncError extends Error {
