@@ -7,10 +7,12 @@ import { ResultCard } from '../components/ResultCard'
 import { WhyList } from '../components/EnginePanel'
 import { ENDGAMES, type EndgameDef } from '../data/endgames'
 import { getCheckEngine, getPlayEngine } from '../lib/engine'
+import { perfectMove, probe } from '../lib/tablebase'
 import { explainMove, type Explanation } from '../lib/explain'
 import { addToSet, award, best, count, useProfile } from '../lib/game'
 import { COURSES } from '../data/courses'
 import { MiniBoard } from '../components/MiniBoard'
+import { EndgameLearn } from './EndgameLearn'
 
 type Result = { ok: boolean; text: string } | null
 
@@ -88,6 +90,7 @@ export function Endgames() {
   const [category, setCategory] = useState<EndgameDef['category']>(ENDGAMES[0].category)
   const [moves, setMoves] = useState<string[]>([])
   const [hint, setHint] = useState<Explanation | null>(null)
+  const [mode, setMode] = useState<'play' | 'learn'>('play')
   const [hintUci, setHintUci] = useState<string | null>(null)
   const [thinking, setThinking] = useState(false)
   const [blind, setBlind] = useState(false)
@@ -144,13 +147,20 @@ export function Endgames() {
     if (result || chess.isGameOver() || chess.turn() === def.side) return
     let live = true
     setThinking(true)
-    const engine = getPlayEngine()
-    engine.setOption('Skill Level', 20)
-    void engine.analyze(fen, { movetime: 500 }).then((a) => {
+    // the defender plays perfectly too (tablebase), so the ★★★ target is fair; Stockfish otherwise
+    void (async () => {
+      const tb = await probe(fen)
+      const perfect = tb && perfectMove(tb)
+      let uci = perfect?.uci
+      if (!uci) {
+        const engine = getPlayEngine()
+        engine.setOption('Skill Level', 20)
+        uci = (await engine.analyze(fen, { movetime: 500 })).bestmove
+      }
       if (!live) return
       setThinking(false)
-      if (a.bestmove && a.bestmove !== '(none)') setMoves((m) => [...m, a.bestmove])
-    })
+      if (uci && uci !== '(none)') setMoves((m) => [...m, uci!])
+    })()
     return () => {
       live = false
     }
@@ -176,6 +186,18 @@ export function Endgames() {
 
   async function askHint() {
     assisted.current = true
+    // perfect play from the tablebase when it covers the position (Stockfish finds *a* mate, not the fastest)
+    const tb = await probe(fen)
+    const perfect = tb && perfectMove(tb)
+    if (perfect) {
+      setHintUci(perfect.uci)
+      const mateIn = perfect.dtm ? Math.ceil(Math.abs(perfect.dtm) / 2) : null
+      const exp = explainMove(fen, perfect.uci, [perfect.uci])
+      // opening heuristics ("early queen move", development) don't belong in an endgame
+      const relevant = exp.reasons.filter((r) => !/early queen|develop|castl|center pawn|opening/i.test(r))
+      setHint({ ...exp, reasons: [...(mateIn !== null && def.goal !== 'draw' ? [`Perfect play (endgame tablebase): mate in ${mateIn + 1} from here.`] : ['Perfect play (endgame tablebase).']), ...relevant] })
+      return
+    }
     const a = await getCheckEngine().analyze(fen, { depth: 18, multipv: 1 })
     const best = a.lines[0]
     if (!best) return
@@ -237,6 +259,17 @@ export function Endgames() {
         </div>
       </div>
 
+      <div className="flex items-center gap-1 border-b border-white/10">
+        {(['play', 'learn'] as const).map((m) => (
+          <button key={m} onClick={() => setMode(m)} className={`-mb-px border-b-2 px-3 py-2 text-sm transition ${mode === m ? 'border-brand-400 text-zinc-50' : 'border-transparent text-zinc-500 hover:text-zinc-200'}`}>
+            {m === 'play' ? 'Play it' : 'Learn it — watch perfect play'}
+          </button>
+        ))}
+      </div>
+
+      {mode === 'learn' ? (
+        <EndgameLearn key={def.id} def={def} />
+      ) : (
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_260px] xl:grid-cols-[minmax(0,1fr)_320px]">
         <div className="min-w-0 space-y-3">
           <Board size="large" fen={fen} orientation={def.side === 'w' ? 'white' : 'black'} onMove={onMove} interactive={!result} player={def.side} arrows={arrows} lastMove={last ? { from: last.slice(0, 2), to: last.slice(2, 4) } : null} blind={blind && !peek}
@@ -313,6 +346,7 @@ export function Endgames() {
           {hint && <WhyList explanation={hint} title={`Hint: ${hint.san}`} />}
         </div>
       </div>
+      )}
     </div>
   )
 }

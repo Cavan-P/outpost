@@ -26,6 +26,8 @@ interface Props {
   result?: ReactNode
   /** 'large' lets the board grow past the usual 620px on pages where it's the main event */
   size?: 'default' | 'large'
+  /** extra square shading (e.g. a king's escape squares in an endgame walkthrough) */
+  highlights?: Record<string, React.CSSProperties>
 }
 
 const EMPTY = '8/8/8/8/8/8/8/8'
@@ -64,7 +66,7 @@ function applyPremoves(fen: string, queue: Premove[], player: 'w' | 'b'): string
 }
 
 
-export function Board({ fen, orientation, onMove, interactive = true, arrows = [], lastMove, flash, player, blind = false, result, size = 'default' }: Props) {
+export function Board({ fen, orientation, onMove, interactive = true, arrows = [], lastMove, flash, player, blind = false, result, size = 'default', highlights }: Props) {
   const settings = useSettings()
   const [light, dark] = boardColors(settings)
   const [selected, setSelected] = useState<string | null>(null)
@@ -159,7 +161,7 @@ export function Board({ fen, orientation, onMove, interactive = true, arrows = [
     return () => window.removeEventListener('keydown', k)
   }, [promo]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const squareStyles: Record<string, React.CSSProperties> = {}
+  const squareStyles: Record<string, React.CSSProperties> = { ...highlights }
   if (lastMove) {
     squareStyles[lastMove.from] = { background: 'rgba(255, 214, 10, 0.35)' }
     squareStyles[lastMove.to] = { background: 'rgba(255, 214, 10, 0.5)' }
