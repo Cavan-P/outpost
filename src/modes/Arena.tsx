@@ -351,7 +351,7 @@ function Duel({ tree, kind, onWin }: { tree: OpeningTree; kind: 'gauntlet' | 'bo
         fen={fen}
         orientation={side === 'w' ? 'white' : 'black'}
         player={side}
-        interactive={!over && !busy && turn === side}
+        interactive={!over} // stays live on the opponent's turn so you can premove
         onMove={onMove}
         lastMove={last ? { from: last.slice(0, 2), to: last.slice(2, 4) } : null}
         result={over ? <ResultCard tone={over.win ? 'success' : 'fail'} title={over.win ? 'Victory' : 'Defeated'} subtitle={<p>{over.text}{kind === 'gauntlet' && ` Score ${score + (over.win ? 5 : 0)}.`}</p>} onPrimary={restart} primaryLabel="Try again" /> : undefined}

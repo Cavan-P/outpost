@@ -23,13 +23,15 @@ const CREDITS: Credit[] = [
   { name: 'React', what: 'UI library', license: 'MIT', url: 'https://react.dev' },
   { name: 'Tailwind CSS', what: 'Styling', license: 'MIT', url: 'https://tailwindcss.com' },
   { name: 'Vite', what: 'Build tool', license: 'MIT', url: 'https://vite.dev' },
-  { name: 'Inter & Cormorant Garamond', what: 'Typefaces, served by Google Fonts', license: 'SIL Open Font License 1.1', url: 'https://fonts.google.com' },
+  { name: 'Inter, Cormorant Garamond, Fraunces, Space Grotesk & JetBrains Mono', what: 'Typefaces, served by Google Fonts', license: 'SIL Open Font License 1.1', url: 'https://fonts.google.com' },
 ]
 
 const SERVICES: Credit[] = [
   { name: 'Lichess API', what: 'Importing your Lichess games (only when you click Import)', license: 'Public API', url: 'https://lichess.org/api' },
   { name: 'Lichess endgame tablebase', what: 'Perfect-play benchmarks for the endgame star ratings', license: 'Public API', url: 'https://tablebase.lichess.ovh' },
   { name: 'chess.com Published-Data API', what: 'Importing your chess.com games (only when you click Import)', license: 'Public API', url: 'https://www.chess.com/news/view/published-data-api' },
+  { name: 'Lichess opening explorer', what: '"What people play" move statistics, fetched through this site\'s server (only the position is sent)', license: 'Public API', url: 'https://lichess.org/api#tag/Opening-Explorer' },
+  { name: 'Cloudflare', what: 'Hosting, plus storage for sync and the leaderboards — only if you turn them on', license: 'Service', url: 'https://www.cloudflare.com/privacypolicy/' },
 ]
 
 const isOurKey = (k: string) => k.startsWith('ctt.')

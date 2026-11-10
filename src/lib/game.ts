@@ -18,10 +18,6 @@ export interface Profile {
   today: { day: string; counts: Record<string, number>; done: string[]; xpBySource: Record<string, number>; quests?: string[] }
   /** highest medal ever reached per opening, so medal XP is paid once */
   medals: Record<string, number>
-  /** weekly league: current tier and past results */
-  league?: { tier: number; week: string; history: { week: string; tier: number; rank: number; moved: -1 | 0 | 1 }[] }
-  /** monthly season pass: which reward tiers were already paid */
-  season?: { key: string; claimed: number[] }
 }
 
 export type GameEvent =
@@ -347,7 +343,7 @@ export function best(name: string, score: number) {
   return true
 }
 
-/** For the league / season modules: change the profile, optionally pay XP, save. */
+/** Change the profile from another module, optionally pay XP, save. */
 export function patchProfile(fn: (p: Profile) => void, xp = 0) {
   fn(profile)
   if (xp) grant(xp)

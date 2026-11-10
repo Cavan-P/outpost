@@ -122,3 +122,23 @@ Yes, it fits easily. The server only hands out static files, so the smallest dro
 
 - **Self-host the fonts** so visitors don't contact Google: download Inter and Cormorant Garamond into `public/fonts/`, swap the Google Fonts `<link>` in `index.html` for `@font-face` rules, then remove the two Google domains from the security policy.
 - **Analytics:** if you add any, mention it on the About page ("Your data" section).
+
+## Server features on Cloudflare (sync, leaderboards, opening explorer)
+
+On Cloudflare, the same Worker that serves the site also runs a small API (`worker/`). Static hosts (GitHub Pages, a plain droplet) can't run it; the app still works there, it just hides those features. Each feature needs one-time setup in the Cloudflare dashboard:
+
+| Feature | What to create | Where it's configured |
+|---|---|---|
+| **Sync** | R2 bucket named `outpost-sync` (R2 → Create bucket) | `r2_buckets` in `wrangler.jsonc` |
+| **Leaderboards** | D1 database named `outpost` (D1 → Create); paste its ID into `wrangler.jsonc` | `d1_databases` in `wrangler.jsonc` (tables are created automatically) |
+| **"What people play"** (optional) | A Lichess personal API token (lichess.org/account/oauth/token, no scopes), saved as the Worker secret `LICHESS_TOKEN` (Worker → Settings → Variables and Secrets) | nothing else |
+
+Create the bucket and database **before** pushing a deploy that references them, or the deploy fails.
+
+To try the API locally, run the Worker next to the dev server (Vite forwards `/api` to it):
+
+```bash
+npx wrangler dev --port 8787
+```
+
+`wrangler dev` simulates R2 and D1 on your machine; put a test `LICHESS_TOKEN=…` in `.dev.vars` (git-ignored) to try the explorer.

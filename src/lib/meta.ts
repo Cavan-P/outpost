@@ -23,7 +23,7 @@ export function weekXp(p: Profile, d = new Date()) {
 export interface Collectible {
   id: Exclude<BoardId, 'theme'>
   how: string
-  /** unlocked by play; season-only boards have no test and are granted by the pass */
+  /** how it's unlocked (all collectibles are earned by play) */
   test?: (p: Profile) => boolean
 }
 

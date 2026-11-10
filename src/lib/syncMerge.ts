@@ -103,9 +103,6 @@ export function mergeProfile(l: Profile | null, r: Profile | null, b: Base): Pro
     else today = l.today.day > r.today.day ? l.today : r.today
   } else today = l.today ?? r.today
 
-  const league = !l.league || !r.league ? (l.league ?? r.league) : l.league.week !== r.league.week ? (l.league.week > r.league.week ? l.league : r.league) : l.league.history.length >= r.league.history.length ? l.league : r.league
-  const season =
-    !l.season || !r.season ? (l.season ?? r.season) : l.season.key !== r.season.key ? (l.season.key > r.season.key ? l.season : r.season) : { key: l.season.key, claimed: [...new Set([...l.season.claimed, ...r.season.claimed])] }
 
   return {
     ...r,
@@ -121,8 +118,6 @@ export function mergeProfile(l: Profile | null, r: Profile | null, b: Base): Pro
     bests: maxRecord(l.bests, r.bests),
     medals: maxRecord(l.medals, r.medals),
     today,
-    league,
-    season,
   }
 }
 
