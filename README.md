@@ -52,7 +52,7 @@ XP pays for learning: new positions and reviews that come due are worth the most
 
 - **A report on your habits**: accuracy, blunders per game, which pieces you hang most, what you miss (forks, free pieces, mates, discovered attacks), how you get hit (walking into forks, back-rank weaknesses, allowed mates), which phase of the game goes wrong, results by opening, and where you leave the theory you've studied.
 - **Full game reviews**: an eval graph, every move classified, "Next mistake" jumping, and for each error the best move, why it works, and the punishing line.
-- **Puzzles from your own mistakes**, which you can filter by mistake type, plus "train" buttons on every pattern.
+- **Puzzles from your own mistakes**, which you can filter by mistake type, plus "train" buttons on every pattern. They come back on a spaced schedule; solve one on enough separate occasions and it retires (it stays in a "Retired" list for practice).
 - **Openings in your games**: every opening you've met, how you score, how long your games stay in book, and whether you've studied it, with a Learn / Practice / Find openings button for each. Matching follows transpositions.
 - **Analysis only**: import someone else's games to analyze them without them counting towards your report or puzzles.
 

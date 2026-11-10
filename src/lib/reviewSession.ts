@@ -6,6 +6,7 @@ import type { OpeningDef } from '../data/openings'
 import { allOpenings } from './custom'
 import { buildReport, type MistakePuzzle } from './gameAnalysis'
 import { getGames, myGames } from './games'
+import { isDuePuzzle } from './ownPuzzles'
 import { getProgress, isDue, progressOf, type NodeStat } from './progress'
 import { PUZZLES, type Puzzle } from './puzzles'
 import { flipOpening, getTree, userDecisionNodes, type TreeNode } from './tree'
@@ -59,9 +60,9 @@ export function buildSession(sets: Record<string, string[]>): Item[] {
   const traps: Item[] = [...pick(trapPool.filter((p) => !has('puzzles', p.id)), 2), ...pick(trapPool.filter((p) => has('puzzles', p.id)), 2)]
     .slice(0, 2)
     .map((puzzle) => ({ kind: 'trap', puzzle }))
-  // mistakes from your own games that you've already had a go at
-  const ownPool = buildReport(myGames(getGames().games)).puzzles.filter((p) => has('ownPuzzlesSeen', p.id) || has('ownPuzzles', p.id))
-  const own: Item[] = [...pick(ownPool.filter((p) => !has('ownPuzzles', p.id)), 3), ...pick(ownPool, 3)]
+  // mistakes from your own games that you've already had a go at — due ones first, never retired ones
+  const ownPool = buildReport(myGames(getGames().games)).puzzles.filter((p) => (has('ownPuzzlesSeen', p.id) || has('ownPuzzles', p.id)) && !has('ownRetired', p.id))
+  const own: Item[] = [...pick(ownPool.filter((p) => isDuePuzzle(p.id)), 3), ...pick(ownPool.filter((p) => !has('ownPuzzles', p.id)), 3)]
     .filter((p, i, a) => a.indexOf(p) === i)
     .slice(0, 3)
     .map((puzzle) => ({ kind: 'own', puzzle }))

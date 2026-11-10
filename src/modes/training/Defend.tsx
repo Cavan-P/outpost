@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import type { Arrow } from 'react-chessboard'
 import { Board, type BoardMove } from '../../components/Board'
 import { ResultCard } from '../../components/ResultCard'
+import { fenAfter } from '../../lib/fenAfter'
 import { OPENINGS, type OpeningDef } from '../../data/openings'
 import { addToSet, award, count, useProfile } from '../../lib/game'
 import { reviewMove } from '../../lib/review'
@@ -38,6 +39,7 @@ export function DefendIt() {
   const [i, setI] = useState(() => Math.max(0, all.findIndex((s) => !held.has(s.id))))
   const [state, setState] = useState<State>('solving')
   const [note, setNote] = useState('')
+  const [played, setPlayed] = useState<string | null>(null) // your answer, kept on the board
 
   const s = all[i % all.length]
   const me = sideToMove(s.node)
@@ -47,12 +49,14 @@ export function DefendIt() {
     setI(order.find((k) => !held.has(all[k].id)) ?? (i + 1) % all.length)
     setState('solving')
     setNote('')
+    setPlayed(null)
 
   }
 
   function onMove(m: BoardMove) {
     if (state !== 'solving') return false
     const uci = m.from + m.to + (m.promotion ?? '')
+    setPlayed(uci)
 
     if (uci === s.trap.uci || uci === s.trap.uci.slice(0, 4)) {
       setState('fell')
@@ -91,13 +95,13 @@ export function DefendIt() {
       </div>
       <div className="grid gap-6 xl:grid-cols-[minmax(0,560px)_1fr]">
         <Board
-          key={s.id + state}
-          fen={fen}
+          fen={played ? fenAfter(fen, played) : fen}
           orientation={me === 'w' ? 'white' : 'black'}
           onMove={onMove}
           interactive={state === 'solving'}
           arrows={arrows}
-          lastMove={s.node.uci ? { from: s.node.uci.slice(0, 2), to: s.node.uci.slice(2, 4) } : null}
+          lastMove={played ? { from: played.slice(0, 2), to: played.slice(2, 4) } : s.node.uci ? { from: s.node.uci.slice(0, 2), to: s.node.uci.slice(2, 4) } : null}
+          flash={played && (state === 'held' || state === 'fell') ? { square: played.slice(2, 4), color: state === 'held' ? 'good' : 'bad' } : null}
           result={state === 'held' || state === 'fell' ? <ResultCard tone={state === 'held' ? 'success' : 'fail'} title={state === 'held' ? 'Safe!' : 'Caught'} subtitle={note} onPrimary={next} primaryLabel="Next" /> : undefined}
         />
         <section className="h-fit space-y-2 rounded-xl bg-zinc-900/80 p-4 text-sm ring-1 ring-white/5">

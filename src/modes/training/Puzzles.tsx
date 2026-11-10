@@ -6,6 +6,7 @@ import { PUZZLES, type Puzzle } from '../../lib/puzzles'
 import { reviewMove } from '../../lib/review'
 import { moveLabel } from '../../lib/tree'
 import { ResultCard } from '../../components/ResultCard'
+import { fenAfter } from '../../lib/fenAfter'
 
 type State = 'solving' | 'checking' | 'solved' | 'failed'
 
@@ -15,6 +16,7 @@ export function TrapPuzzles() {
   const [puzzle, setPuzzle] = useState<Puzzle>(() => PUZZLES.find((p) => !solved.has(p.id)) ?? PUZZLES[0])
   const [step, setStep] = useState(0) // index into puzzle.line of the next move to play
   const [state, setState] = useState<State>('solving')
+  const [played, setPlayed] = useState<string | null>(null) // an off-book answer, kept on the board
   const [note, setNote] = useState('')
   const [streak, setStreak] = useState(0)
 
@@ -23,6 +25,7 @@ export function TrapPuzzles() {
 
   function load(p: Puzzle) {
     setPuzzle(p)
+    setPlayed(null)
     setStep(0)
     setState('solving')
     setNote('')
@@ -60,7 +63,8 @@ export function TrapPuzzles() {
       setStep((s) => s + 1)
       return true
     }
-    // a different move may be just as good — let Stockfish judge
+    // a different move may be just as good — let Stockfish judge (your move stays on the board)
+    setPlayed(uci)
     setState('checking')
     void reviewMove(fen, uci, expected.uci, 14).then((r) => {
       if (r.verdict.loss < 0.3) win(`${r.playedSan} works too — the book continues ${moveLabel(expected)}.`)
@@ -80,9 +84,9 @@ export function TrapPuzzles() {
   return (
     <div className="grid xl:grid-cols-[minmax(0,520px)_1fr] gap-6">
       <div className="space-y-3">
-        <Board fen={fen} orientation={puzzle.solver === 'w' ? 'white' : 'black'} onMove={onMove} player={puzzle.solver} interactive={state === 'solving'}
+        <Board fen={played ? fenAfter(fen, played) : fen} orientation={puzzle.solver === 'w' ? 'white' : 'black'} onMove={onMove} player={puzzle.solver} interactive={state === 'solving'}
           arrows={arrows}
-          lastMove={lastUci ? { from: lastUci.slice(0, 2), to: lastUci.slice(2, 4) } : null}
+          lastMove={(played ?? lastUci) ? { from: (played ?? lastUci)!.slice(0, 2), to: (played ?? lastUci)!.slice(2, 4) } : null}
           result={
             (state === 'solved' || state === 'failed') ? (
               <ResultCard

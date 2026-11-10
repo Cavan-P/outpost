@@ -5,6 +5,7 @@ import { Board, type BoardMove } from '../components/Board'
 import { ResultCard } from '../components/ResultCard'
 import { award, addToSet, count, useProfile } from '../lib/game'
 import { recordAnswer } from '../lib/progress'
+import { recordPuzzle } from '../lib/ownPuzzles'
 import { buildSession } from '../lib/reviewSession'
 import { reviewMove } from '../lib/review'
 import { bookMoves, moveLabel } from '../lib/tree'
@@ -65,6 +66,7 @@ export function Review({ onDone }: { onDone: () => void }) {
     setTally((t) => (ok ? { ...t, right: t.right + 1 } : { ...t, wrong: t.wrong + 1 }))
     if (item.kind === 'trap' && ok) addToSet('puzzles', item.puzzle.id)
     if (item.kind === 'own' && ok) addToSet('ownPuzzles', item.puzzle.id)
+    if (item.kind === 'own') recordPuzzle(item.puzzle.id, ok) // counts toward retiring it
     if (item.kind === 'trap') addToSet('puzzlesSeen', item.puzzle.id)
     if (ok && item.kind !== 'book') award(5, undefined, 'review')
   }

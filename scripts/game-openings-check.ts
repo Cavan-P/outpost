@@ -5,6 +5,7 @@ import type { ImportedGame } from '../src/lib/games'
 import { Chess } from 'chess.js'
 import { mem } from './mock-storage'
 import { coverage } from '../src/lib/coverage'
+import { isDuePuzzle, isRetired, recordPuzzle } from '../src/lib/ownPuzzles'
 import { addGames, getGames, parsePgnText } from '../src/lib/games'
 
 let fails = 0
@@ -79,6 +80,18 @@ check('the same game from Lichess is recognized as a duplicate', addGames('Me', 
 const newGame = { ...fromLichess, id: 'li:new1', sans: ['e4', 'c5'] }
 check('a genuinely new game is still added', addGames('Me', 'lichess', [newGame]) === 1, `${getGames().games.length} games stored`)
 check('re-importing your last N Lichess games only adds the new ones', addGames('Me', 'lichess', [newGame, { ...newGame, id: 'li:new2', sans: ['e4', 'e6'] }]) === 1, `${getGames().games.length} games stored`)
+
+// mistakes from your games retire after being solved on spaced occasions
+const pid = 'game1:23'
+const skip = () => { const st = JSON.parse(mem['ctt.progress.v1']); st['#own-mistakes'].nodes[pid].due = Date.now() - 1; mem['ctt.progress.v1'] = JSON.stringify(st) } // jump past the wait
+recordPuzzle(pid, true)
+check('a solved mistake is not due again straight away', !isDuePuzzle(pid))
+let solves = 1
+while (!isRetired(pid) && solves < 10) { skip(); recordPuzzle(pid, true); solves++ }
+check('it retires after a few spaced solves', isRetired(pid) && solves >= 4 && solves <= 5, `${solves} solves`)
+const pid2 = 'game1:31'
+recordPuzzle(pid2, true); skip(); recordPuzzle(pid2, true); skip(); recordPuzzle(pid2, false)
+check('a miss sends it back to the start', !isRetired(pid2) && isDuePuzzle(pid2))
 
 console.log(fails ? `\n${fails} failed` : '\nall passed')
 process.exit(fails ? 1 : 0)
