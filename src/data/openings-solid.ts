@@ -172,6 +172,7 @@ export const SOLID_OPENINGS: OpeningDef[] = [
       "c4 c5{The Symmetrical English.} Nc3 Nc6 g3 g6 Bg2 Bg7 Nf3 e5{The Botvinnik setup for Black.} O-O{A long maneuvering game.}",
       "c4 Nf6 Nc3 e6 e4{The Mikenas-Carls: grabbing the center.} d5 e5 d4{Sharp play with a space advantage for White.}",
       "c4 e6 Nc3 d5 d4{Transposing to a Queen's Gambit.} Nf6 Nf3{Normal QGD territory.}",
+      "c4 e5 Nc3 Bb4{The Kramnik–Shirov Counterattack.} g3 Bxc3 bxc3 Nc6 Bg2 Nf6 d3 O-O Nf3",
     ],
   },
   {

@@ -265,6 +265,7 @@ export const EXTRA_OPENINGS: OpeningDef[] = [
       "e4 e5 Nf3 Nc6 Bb5 Nd4{Bird's Defense.} Nxd4 exd4 O-O c6 Bc4{White is comfortable; Black's d4 pawn can become weak.}",
       "e4 e5 Nf3 Nc6 Bb5 Bc5{The Classical (Cordel) Defense.} c3{Preparing d4 with tempo on the bishop.} Nf6 O-O O-O d4 Bb6{A classical center for White.}",
       "e4 e5 Nf3 Nc6 Bb5 a6 Ba4 d6{The Modern Steinitz.} c3 Bd7 d4{A solid center.}",
+      "e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O b5{The Arkhangelsk.} Bb3 Bb7 Re1 Bc5 c3 d6 d4 Bb6 Bg5 h6 Bh4",
     ],
   },
   {
@@ -533,6 +534,8 @@ export const EXTRA_OPENINGS: OpeningDef[] = [
       "d4 e5 dxe5 Nc6 Nf3 Qe7 Nc3{The sound reply: develop and protect.} Nxe5 e4{White has a nice center, but Black has regained the pawn.}",
       "d4 e5 dxe5 Nc6 Nf3 Qe7 Qd5{Defending e5 with the queen.} f6{Undermining the pawn.} exf6 Nxf6 Qb3 d5{Black has rapid development for the pawn.}",
       "d4 e5 d5{Avoiding the gambit.} Bc5{An active post; …d6 and …Nf6 follow.}",
+      "d4 e5 Nf3{Declining with development.} e4 Ne5 d6 Nc4 d5 Ne3 c6{A French-like structure where Black has space.}",
+      "d4 e5 e4{Turning it into a Center Game.} exd4 Nf3 Nc6 Bc4 Bc5 O-O d6",
     ],
   },
   {

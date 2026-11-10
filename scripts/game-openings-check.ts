@@ -46,6 +46,11 @@ for (const m of 'Nf3 d5 d4 Nf6 c4'.split(' ')) c.move(m)
 const hits = openingsAt(c.fen()).map((h) => h.def.name)
 check('a transposed move order still finds openings', hits.length > 0, hits.slice(0, 3).join(', '))
 
+// White facing the Englund with an uncovered 2nd move: identified as the Englund, not "not in Outpost"
+const g6 = game('6', 'w', 'd4 e5 Bf4 exd4 Qxd4 Nc6 Qd2 d6', 'Englund Gambit')
+const b6 = bookOf(g6)!
+check('an uncovered Englund line is still identified as the Englund', b6.tree.def.id.startsWith('englund') && b6.identified, `${b6.tree.def.id} depth ${b6.depth}`)
+
 // coverage: pretend you've studied the Budapest (Black) and the King's Gambit (White)
 const seen = { correct: 1, wrong: 0, streak: 1, last: Date.now(), box: 1, due: Date.now() }
 mem['ctt.progress.v1'] = JSON.stringify({ budapest: { nodes: { 'd4 Nf6 c4': seen }, learned: [] }, 'kings-gambit': { nodes: { '': seen }, learned: [] } })

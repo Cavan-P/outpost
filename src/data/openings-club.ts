@@ -207,4 +207,24 @@ export const CLUB_OPENINGS: OpeningDef[] = [
     ],
   },
 
+  {
+    id: 'nimzo-larsen',
+    name: 'Nimzo-Larsen Attack (1.b3)',
+    eco: 'A01',
+    side: 'w',
+    tags: ['b3', 'flexible', 'offbeat'],
+    summary: "1.b3 and Bb2: the bishop rakes the long diagonal before Black has decided anything. Rare enough that most opponents are on their own.",
+    ideas: [
+      'The b2-bishop is your best piece — aim it at e5 and g7.',
+      'e3, Nf3, Be2/Bb5 and c4: a reversed Queen\'s Indian setup.',
+      'Against …e5, pressure the pawn with Bb5 (pinning the c6-knight) and f4 ideas.',
+    ],
+    lines: [
+      "b3{The Nimzo-Larsen.} e5 Bb2 Nc6 e3 d5 Bb5{Pinning the defender of e5.} Bd6 Nf3",
+      "b3 d5 Bb2 Nf6 e3 Bf5 Nf3 e6 Be2",
+      "b3 Nf6 Bb2 g6 Nf3 Bg7 g3 O-O Bg2 d6 O-O",
+      "b3 d6 Bb2 e5 e3 Nf6 c4",
+      "b3 c5 Bb2 Nc6 e3 e5 Bb5",
+    ],
+  },
 ]

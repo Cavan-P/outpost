@@ -5,9 +5,12 @@ import type { ImportedGame } from '../../lib/games'
 
 const baseId = (id: string) => id.replace(/~flip$/, '')
 
+const covered = (u: OpeningUsage) => !!u.book && (u.book.identified || u.avgDepth >= 4)
+
 function status(u: OpeningUsage): { tone: string; text: string } {
-  if (!u.book || u.avgDepth < 4) return { tone: 'text-amber-300', text: 'Not in Outpost yet' }
-  if (!u.book.practiced) return { tone: 'text-sky-300', text: 'In Outpost — not studied' }
+  if (!covered(u)) return { tone: 'text-amber-300', text: 'Not in Outpost yet' }
+  if (u.avgDepth < 6) return { tone: 'text-sky-300', text: `In Outpost${u.book!.practiced ? '' : ' (not studied)'} — but not this line yet` }
+  if (!u.book!.practiced) return { tone: 'text-sky-300', text: 'In Outpost — not studied' }
   if (u.youLeft > u.games.length / 2) return { tone: 'text-red-300', text: 'Studied, but you leave book early' }
   return { tone: 'text-emerald-400', text: 'Studied' }
 }
@@ -20,7 +23,7 @@ export function GameOpenings({ games, onOpenOpening, onFind }: { games: Imported
   const usage = useMemo(() => openingUsage(games), [games])
   const [all, setAll] = useState(false)
   if (!usage.length) return null
-  const gaps = usage.filter((u) => u.games.length >= 2 && (!u.book || u.avgDepth < 4 || !u.book.practiced))
+  const gaps = usage.filter((u) => u.games.length >= 2 && (!covered(u) || !u.book!.practiced))
   const shown = all ? usage : usage.slice(0, 10)
   return (
     <section className="space-y-3 rounded-xl p-5 ring-1 ring-white/5">
@@ -56,7 +59,7 @@ export function GameOpenings({ games, onOpenOpening, onFind }: { games: Imported
                   <td className="py-2 pr-2">
                     <span className="mr-1 text-zinc-500">{u.side === 'w' ? '♔' : '♚'}</span>
                     <span className="text-zinc-200">{u.family}</span>
-                    {b && b.depth >= 4 && (
+                    {b && covered(u) && (
                       <span className="block text-[11px] text-zinc-500">
                         closest: {b.tree.def.name}
                         {flip ? ' (facing it)' : ''}
@@ -73,7 +76,7 @@ export function GameOpenings({ games, onOpenOpening, onFind }: { games: Imported
                     </span>
                   </td>
                   <td className="py-2 text-right text-xs">
-                    {b && b.depth >= 4 ? (
+                    {b && covered(u) ? (
                       <button className="text-brand-400 hover:underline" onClick={() => onOpenOpening(baseId(b.tree.def.id), flip)}>
                         {b.practiced ? 'Practice' : 'Learn it'}
                       </button>

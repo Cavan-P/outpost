@@ -53,6 +53,21 @@ export interface GameBook {
   node: TreeNode // the last book position
   leftBy: 'you' | 'opponent' | 'end' // who left the book first ("end" = the line ran out)
   practiced: boolean
+  /** the game got through the opening's defining moves (it IS this opening, just maybe not your line) */
+  identified: boolean
+}
+
+const trunks = new WeakMap<OpeningTree, number>()
+/** How many plies every line of an opening shares — its defining moves (1.d4 e5 for the Englund). */
+function trunkOf(tree: OpeningTree) {
+  let t = trunks.get(tree)
+  if (t === undefined) {
+    const paths = tree.leaves.map((l) => l.id.split(' '))
+    t = 0
+    while (paths.length && paths.every((p) => p.length > t! && p[t!] === paths[0][t!])) t++
+    trunks.set(tree, t)
+  }
+  return t
 }
 
 const treePositions = new WeakMap<OpeningTree, Map<string, TreeNode>>()
@@ -106,10 +121,15 @@ export function bookOf(game: ImportedGame): GameBook | null {
         node = n
       } else if (i + 1 - depth > 6) break
     }
-    if (depth < 2 || (best && depth <= best.depth)) continue
+    if (depth < 2) continue
+    // 1.d4 e5 is enough to call it an Englund; a 1-move trunk (the London is just "1.d4") needs a bit more
+    const trunk = trunkOf(tree)
+    const identified = trunk >= 2 ? depth >= trunk : depth >= 3
+    // an opening the game really is (defining moves reached) beats one that just shares a few moves
+    if (best && (Number(best.identified) * 1000 + best.depth >= Number(identified) * 1000 + depth)) continue
     const mover = depth % 2 === 0 ? 'w' : 'b' // who moved next, out of book
     const leftBy: GameBook['leftBy'] = !node.children.length || depth >= game.sans.length ? 'end' : mover === game.userColor ? 'you' : 'opponent'
-    best = { tree, depth, node, leftBy, practiced: false }
+    best = { tree, depth, node, leftBy, practiced: false, identified }
   }
   if (best) best.practiced = practiced(best.tree)
   return best

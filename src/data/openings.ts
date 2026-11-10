@@ -165,6 +165,7 @@ const CORE_OPENINGS: OpeningDef[] = [
       "d4 d5 c4 e5{The Albin Countergambit.} dxe5{Take it.} d4 Nf3{Defending against ...dxe3 tricks and preparing g3.} Nc6 g3{Fianchetto pressure on the long diagonal.} Be6 Nbd2 Qd7 Bg2{White plans O-O, a3 and b4 to attack Black's long-castled king.}",
       "d4 d5 c4 Nc6{The Chigorin Defense: Black gives up the center for piece play.} Nf3{Calmly stops ...e5.} Bg4 cxd5{Exploiting the pin-free moment.} Bxf3 gxf3{Bishop pair and center for White.}",
       "d4 d5 c4 c6 Nf3 Nf6 Nc3 e6{The Semi-Slav.} e3 Nbd7 Bd3 dxc4 Bxc4 b5{The Meran.} Bd3 Bb7 O-O",
+      "d4 d5 c4 e6 Nc3 Be7 cxd5 exd5 Bf4{The Exchange Variation.} c6 e3 Bf5 g4 Be6 h3",
     ],
   },
   // ───────────────────────────── White solid ─────────────────────────────
@@ -208,6 +209,15 @@ const CORE_OPENINGS: OpeningDef[] = [
       "d4 d5 Bf4 Nf6 e3 e6 Nf3 c5 c3 Nc6 Nbd2 Bd6 Bg3 O-O Bd3{Same structure by a different move order. Learn the setup, not just the moves.}",
       "d4 d5 Bf4 c5 e3 Qb6{Immediately hitting b2.} Nc3!?{A gambit: if ...Qxb2, Nb5 threatens Nc7+.} Qxb2?{Greedy — Stockfish says this already costs Black a lot.} Nb5{Threatening Nc7+ forking king and rook. Black's queen is in real danger after Rb1 too.}",
       "d4 Nf6 Bf4{The London works against ...Nf6 too.} g6{A King's Indian setup.} e3 Bg7 Nf3 O-O Be2 d6 h3{Giving the bishop a retreat square on h2 against ...Nh5.}",
+      "d4 d5 Bf4 c6{The Accelerated London with …c6: Black eyes …Qb6.} e3 Bf5 Nd2 e6 Ngf3 Nd7 c3",
+      "d4 d5 Bf4 Bf5{Mirroring the bishop.} e3 e6 Nf3 Nf6 c4{Hitting d5 while Black's bishop is away.} Bb4+ Nc3",
+      "d4 d5 Bf4 Nc6{A Chigorin setup.} e3 Bf5 Nf3 e6 c4",
+      "d4 d6 Bf4 Nf6 e3 g6 Nf3 Bg7 h3{Keeping a retreat for the bishop.} O-O Be2",
+      "d4 d6 Bf4 e5 dxe5 dxe5 Qxd8+ Kxd8 Bxe5{A clean extra pawn — Black's king has lost castling too.} Nc6 Bg3",
+      "d4 g6 Bf4 Bg7 e3 d6 Nf3 Nd7 h3 e6{The Hippopotamus.} Be2 Ne7 O-O",
+      "d4 e6 Bf4 d5 e3 Nf6 Nf3 c5 c3",
+      "d4 Nf6 Bf4 d5 e3 c5 c3 Nc6 Nd2",
+      "d4 Nf6 Bf4 e6 e3 c5 c3 d5 Nd2",
     ],
   },
   // ───────────────────────────── Black gambits ─────────────────────────────
