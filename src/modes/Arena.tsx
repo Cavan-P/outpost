@@ -179,7 +179,11 @@ function Duel({ tree, kind, onWin }: { tree: OpeningTree; kind: 'gauntlet' | 'bo
   const [fen, setFen] = useState(tree.root.fen)
   const [node, setNode] = useState<TreeNode | null>(tree.root) // null = out of book
   const [last, setLast] = useState<string | null>(null)
-  const [busy, setBusy] = useState(false)
+  // two separate waits: Stockfish grading YOUR move, and Stockfish choosing ITS move. The opponent
+  // has to wait for the grading, and must try again when it finishes (it's in the effect's deps).
+  const [judging, setJudging] = useState(false)
+  const [thinking, setThinking] = useState(false)
+  const busy = judging || thinking
   const [msg, setMsg] = useState<{ tone: 'good' | 'bad' | 'info'; text: string } | null>(null)
   const [stats, setStatsState] = useState({ book: 0, survived: 0, free: 0 })
   // a ref too: finish() can run in the same tick as an update
@@ -192,12 +196,17 @@ function Duel({ tree, kind, onWin }: { tree: OpeningTree; kind: 'gauntlet' | 'bo
   const [lines, setLines] = useState(0)
   const [over, setOver] = useState<{ win: boolean; text: string } | null>(null)
   const alive = useRef(true)
-  useEffect(() => () => void (alive.current = false), [])
+  // set on (re)mount too: React's dev mode mounts, unmounts and remounts once, which would otherwise
+  // leave this false and make every "still mounted?" check bail out
+  useEffect(() => {
+    alive.current = true
+    return () => void (alive.current = false)
+  }, [])
   const turn = new Chess(fen).turn()
 
   // opponent moves
   useEffect(() => {
-    if (over || turn === side || busy) return
+    if (over || turn === side || judging) return
     let cancel = false
     const t = setTimeout(async () => {
       if (node && node.children.length) {
@@ -218,10 +227,17 @@ function Duel({ tree, kind, onWin }: { tree: OpeningTree; kind: 'gauntlet' | 'bo
         return
       }
       if (kind === 'boss') return
-      setBusy(true)
-      const u = await humanMove(fen)
-      if (cancel || !alive.current) return
-      setBusy(false)
+      setThinking(true)
+      let u: string | null = null
+      try {
+        u = await humanMove(fen)
+      } catch {
+        // the explorer or the multi-line search failed: just take Stockfish's move
+        u = (await getPlayEngine().analyze(fen, { depth: 8 }).catch(() => null))?.bestmove ?? null
+      }
+      if (!alive.current) return
+      setThinking(false)
+      if (cancel) return
       if (!u) return finish(true, 'Stockfish has no moves left — you outlasted it!')
       const c = new Chess(fen)
       c.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] })
@@ -234,7 +250,7 @@ function Duel({ tree, kind, onWin }: { tree: OpeningTree; kind: 'gauntlet' | 'bo
       cancel = true
       clearTimeout(t)
     }
-  }, [fen, turn, over]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [fen, turn, over, judging]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // boss: when the line ends on your move (no opponent reply), count it
   useEffect(() => {
@@ -263,7 +279,8 @@ function Duel({ tree, kind, onWin }: { tree: OpeningTree; kind: 'gauntlet' | 'bo
     setLives(LIVES)
     setLines(0)
     setOver(null)
-    setBusy(false)
+    setJudging(false)
+    setThinking(false)
   }
 
   function finish(win: boolean, text: string) {
@@ -329,10 +346,18 @@ function Duel({ tree, kind, onWin }: { tree: OpeningTree; kind: 'gauntlet' | 'bo
   }
 
   async function judge(before: string, uci: string, c: Chess) {
-    setBusy(true)
-    const r = await reviewMove(before, uci, undefined, 12)
+    setJudging(true)
+    let r: Awaited<ReturnType<typeof reviewMove>>
+    try {
+      r = await reviewMove(before, uci, undefined, 12)
+    } catch {
+      // grading failed: don't hold the game hostage — count it as a fine move and play on
+      if (alive.current) setJudging(false)
+      setStats((s) => ({ ...s, free: s.free + 1 }))
+      return
+    }
     if (!alive.current) return
-    setBusy(false)
+    setJudging(false)
     const free = statsRef.current.free + 1
     const survived = statsRef.current.survived
     if (r.verdict.loss >= 1) return finish(false, `${r.playedSan} was a ${r.verdict.label.toLowerCase()} — ${r.bestSan} was the move. You survived ${survived} move${survived === 1 ? '' : 's'} out of book.`)
