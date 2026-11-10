@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getSettings } from '../lib/settings'
-import { Collection, LeagueCard, SeasonPass, YearReview } from './MetaUI'
+import { Collection, YearReview } from './MetaUI'
 import { LeaderboardCard } from './LeaderboardUI'
 import { ACHIEVEMENTS, DAILY_GOAL, MEDALS, MAX_LEVEL, lastDays, levelInfo, liveStreak, onGameEvent, questProgress, resetProfile, titleFor, todaysQuests, todayXp, useProfile, type GameEvent } from '../lib/game'
 
@@ -133,7 +133,7 @@ export function Toasts() {
     })
   }, [])
   return (
-    <div className="pointer-events-none fixed bottom-4 right-4 z-30 flex flex-col items-end gap-2">
+    <div className="pointer-events-none fixed bottom-20 right-3 z-40 lg:bottom-4 lg:right-4 flex flex-col items-end gap-2">
       {toasts.map((t) => (
         <div
           key={t.id}
@@ -185,15 +185,11 @@ export function ProfilePage() {
         </p>
       </section>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <LeagueCard />
-        <div className="space-y-4">
-          <SeasonPass />
-          <YearReview />
-        </div>
-      </div>
       <LeaderboardCard />
-      <Collection />
+      <div className="grid gap-4 lg:grid-cols-2">
+        <YearReview />
+        <Collection />
+      </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {stat('day streak 🔥', liveStreak(p))}

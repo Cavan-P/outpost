@@ -45,9 +45,9 @@ export function Arena({ onAnalyze }: { onAnalyze: (fen: string) => void }) {
       </header>
       <div className="divide-y divide-white/5 border-y border-white/10">
         {MODES.map((m) => (
-          <button key={m.id} onClick={() => setMode(m.id)} className="group flex w-full items-baseline gap-6 py-5 text-left">
-            <span className="w-48 shrink-0 text-lg text-zinc-100 group-hover:text-brand-300">{m.name}</span>
-            <span className="flex-1 text-sm text-zinc-500 group-hover:text-zinc-300">{m.desc}</span>
+          <button key={m.id} onClick={() => setMode(m.id)} className="group flex w-full flex-wrap items-baseline gap-x-6 gap-y-1 py-5 text-left sm:flex-nowrap">
+            <span className="w-full text-lg text-zinc-100 group-hover:text-brand-300 sm:w-48 sm:shrink-0">{m.name}</span>
+            <span className="min-w-0 flex-1 text-sm text-zinc-500 group-hover:text-zinc-300">{m.desc}</span>
             <span className="text-zinc-600 transition group-hover:translate-x-0.5 group-hover:text-brand-400">→</span>
           </button>
         ))}

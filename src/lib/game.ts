@@ -432,9 +432,6 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'masters-3', name: 'Student of the Classics', desc: "Score 70%+ on 3 master games", icon: '📚', test: (p) => (p.sets.mastersPassed ?? []).length >= 3 },
   { id: 'course-1', name: 'Graduate', desc: 'Complete an endgame course', icon: '🎓', test: (p) => (p.sets.courses ?? []).length >= 1 },
   { id: 'course-all', name: 'Endgame Professor', desc: 'Complete every endgame course', icon: '🏛️', test: (p) => (p.sets.courses ?? []).length >= 5 },
-  { id: 'league-up', name: 'Moving Up', desc: 'Get promoted in the weekly league', icon: '📈', test: (p) => c(p, 'promotions') >= 1 },
-  { id: 'league-top', name: 'Top Division', desc: 'Reach the Diamond league', icon: '💎', test: (p) => (p.league?.tier ?? 0) >= 9 },
-  { id: 'season-30', name: 'Season Champion', desc: 'Reach tier 30 of a season pass', icon: '🎟️', test: (p) => (p.sets.seasons ?? []).length >= 1 },
   { id: 'quests-1', name: 'Quest Giver', desc: 'Finish all three daily quests', icon: '📜', test: (p) => c(p, 'questDays') >= 1 },
   { id: 'quests-14', name: 'Fortnight of Focus', desc: 'Finish all daily quests on 14 days', icon: '🗺️', test: (p) => c(p, 'questDays') >= 14 },
 ]

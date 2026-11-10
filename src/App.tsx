@@ -17,12 +17,12 @@ import { Endgames } from './modes/Endgames'
 import { Training } from './modes/training/Training'
 import { Arena } from './modes/Arena'
 import { ProfilePage, Toasts } from './components/GameUI'
-import { configureTotals, getProfile, onGameEvent } from './lib/game'
+import { configureTotals, getProfile } from './lib/game'
 import { SyncPanel } from './components/SyncPanel'
 import { LeaderboardSettings } from './components/LeaderboardUI'
 import { startBoardPosting } from './lib/leaderboard'
 import { startAutoSync } from './lib/sync'
-import { claimSeason, isCollectible, isUnlocked, settleLeague } from './lib/meta'
+import { isCollectible, isUnlocked } from './lib/meta'
 import { getGames, myGames } from './lib/games'
 import { PUZZLES } from './lib/puzzles'
 import { ENDGAMES } from './data/endgames'
@@ -36,28 +36,16 @@ configureTotals({
   hasGameAnalysis: () => myGames(getGames().games).some((g) => g.analysis),
 })
 
-type View = { kind: 'home' } | { kind: 'opening'; id: string; mode: 'learn' | 'practice'; flip: boolean } | { kind: 'analysis'; fen?: string; key: number; blind?: boolean } | { kind: 'endgames' } | { kind: 'training' } | { kind: 'arena' } | { kind: 'profile' } | { kind: 'games' } | { kind: 'review'; key: number } | { kind: 'builder' } | { kind: 'about' }
+type View = { kind: 'home'; finder?: string[]; key?: number } | { kind: 'opening'; id: string; mode: 'learn' | 'practice'; flip: boolean } | { kind: 'analysis'; fen?: string; key: number; blind?: boolean } | { kind: 'endgames' } | { kind: 'training' } | { kind: 'arena' } | { kind: 'profile' } | { kind: 'games' } | { kind: 'review'; key: number } | { kind: 'builder' } | { kind: 'about' }
 
 const sideName = (s: 'w' | 'b') => (s === 'w' ? 'White' : 'Black')
 
 export default function App() {
   const [view, setView] = useState<View>({ kind: 'home' })
   const [showSettings, setShowSettings] = useState(false)
-  // weekly league results and season-pass rewards (after mount, so their toasts are visible)
   useEffect(() => {
-    const t = setTimeout(() => {
-      settleLeague()
-      claimSeason()
-    }, 800)
     startAutoSync()
     startBoardPosting()
-    const off = onGameEvent((e) => {
-      if (e.kind === 'xp') setTimeout(claimSeason, 0)
-    })
-    return () => {
-      clearTimeout(t)
-      off()
-    }
   }, [])
   const analyze = (fen: string) => setView({ kind: 'analysis', fen, key: Date.now() })
 
@@ -75,27 +63,27 @@ export default function App() {
   return (
     <>
       <Shell active={active} onNav={go} onSettings={() => setShowSettings(true)} badges={{ review: dueCount }}>
-        {view.kind === 'home' && <Library onOpen={(id, mode, flip) => setView({ kind: 'opening', id, mode, flip })} />}
+        {view.kind === 'home' && <Library key={view.key} finder={view.finder} onOpen={(id, mode, flip) => setView({ kind: 'opening', id, mode, flip })} />}
 
         {view.kind === 'opening' && opening && tree && (
-          <div className="space-y-5">
-            <div className="flex flex-wrap items-end gap-4">
-              <div>
+          <div className="space-y-3 sm:space-y-5">
+            <div className="flex flex-wrap items-end gap-2 sm:gap-4">
+              <div className="w-full sm:w-auto">
                 <button className="text-xs uppercase tracking-widest text-zinc-500 hover:text-zinc-300" onClick={() => setView({ kind: 'home' })}>
                   ← Openings
                 </button>
-                <h1 className="mt-1 text-3xl font-bold text-zinc-50">{opening.name}</h1>
+                <h1 className="mt-1 text-2xl font-bold text-zinc-50 sm:text-3xl">{opening.name}</h1>
                 <p className="text-sm text-zinc-400">
                   {opening.eco} · you play {sideName(opening.side)}
                   {opening.flipped && <span className="ml-2 rounded bg-sky-500/15 px-1.5 py-0.5 text-xs text-sky-300">defending against it</span>}
                 </p>
               </div>
-              <div className="ml-auto flex rounded-lg bg-zinc-900 p-1 ring-1 ring-white/5" role="group" aria-label="Which side">
+              <div className="flex rounded-lg bg-zinc-900 p-1 ring-1 ring-white/5 sm:ml-auto" role="group" aria-label="Which side">
                 {[false, true].map((f) => (
                   <button
                     key={String(f)}
                     onClick={() => setView({ ...view, flip: f })}
-                    className={`px-3 py-1.5 rounded-md text-sm font-medium ${view.flip === f ? 'bg-zinc-700 text-zinc-50' : 'text-zinc-400 hover:text-zinc-100'}`}
+                    className={`px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-md text-xs sm:text-sm font-medium ${view.flip === f ? 'bg-zinc-700 text-zinc-50' : 'text-zinc-400 hover:text-zinc-100'}`}
                     title={f ? 'Train the replies to this opening' : 'Train the opening itself'}
                   >
                     {f ? `Face it (${sideName(base!.side === 'w' ? 'b' : 'w')})` : `Play it (${sideName(base!.side)})`}
@@ -104,13 +92,13 @@ export default function App() {
               </div>
               <div className="flex rounded-lg bg-zinc-900 p-1 ring-1 ring-white/5">
                 {(['learn', 'practice'] as const).map((m) => (
-                  <button key={m} onClick={() => setView({ ...view, mode: m })} className={`px-4 py-1.5 rounded-md text-sm font-medium capitalize ${view.mode === m ? 'bg-brand-600 text-white' : 'text-zinc-400 hover:text-zinc-100'}`}>
+                  <button key={m} onClick={() => setView({ ...view, mode: m })} className={`px-3 py-1 sm:px-4 sm:py-1.5 rounded-md text-xs sm:text-sm font-medium capitalize ${view.mode === m ? 'bg-brand-600 text-white' : 'text-zinc-400 hover:text-zinc-100'}`}>
                     {m}
                   </button>
                 ))}
               </div>
             </div>
-            <details className="rounded-xl bg-zinc-900/60 ring-1 ring-white/5 px-4 py-3 text-sm" open={view.mode === 'learn'}>
+            <details className="rounded-xl bg-zinc-900/60 ring-1 ring-white/5 px-4 py-2.5 text-sm sm:py-3" open={view.mode === 'learn' && window.innerWidth >= 640}>
               <summary className="cursor-pointer text-zinc-300 font-medium">Key ideas</summary>
               <p className="text-zinc-300 mt-2">{opening.summary}</p>
               <ul className="list-disc pl-5 mt-2 space-y-1 text-zinc-400">
@@ -136,7 +124,7 @@ export default function App() {
         {view.kind === 'review' && <Review key={view.key} onDone={() => setView({ kind: 'home' })} />}
         {view.kind === 'about' && <About />}
         {view.kind === 'builder' && <Builder onOpen={(id) => setView({ kind: 'opening', id, mode: 'learn', flip: false })} />}
-        {view.kind === 'games' && <MyGames onOpenOpening={(id, flip) => setView({ kind: 'opening', id, mode: 'practice', flip })} />}
+        {view.kind === 'games' && <MyGames onOpenOpening={(id, flip) => setView({ kind: 'opening', id, mode: 'practice', flip })} onFind={(sans) => setView({ kind: 'home', finder: sans, key: Date.now() })} />}
       </Shell>
 
       {showSettings && <SettingsDialog onClose={() => setShowSettings(false)} />}

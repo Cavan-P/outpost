@@ -6,6 +6,7 @@ import { MedalBadge } from '../components/GameUI'
 import { openingOfWeek, weekBounds } from '../lib/weekly'
 import { getTree, isMistake, userDecisionNodes, type OpeningTree, type TreeNode } from '../lib/tree'
 import { MiniBoard } from '../components/MiniBoard'
+import { OpeningFinder } from './OpeningFinder'
 
 type Style = 'all' | 'gambit' | 'solid' | 'aggressive' | 'trappy' | 'dubious'
 type Status = 'all' | 'started' | 'due' | 'new' | 'medal'
@@ -108,12 +109,14 @@ function loadPrefs(): { sort: Sort; view: 'grid' | 'list' } {
 
 type Open = (id: string, mode: 'learn' | 'practice', flip: boolean) => void
 
-export function Library({ onOpen }: { onOpen: Open }) {
+export function Library({ onOpen, finder }: { onOpen: Open; finder?: string[] }) {
+  const [tab, setTab] = useState<'browse' | 'finder'>(finder ? 'finder' : 'browse')
   const [style, setStyle] = useState<Style>('all')
   const [status, setStatus] = useState<Status>('all')
   const [first, setFirst] = useState<First>('any')
   const [side, setSide] = useState<SideFilter>('any')
   const [query, setQuery] = useState('')
+  const [showFilters, setShowFilters] = useState(false) // phones: filters fold away
   const [prefs, setPrefsState] = useState(loadPrefs)
   const setPrefs = (p: Partial<typeof prefs>) => {
     const next = { ...prefs, ...p }
@@ -159,6 +162,7 @@ export function Library({ onOpen }: { onOpen: Open }) {
   const mine = grouped ? list.filter((s) => s.started) : list
   const rest = grouped ? list.filter((s) => !s.started) : []
   const dueTotal = all.reduce((n, s) => n + s.due, 0)
+  const activeFilters = [status !== 'all', style !== 'all', first !== 'any'].filter(Boolean).length
   const startedCount = all.filter((s) => s.started).length
 
   const chip = (active: boolean) => `chip !px-2.5 !py-0.5 text-xs ${active ? 'chip-active' : ''}`
@@ -189,9 +193,21 @@ export function Library({ onOpen }: { onOpen: Open }) {
         </div>
       </header>
 
+      <div className="flex gap-1 border-b border-white/10">
+        {(['browse', 'finder'] as const).map((t) => (
+          <button key={t} onClick={() => setTab(t)} className={`-mb-px border-b-2 px-3 py-2 text-sm transition ${tab === t ? 'border-brand-400 text-zinc-50' : 'border-transparent text-zinc-500 hover:text-zinc-200'}`}>
+            {t === 'browse' ? 'Browse' : 'Opening finder'}
+          </button>
+        ))}
+      </div>
+
+      {tab === 'finder' ? (
+        <OpeningFinder initial={finder} onOpen={onOpen} />
+      ) : (
+      <>
       <WeeklyBanner all={all} onOpen={onOpen} />
 
-      <section className="sticky top-0 z-10 -mx-2 space-y-2 rounded-xl bg-zinc-950/85 px-2 py-3 backdrop-blur">
+      <section className="z-10 -mx-2 space-y-2 rounded-xl bg-zinc-950/85 px-2 py-3 backdrop-blur lg:sticky lg:top-0">
         <div className="flex flex-wrap items-center gap-2">
           <input className="input w-full sm:w-64" placeholder="Search name, ECO, tag…" value={query} onChange={(e) => setQuery(e.target.value)} />
           <div className="flex rounded-lg p-0.5 ring-1 ring-white/10" role="group" aria-label="Side">
@@ -201,6 +217,9 @@ export function Library({ onOpen }: { onOpen: Open }) {
               </button>
             ))}
           </div>
+          <button className="btn-secondary lg:hidden" onClick={() => setShowFilters((f) => !f)}>
+            Filters{activeFilters ? ` · ${activeFilters}` : ''} {showFilters ? '▴' : '▾'}
+          </button>
           <div className="ml-auto flex items-center gap-2">
             <select className="input" value={prefs.sort} onChange={(e) => setPrefs({ sort: e.target.value as Sort })} aria-label="Sort">
               {SORTS.map((s) => (
@@ -218,7 +237,7 @@ export function Library({ onOpen }: { onOpen: Open }) {
             </div>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+        <div className={`${showFilters ? 'flex' : 'hidden'} flex-wrap items-center gap-x-4 gap-y-2 lg:flex`}>
           <div className="flex flex-wrap gap-1">
             {STATUSES.map((f) => (
               <button key={f.id} onClick={() => setStatus(f.id)} className={chip(status === f.id)}>
@@ -268,6 +287,8 @@ export function Library({ onOpen }: { onOpen: Open }) {
           {renderList(rest)}
         </section>
       )}
+      </>
+      )}
     </div>
   )
 }
@@ -278,13 +299,13 @@ function WeeklyBanner({ all, onOpen }: { all: Stats[]; onOpen: Open }) {
   const { end } = weekBounds()
   const days = Math.ceil((end.getTime() - Date.now()) / 86_400_000)
   return (
-    <section className="relative overflow-hidden rounded-xl p-5 ring-1 ring-brand-500/30">
+    <section className="relative overflow-hidden rounded-xl p-4 ring-1 ring-brand-500/30 sm:p-5">
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-brand-500/10 to-transparent" />
       <div className="relative flex flex-wrap items-center gap-4">
         <div className="min-w-0 flex-1">
           <p className="text-[11px] uppercase tracking-[0.25em] text-brand-400">Opening of the week · ×1.5 XP · {days} day{days === 1 ? '' : 's'} left</p>
-          <h2 className="mt-1 text-2xl text-zinc-50">{o.name}</h2>
-          <p className="mt-1 line-clamp-2 max-w-2xl text-sm text-zinc-400">{o.summary}</p>
+          <h2 className="mt-1 text-xl text-zinc-50 sm:text-2xl">{o.name}</h2>
+          <p className="mt-1 line-clamp-2 hidden max-w-2xl text-sm text-zinc-400 sm:block">{o.summary}</p>
         </div>
         <div className="flex items-center gap-3">
           {s && <MedalBadge tier={s.medal} title={s.medalHint} />}

@@ -1,94 +1,9 @@
 import { useState } from 'react'
 import { useProfile } from '../lib/game'
-import { COLLECTIBLES, LEAGUE_COLORS, LEAGUES, SEASON_REWARDS, SEASON_TIERS, XP_PER_TIER, demoteZone, isUnlocked, promoteZone, seasonName, seasonTier, seasonXp, standings, yearStats } from '../lib/meta'
+import { COLLECTIBLES, isUnlocked, yearStats } from '../lib/meta'
 import { BOARDS, saveSettings, useSettings } from '../lib/settings'
-import { weekBounds } from '../lib/weekly'
 
 const card = 'rounded-xl bg-zinc-900/80 p-4 ring-1 ring-white/5'
-
-/** Compact league line for the sidebar. */
-export function LeagueLine() {
-  const p = useProfile()
-  const tier = p.league?.tier ?? 0
-  const rank = standings(p, tier).findIndex((s) => s.you) + 1
-  return (
-    <span className="text-[11px] text-zinc-500">
-      <span style={{ color: LEAGUE_COLORS[tier] }}>●</span> {LEAGUES[tier]} league · #{rank}
-    </span>
-  )
-}
-
-export function LeagueCard() {
-  const p = useProfile()
-  const tier = p.league?.tier ?? 0
-  const table = standings(p, tier)
-  const days = Math.ceil((weekBounds().end.getTime() - Date.now()) / 86_400_000)
-  const last = p.league?.history.at(-1)
-  return (
-    <section className={card}>
-      <div className="mb-3 flex flex-wrap items-baseline gap-2">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-300">
-          <span style={{ color: LEAGUE_COLORS[tier] }}>●</span> {LEAGUES[tier]} league
-        </h2>
-        <span className="text-xs text-zinc-500">
-          {days} day{days === 1 ? '' : 's'} left · top 3 promote, bottom 3 drop
-        </span>
-        {last && (
-          <span className="ml-auto text-xs text-zinc-500">
-            last week: #{last.rank} in {LEAGUES[last.tier]} {last.moved === 1 ? '📈' : last.moved === -1 ? '📉' : ''}
-          </span>
-        )}
-      </div>
-      <ol className="space-y-0.5 text-sm">
-        {table.map((s, i) => {
-          const r = i + 1
-          const zone = promoteZone(r) && tier < LEAGUES.length - 1 ? 'text-emerald-400' : demoteZone(r) && tier > 0 ? 'text-red-400' : 'text-zinc-500'
-          return (
-            <li key={s.name} className={`flex items-center gap-3 rounded px-2 py-1 ${s.you ? 'bg-brand-500/15 ring-1 ring-brand-500/30' : ''}`}>
-              <span className={`w-5 text-right tabular-nums ${zone}`}>{r}</span>
-              <span className={`flex-1 truncate ${s.you ? 'font-semibold text-zinc-50' : 'text-zinc-300'}`}>{s.name}</span>
-              <span className="tabular-nums text-zinc-400">{s.xp.toLocaleString()} XP</span>
-            </li>
-          )
-        })}
-      </ol>
-      <p className="mt-2 text-[11px] text-zinc-600">Your rivals are simulated from your own recent weeks, so the race stays close however much you play.</p>
-    </section>
-  )
-}
-
-export function SeasonPass() {
-  const p = useProfile()
-  const xp = seasonXp(p)
-  const tier = seasonTier(xp)
-  const into = tier >= SEASON_TIERS ? XP_PER_TIER : xp - tier * XP_PER_TIER
-  return (
-    <section className={card}>
-      <div className="mb-3 flex items-baseline gap-2">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-300">🎟️ {seasonName()}</h2>
-        <span className="text-xs text-zinc-500">
-          tier {tier}/{SEASON_TIERS} · {xp.toLocaleString()} XP this month
-        </span>
-        <span className="ml-auto text-xs text-zinc-500">{tier < SEASON_TIERS ? `${XP_PER_TIER - into} XP to tier ${tier + 1}` : 'complete!'}</span>
-      </div>
-      <div className="relative h-2 overflow-hidden rounded bg-zinc-800">
-        <div className="h-full bg-gradient-to-r from-brand-600 to-amber-400" style={{ width: `${(Math.min(xp, SEASON_TIERS * XP_PER_TIER) / (SEASON_TIERS * XP_PER_TIER)) * 100}%` }} />
-      </div>
-      <div className="mt-3 grid grid-cols-5 gap-2 sm:grid-cols-10">
-        {SEASON_REWARDS.map((r) => {
-          const got = tier >= r.tier
-          return (
-            <div key={r.tier} className={`rounded-lg p-2 text-center ring-1 ${got ? 'bg-amber-500/10 ring-amber-400/40' : 'ring-white/5 opacity-60'}`} title={r.label}>
-              <div className="text-lg">{r.icon}</div>
-              <div className="text-[10px] text-zinc-400">T{r.tier}</div>
-            </div>
-          )
-        })}
-      </div>
-      <p className="mt-2 text-[11px] text-zinc-600">Resets on the 1st. Rewards are paid automatically when you reach them.</p>
-    </section>
-  )
-}
 
 export function Collection() {
   const p = useProfile()
@@ -163,7 +78,6 @@ export function YearReview() {
     g.font = '400 44px Georgia, serif'
     g.fillStyle = '#d4d4d8'
     g.fillText(`Level ${y.level.level} · ${y.level.title}`, 80, 370)
-    g.fillText(`${y.league} league`, 80, 430)
     tiles.forEach(([label, value], i) => {
       const col = i % 3
       const row = Math.floor(i / 3)

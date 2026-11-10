@@ -5,10 +5,11 @@ import { TAG_LABEL, buildReport, type Report } from '../../lib/gameAnalysis'
 import { addGames, clearGames, fetchChessCom, fetchLichess, myGames, parsePgnText, useGames, userResult, type ImportedGame } from '../../lib/games'
 import { GameReview } from './GameReview'
 import { MistakePuzzles } from './MistakePuzzles'
+import { GameOpenings } from './GameOpenings'
 
 type Sub = { kind: 'report' } | { kind: 'game'; id: string; ply?: number } | { kind: 'puzzles'; tag?: string }
 
-export function MyGames({ onOpenOpening }: { onOpenOpening: (id: string, flip: boolean) => void }) {
+export function MyGames({ onOpenOpening, onFind }: { onOpenOpening: (id: string, flip: boolean) => void; onFind: (sans: string[]) => void }) {
   const store = useGames()
   const [sub, setSub] = useState<Sub>({ kind: 'report' })
   // only your own games feed the report and puzzles; ones imported "just to analyze" are listed but left out
@@ -30,6 +31,7 @@ export function MyGames({ onOpenOpening }: { onOpenOpening: (id: string, flip: b
       </header>
       <Importer />
       <RunnerBar count={store.games.length} unanalyzed={store.games.filter((g) => !g.analysis).length} />
+      <GameOpenings games={myGames(store.games)} onOpenOpening={onOpenOpening} onFind={onFind} />
       {report.analyzed > 0 ? (
         <ReportView report={report} onTrain={(tag) => setSub({ kind: 'puzzles', tag })} onOpenOpening={onOpenOpening} />
       ) : (
@@ -259,33 +261,7 @@ function ReportView({ report: r, onTrain, onOpenOpening }: { report: Report; onT
         </ul>
       </section>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <section className="rounded-xl p-5 ring-1 ring-white/5">
-          <h3 className="text-sm font-semibold uppercase tracking-wide text-zinc-400">Your openings</h3>
-          <table className="mt-3 w-full text-sm">
-            <thead className="text-left text-xs text-zinc-500">
-              <tr>
-                <th className="font-normal">Opening</th>
-                <th className="font-normal">Games</th>
-                <th className="font-normal">Score</th>
-                <th className="font-normal">Accuracy</th>
-              </tr>
-            </thead>
-            <tbody>
-              {r.openings.slice(0, 8).map((o) => (
-                <tr key={`${o.name}|${o.side}`} className="border-t border-white/5">
-                  <td className="py-1.5 pr-2 text-zinc-200">
-                    <span className="mr-1 text-zinc-500">{o.side === 'w' ? '♔' : '♚'}</span>
-                    {o.name}
-                  </td>
-                  <td className="tabular-nums text-zinc-400">{o.games}</td>
-                  <td className={`tabular-nums ${o.score >= 0.5 ? 'text-emerald-400' : 'text-red-400'}`}>{Math.round(o.score * 100)}%</td>
-                  <td className="tabular-nums text-zinc-400">{Number.isNaN(o.accuracy) ? '–' : `${o.accuracy.toFixed(0)}%`}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
+      <div>
         <section className="rounded-xl p-5 ring-1 ring-white/5">
           <h3 className="text-sm font-semibold uppercase tracking-wide text-zinc-400">Where you leave your theory</h3>
           {r.deviations.length ? (

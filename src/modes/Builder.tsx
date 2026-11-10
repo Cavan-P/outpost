@@ -27,9 +27,9 @@ export function Builder({ onOpen }: { onOpen: (id: string) => void }) {
           <h1 className="mt-1 text-3xl font-bold text-zinc-50">My repertoire</h1>
           <p className="mt-1 text-sm text-zinc-500">Build openings from scratch, extend a built-in one, or import PGN. They show up in the library and work with Learn, Practice, Face it and Review.</p>
         </div>
-        <div className="ml-auto flex gap-2">
+        <div className="flex w-full flex-wrap gap-2 sm:ml-auto sm:w-auto">
           <select
-            className="input"
+            className="input min-w-0 flex-1 sm:flex-none"
             value=""
             onChange={(e) => {
               const src = OPENINGS.find((o) => o.id === e.target.value)

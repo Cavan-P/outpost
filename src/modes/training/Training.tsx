@@ -68,9 +68,9 @@ export function Training({ onBlindfold }: { onBlindfold: () => void }) {
   const stat = (d: (typeof DRILLS)[number]) =>
     d.id === 'puzzles' ? `${(profile.sets.puzzles ?? []).length}/${PUZZLES.length}` : d.id === 'defend' ? `${(profile.sets.defended ?? []).length} held` : d.id === 'masters' ? `${(profile.sets.mastersPassed ?? []).length}/${MASTER_GAMES.length}` : d.id === 'mates' ? `${(profile.sets.mates ?? []).length}/${MATES.length}` : profile.bests[d.bestKey!] ? `best ${profile.bests[d.bestKey!]}` : ''
   const row = (key: string, name: string, desc: string, onClick: () => void, right = '') => (
-    <button key={key} onClick={onClick} className="group flex w-full items-baseline gap-6 py-4 text-left">
-      <span className="w-48 shrink-0 text-lg text-zinc-100 group-hover:text-brand-300">{name}</span>
-      <span className="flex-1 text-sm text-zinc-500 group-hover:text-zinc-300">{desc}</span>
+    <button key={key} onClick={onClick} className="group flex w-full flex-wrap items-baseline gap-x-6 gap-y-1 py-4 text-left sm:flex-nowrap">
+      <span className="w-full text-lg text-zinc-100 group-hover:text-brand-300 sm:w-48 sm:shrink-0">{name}</span>
+      <span className="min-w-0 flex-1 text-sm text-zinc-500 group-hover:text-zinc-300">{desc}</span>
       <span className="w-16 shrink-0 text-right text-xs tabular-nums text-zinc-500">{right}</span>
       <span className="text-zinc-600 transition group-hover:translate-x-0.5 group-hover:text-brand-400">→</span>
     </button>
