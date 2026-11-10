@@ -21,6 +21,7 @@ export interface OpeningDef {
 import { EXTRA_OPENINGS } from './openings-extra'
 import { SOLID_OPENINGS } from './openings-solid'
 import { MORE_OPENINGS } from './openings-more'
+import { CLUB_OPENINGS } from './openings-club'
 
 const CORE_OPENINGS: OpeningDef[] = [
   // ───────────────────────────── White gambits ─────────────────────────────
@@ -163,6 +164,7 @@ const CORE_OPENINGS: OpeningDef[] = [
       "d4 d5 c4 c6{The Slav: supports d5 while keeping the c8-bishop free.} Nf3 Nf6 Nc3 dxc4 a4{Stops ...b5 holding the pawn.} Bf5 e3 e6 Bxc4 Bb4 O-O{The main line of the Slav. Balanced, but White has the center to play with.}",
       "d4 d5 c4 e5{The Albin Countergambit.} dxe5{Take it.} d4 Nf3{Defending against ...dxe3 tricks and preparing g3.} Nc6 g3{Fianchetto pressure on the long diagonal.} Be6 Nbd2 Qd7 Bg2{White plans O-O, a3 and b4 to attack Black's long-castled king.}",
       "d4 d5 c4 Nc6{The Chigorin Defense: Black gives up the center for piece play.} Nf3{Calmly stops ...e5.} Bg4 cxd5{Exploiting the pin-free moment.} Bxf3 gxf3{Bishop pair and center for White.}",
+      "d4 d5 c4 c6 Nf3 Nf6 Nc3 e6{The Semi-Slav.} e3 Nbd7 Bd3 dxc4 Bxc4 b5{The Meran.} Bd3 Bb7 O-O",
     ],
   },
   // ───────────────────────────── White solid ─────────────────────────────
@@ -321,8 +323,14 @@ const CORE_OPENINGS: OpeningDef[] = [
       "e4 c6 c4{The Accelerated Panov.} d5{Hit back in the center.}",
       "e4 c6 d4 d5 f3{The Fantasy Variation: holding e4 with a pawn.} e6{Solid; …c5 and …Bb4 follow.} Nc3 Bb4{Pinning the knight and pressuring e4.}",
       "e4 c6 d4 d5 Nd2{The Classical by another move order.} dxe4 Nxe4 Bf5 Ng3 Bg6{Same structure as the main line.}",
+      "e4 c6 Nc3 d5 Nf3 Bg4 h3 Bxf3{Giving up the bishop for a solid structure.} Qxf3 Nf6{The Mindeno Exchange line.} d3 e6 g3 Bb4 Bd2 d4 Nb1 Qb6",
+      "e4 c6 Nc3 d5 Nf3 Bg4 h3 Bxf3 Qxf3 Nf6 d4 e6 Bd3 dxe4 Nxe4 Nxe4 Qxe4 Nd7",
+      "e4 c6 Nf3{The Two Knights move order.} d5 Nc3 Bg4 h3 Bxf3 Qxf3 Nf6 d3 e6 Bd2 Nbd7",
+      "e4 c6 Nf3 d5 e5 Bg4{With Nf3 played, the bishop pins instead of going to f5.} d4 e6 Be2 c5",
+      "e4 c6 Nf3 d5 d3{A King's Indian Attack setup.} dxe4 dxe4 Qxd1+ Kxd1 Bg4{An easy endgame for Black.} Be2 Nd7",
+      "e4 c6 Nf3 d5 exd5 cxd5 d4 Nf6 Bd3 Nc6 c3 Bg4",
     ],
   },
 ]
 
-export const OPENINGS: OpeningDef[] = [...CORE_OPENINGS, ...EXTRA_OPENINGS, ...SOLID_OPENINGS, ...MORE_OPENINGS]
+export const OPENINGS: OpeningDef[] = [...CORE_OPENINGS, ...EXTRA_OPENINGS, ...SOLID_OPENINGS, ...MORE_OPENINGS, ...CLUB_OPENINGS]

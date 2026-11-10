@@ -509,6 +509,10 @@ export const EXTRA_OPENINGS: OpeningDef[] = [
       "e4 d5 exd5 Qxd5 Nc3{Gaining time on the queen.} Qa5{The main line.} d4 Nf6 Nf3 Bf5{Developing the bishop before …e6.} Bc4 e6 Bd2 c6{A solid structure for Black.}",
       "e4 d5 exd5 Qxd5 Nf3 Bg4 Be2 Nc6{Black develops quickly.}",
       "e4 d5 exd5 Qxd5 Nc3 Qa5 Bc4 Nf6 d3 c6{Solid and flexible.}",
+      "e4 d5 e5{The Advance.} Bf5 d4 e6 Nf3 c5{A French where your light-squared bishop is already out.}",
+      "e4 d5 Nc3{Declining with the knight.} d4 Nce2 e5 Ng3 Be6",
+      "e4 d5 d3 dxe4 dxe4 Qxd1+ Kxd1 Nc6{White can't castle; easy development for Black.}",
+      "e4 d5 exd5 Qxd5 d4 Nf6 Nf3 Bg4 Be2 e6",
     ],
   },
   {

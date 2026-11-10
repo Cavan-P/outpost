@@ -7,6 +7,7 @@ import { openingOfWeek, weekBounds } from '../lib/weekly'
 import { getTree, isMistake, userDecisionNodes, type OpeningTree, type TreeNode } from '../lib/tree'
 import { MiniBoard } from '../components/MiniBoard'
 import { OpeningFinder } from './OpeningFinder'
+import { CoveragePanel } from '../components/CoveragePanel'
 
 type Style = 'all' | 'gambit' | 'solid' | 'aggressive' | 'trappy' | 'dubious'
 type Status = 'all' | 'started' | 'due' | 'new' | 'medal'
@@ -206,6 +207,7 @@ export function Library({ onOpen, finder }: { onOpen: Open; finder?: string[] })
       ) : (
       <>
       <WeeklyBanner all={all} onOpen={onOpen} />
+      <CoveragePanel onOpen={onOpen} />
 
       <section className="z-10 -mx-2 space-y-2 rounded-xl bg-zinc-950/85 px-2 py-3 backdrop-blur lg:sticky lg:top-0">
         <div className="flex flex-wrap items-center gap-2">

@@ -23,6 +23,11 @@ export const SOLID_OPENINGS: OpeningDef[] = [
       "e4 e6 d4 d5 exd5{The Exchange Variation.} exd5 Bd3 Bd6{Mirroring; a calm, equal position.}",
       "e4 e6 d4 d5 Nd2{The Tarrasch Variation.} c5{The most active answer.} exd5 Qxd5 Ngf3 cxd4 Bc4 Qd6{Black accepts an isolated pawn structure for free piece play.}",
       "e4 e6 d3{The King's Indian Attack.} d5 Nd2 Nf6 Ngf3 c5{Black takes space in the center.}",
+      "e4 e6 Nf3{The Knight Variation.} d5 Nc3 Nf6 e5 Nfd7 d4 c5 dxc5 Nc6",
+      "e4 e6 Nf3 d5 e5 c5 b4{The Wing Gambit idea.} cxb4 a3 Nc6",
+      "e4 e6 Nf3 d5 exd5 exd5 d4 Nf6",
+      "e4 e6 d4 d5 Nc3 Nf6 e5 Nfd7 f4{The Steinitz Variation.} c5 Nf3 Nc6 Be3 cxd4 Nxd4 Bc5 Qd2 O-O",
+      "e4 e6 d4 d5 Nc3 Nf6 e5 Nfd7 Nf3 c5",
     ],
   },
   {

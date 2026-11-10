@@ -1,3 +1,4 @@
+import { Chess } from 'chess.js'
 import type { OpeningDef } from '../data/openings'
 import { allOpenings } from './custom'
 import { getProgress, medalOf } from './progress'
@@ -54,23 +55,60 @@ export interface GameBook {
   practiced: boolean
 }
 
-/** The Outpost opening this game followed furthest, from the user's side. */
+const treePositions = new WeakMap<OpeningTree, Map<string, TreeNode>>()
+function positionsOf(tree: OpeningTree) {
+  let m = treePositions.get(tree)
+  if (!m) {
+    m = new Map()
+    for (const n of tree.nodes.values()) if (!m.has(posKey(n.fen))) m.set(posKey(n.fen), n)
+    treePositions.set(tree, m)
+  }
+  return m
+}
+
+const gamePositions = new WeakMap<ImportedGame, string[]>()
+function positionsOfGame(g: ImportedGame) {
+  let p = gamePositions.get(g)
+  if (!p) {
+    p = []
+    const c = new Chess()
+    for (const san of g.sans) {
+      try {
+        c.move(san)
+      } catch {
+        break
+      }
+      p.push(posKey(c.fen()))
+    }
+    gamePositions.set(g, p)
+  }
+  return p
+}
+
+/**
+ * The Outpost opening this game followed furthest, from the user's side. Matching is by position,
+ * so other move orders count (a London with Nf3 before e3 is still a London): the game can drift
+ * out of book for a few moves and come back.
+ */
 export function bookOf(game: ImportedGame): GameBook | null {
   if (game.startFen) return null
+  const pos = positionsOfGame(game)
   let best: GameBook | null = null
   for (const def of allOpenings()) {
     const tree = getTree(def.side === game.userColor ? def : flipOpening(def))
-    let node = tree.root
+    const map = positionsOf(tree)
     let depth = 0
-    for (const san of game.sans) {
-      const next = node.children.find((c) => c.san === san)
-      if (!next) break
-      node = next
-      depth++
+    let node: TreeNode = tree.root
+    for (let i = 0; i < pos.length; i++) {
+      const n = map.get(pos[i])
+      if (n) {
+        depth = i + 1
+        node = n
+      } else if (i + 1 - depth > 6) break
     }
     if (depth < 2 || (best && depth <= best.depth)) continue
-    const mover = depth % 2 === 0 ? 'w' : 'b' // who was to move after the last book ply
-    const leftBy: GameBook['leftBy'] = !node.children.length ? 'end' : depth >= game.sans.length ? 'end' : mover === game.userColor ? 'you' : 'opponent'
+    const mover = depth % 2 === 0 ? 'w' : 'b' // who moved next, out of book
+    const leftBy: GameBook['leftBy'] = !node.children.length || depth >= game.sans.length ? 'end' : mover === game.userColor ? 'you' : 'opponent'
     best = { tree, depth, node, leftBy, practiced: false }
   }
   if (best) best.practiced = practiced(best.tree)

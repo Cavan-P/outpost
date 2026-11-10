@@ -152,6 +152,8 @@ export const MORE_OPENINGS: OpeningDef[] = [
       "e4 c5 Nf3 Nc6 Bb5{The Rossolimo.} g6 O-O Bg7 Re1 Nf6 c3 O-O d4 cxd4 cxd4 d5 e5 Ne4{Active knight, solid center.}",
       "e4 c5 c3{The Alapin.} Nf6 e5 Nd5 d4 cxd4 cxd4 d6 Nf3 Nc6{Pressure on White's center.}",
       "e4 c5 Nc3{The Closed Sicilian.} Nc6 g3 g6 Bg2 Bg7 d3 d6{A slow positional fight.}",
+      "e4 c5 Nf3 Nc6 Bc4{The Old Sicilian with Bc4.} g6 O-O Bg7 c3 e5{Blunting the bishop's diagonal and grabbing space.}",
+      "e4 c5 Nf3 Nc6 Bc4 g6 c3 Bg7 d4 cxd4 cxd4 d5{Hitting the bishop and the center at once.} exd5 Na5 Bb5+ Bd7",
     ],
   },
 ]

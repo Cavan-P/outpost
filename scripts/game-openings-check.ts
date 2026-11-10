@@ -3,6 +3,8 @@ import './mock-storage'
 import { bookOf, openingUsage, openingsAt } from '../src/lib/openingIndex'
 import type { ImportedGame } from '../src/lib/games'
 import { Chess } from 'chess.js'
+import { mem } from './mock-storage'
+import { coverage } from '../src/lib/coverage'
 
 let fails = 0
 const check = (name: string, ok: boolean, info = '') => {
@@ -28,6 +30,11 @@ check('you left book with a3', b2.leftBy === 'you', `${b2.leftBy} at depth ${b2.
 const g3 = game('3', 'w', 'a3 e5 h3 d5 b3 Nf6', "Anderssen's Opening")
 check('unknown opening has no deep match', !bookOf(g3) || bookOf(g3)!.depth < 4)
 
+// A London reached by a different move order (Nf3 before e3) still matches
+const g5 = game('5', 'w', 'd4 d5 Bf4 Nf6 Nf3 c5 c3 e6 e3 Nc6 Nbd2 Bd6 Bg3', 'London System')
+const b5 = bookOf(g5)!
+check('transposed London still matches the London', b5.tree.def.id === 'london' && b5.depth >= 12, `${b5.tree.def.id} depth ${b5.depth}`)
+
 const usage = openingUsage([g1, g2, g3, { ...g1, id: '4' }])
 const bud = usage.find((u) => u.family === 'Budapest Defense' && u.side === 'b')!
 check('games grouped by opening and side', bud.games.length === 2 && usage.length === 3, usage.map((u) => `${u.side}:${u.family}×${u.games.length}`).join(', '))
@@ -38,6 +45,21 @@ const c = new Chess()
 for (const m of 'Nf3 d5 d4 Nf6 c4'.split(' ')) c.move(m)
 const hits = openingsAt(c.fen()).map((h) => h.def.name)
 check('a transposed move order still finds openings', hits.length > 0, hits.slice(0, 3).join(', '))
+
+// coverage: pretend you've studied the Budapest (Black) and the King's Gambit (White)
+const seen = { correct: 1, wrong: 0, streak: 1, last: Date.now(), box: 1, due: Date.now() }
+mem['ctt.progress.v1'] = JSON.stringify({ budapest: { nodes: { 'd4 Nf6 c4': seen }, learned: [] }, 'kings-gambit': { nodes: { '': seen }, learned: [] } })
+const cov = coverage()
+const vs = (m: string) => cov.black.find((g) => g.moves[0] === m)!
+check('Budapest answers 1.d4', vs('d4').covered.some((d) => d.id === 'budapest'))
+check('1.e4 is a gap as Black', !vs('e4').covered.length && vs('e4').suggest.length > 0, vs('e4').suggest.map((d) => d.name).join(', '))
+check('1.Nc3 is flagged with a suggestion or a build-it note', !vs('Nc3').covered.length, vs('Nc3').suggest.map((d) => d.name).join(', ') || 'none in Outpost')
+const e4 = cov.white.find((w) => w.first === 'e4')
+check("King's Gambit gives you 1.e4 as White", !!e4)
+const c5 = e4?.replies.find((r) => r.moves[1] === 'c5')
+check('1.e4 c5 is uncovered by the King\'s Gambit, with suggestions', !!c5 && !c5.covered.length && c5.suggest.length > 0, c5?.suggest.map((d) => d.name).join(', '))
+const e5 = e4?.replies.find((r) => r.moves[1] === 'e5')
+check('1.e4 e5 is covered', !!e5 && e5.covered.length > 0)
 
 console.log(fails ? `\n${fails} failed` : '\nall passed')
 process.exit(fails ? 1 : 0)
