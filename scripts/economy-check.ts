@@ -71,12 +71,15 @@ check('training after a missed day uses the freeze', getProfile().streak === 10 
 
 check('opening of the week is stable', openingOfWeek().id === openingOfWeek().id, openingOfWeek().name)
 
-// secret codes (lowercase / missing dashes still work)
+// secret codes. The real codes must never be written in the repo: to test them, pass them in the
+// environment, e.g.  OUTPOST_CODES="ARCHITECT-…,TESTER-…" npm run test:economy
 check('a wrong code unlocks nothing', (await redeemCode('NOPE-1234')) === null)
-const arch = await redeemCode('architect 4xh2 dxde')
-check('the Architect code unlocks its achievement', arch?.id === 'architect' && !!getProfile().achievements.architect)
-const tester = await redeemCode('TESTER-VH5Z-MAGZ')
-check('the tester code unlocks Founding Tester', tester?.id === 'founding-tester' && !!getProfile().achievements['founding-tester'])
+const codes = (process.env.OUTPOST_CODES ?? '').split(',').map((c) => c.trim()).filter(Boolean)
+if (!codes.length) console.log('· secret codes not tested (set OUTPOST_CODES to test them)')
+for (const code of codes) {
+  const a = await redeemCode(code.toLowerCase().replace(/-/g, ' ')) // lowercase / spaces still work
+  check(`a real code unlocks its achievement (${a?.name ?? 'none'})`, !!a && !!getProfile().achievements[a.id])
+}
 
 console.log(fails ? `\n${fails} failed` : '\nall passed')
 process.exit(fails ? 1 : 0)

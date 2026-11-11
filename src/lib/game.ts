@@ -292,10 +292,13 @@ function checkQuests() {
 /** Add XP without the source/label machinery (quests, medals, achievements). */
 // ───────────── secret codes ─────────────
 
-/** Codes are stored as one-way hashes, so reading the source doesn't reveal them. */
+/**
+ * Codes are stored as one-way hashes, so reading the source doesn't reveal them. Never put a real
+ * code anywhere in the repo (tests read them from the OUTPOST_CODES environment variable).
+ */
 const CODES: Record<string, string> = {
-  '833c8c676230c563935453e421ad33ee9e7e0711b75832dca013fa8aa871ae50': 'architect',
-  e061cc12fb8ed2b52f8cb9a555c9eb29cd72a82d610821aeb6289d07ccf824f5: 'founding-tester',
+  '5cca67f5fb0f4abc4c981126cfbc46c71dff0931ecce05e85970613950c03cfc': 'architect',
+  '116948472fe44edb1ed188dd89b371861fd0238bf60b2b14cec7e73ce3061e50': 'founding-tester',
 }
 
 /** Redeem a secret code; returns the achievement it unlocked, or null. */
