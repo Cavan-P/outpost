@@ -256,10 +256,11 @@ export function ProfilePage({ onQuest }: { onQuest?: (to: string) => void }) {
   )
 }
 
-/** "Have a code?" — secret achievements. */
+/** "Have a code?" — secret achievements. A real form, so Enter / the phone keyboard's Go submits. */
 function RedeemCode() {
   const [open, setOpen] = useState(false)
   const [code, setCode] = useState('')
+  const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
   if (!open)
     return (
@@ -267,21 +268,40 @@ function RedeemCode() {
         Have a code?
       </button>
     )
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!code.trim()) return setMsg({ ok: false, text: 'Type or paste a code first.' })
+    setBusy(true)
+    try {
+      const a = await redeemCode(code)
+      setMsg(a ? { ok: true, text: `${a.icon} ${a.name} unlocked!` } : { ok: false, text: "That code didn't work — check it was copied exactly (dashes and capitals don't matter)." })
+      if (a) setCode('')
+    } catch {
+      setMsg({ ok: false, text: "Couldn't check the code in this browser." })
+    } finally {
+      setBusy(false)
+    }
+  }
   return (
-    <span className="flex flex-wrap items-center gap-2">
-      <input className="input w-44 !py-1 font-mono text-xs uppercase" placeholder="CODE-XXXX-XXXX" value={code} onChange={(e) => setCode(e.target.value)} autoFocus spellCheck={false} autoComplete="off" />
-      <button
-        className="btn-secondary !py-1 text-xs"
-        disabled={!code.trim()}
-        onClick={async () => {
-          const a = await redeemCode(code)
-          setMsg(a ? { ok: true, text: `${a.icon} ${a.name} unlocked!` } : { ok: false, text: "That code didn't work." })
-          if (a) setCode('')
+    <form onSubmit={submit} className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+      <input
+        className="input min-w-0 flex-1 !py-1 font-mono text-xs uppercase sm:w-56 sm:flex-none"
+        placeholder="CODE-XXXX-XXXX-XXXX"
+        value={code}
+        onChange={(e) => {
+          setCode(e.target.value)
+          setMsg(null)
         }}
-      >
-        Redeem
+        autoFocus
+        spellCheck={false}
+        autoComplete="off"
+        autoCapitalize="characters"
+        enterKeyHint="go"
+      />
+      <button type="submit" className="btn-secondary !py-1 text-xs" disabled={busy}>
+        {busy ? 'Checking…' : 'Redeem'}
       </button>
-      {msg && <span className={`text-xs ${msg.ok ? 'text-emerald-400' : 'text-red-400'}`}>{msg.text}</span>}
-    </span>
+      {msg && <span className={`w-full text-xs sm:w-auto ${msg.ok ? 'text-emerald-400' : 'text-red-400'}`}>{msg.text}</span>}
+    </form>
   )
 }
